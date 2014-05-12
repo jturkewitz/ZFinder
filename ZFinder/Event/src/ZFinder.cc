@@ -91,6 +91,8 @@ class ZFinder : public edm::EDAnalyzer {
         std::vector<zf::ZDefinitionWorkspace*> zdef_workspaces_;
         zf::ZEfficiencies zeffs_;
         bool is_mc_;
+        TH1D* tags_plot_;
+        TH1D* probes_plot_;
 };
 
 //
@@ -158,6 +160,11 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
             zdef_workspaces_.push_back(zdw_truth);
         }
     }
+
+    // Make the n_e plot
+    TFileDirectory ne_tdir(fs->mkdir("n_e_pass"));
+    tags_plot_ = ne_tdir.make<TH1D>("tags", "tags", 10, 0., 10.);
+    probes_plot_ = ne_tdir.make<TH1D>("probes", "probes", 10, 0., 10.);
 }
 
 ZFinder::~ZFinder() {
@@ -211,6 +218,32 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
         // Make all ZDef workspaces for reco (data and reco MC)
         for (auto& i_zdefw : zdef_workspaces_) {
             i_zdefw->Fill(zfe);
+        }
+        // Hardcoded ne cut
+        const std::string zdef_name = "Combined Double Reco";
+        if (zfe.ZDefPassed(zdef_name)) {
+            int tags = 0;
+            int probes = 0;
+            for (auto& i_elec : (*zfe.FilteredElectrons("acc(MUON_LOOSE)"))) {
+                if (
+                        i_elec->pt > 30
+                        && i_elec->CutPassed("acc(MUON_TIGHT)")
+                        && i_elec->CutPassed("trig(et_et_tight)")
+                        && i_elec->CutPassed("eg_medium")
+                   ) {
+                    tags++;
+                }
+                if (
+                        i_elec->pt > 20
+                        && i_elec->CutPassed("acc(MUON_LOOSE)")
+                        && i_elec->CutPassed("trig(et_et_loose)")
+                        && i_elec->CutPassed("eg_medium")
+                   ) {
+                    probes++;
+                }
+            }
+            tags_plot_->Fill(tags);
+            probes_plot_->Fill(probes);
         }
     }
 }
