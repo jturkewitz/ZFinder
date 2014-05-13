@@ -116,8 +116,6 @@ zdefs = cms.untracked.VPSet(
         combined_double,
         combined_single,
         ecal_ecal,
-        ecal_nt,
-        ecal_hf,
         )
 
 # The ZDefinition for MC

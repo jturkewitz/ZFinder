@@ -221,7 +221,7 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
         }
         // Hardcoded ne cut
         const std::string zdef_name = "Combined Double Reco";
-        if (zfe.ZDefPassed(zdef_name)) {
+        if (true) {
             int tags = 0;
             int probes = 0;
             for (auto& i_elec : (*zfe.FilteredElectrons("acc(MUON_LOOSE)"))) {

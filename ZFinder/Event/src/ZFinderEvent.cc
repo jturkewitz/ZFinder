@@ -149,8 +149,8 @@ namespace zf {
 
         /* Find electrons */
         InitGSFElectrons(iEvent, iSetup);
-        InitHFElectrons(iEvent, iSetup);
-        InitNTElectrons(iEvent, iSetup);
+        //InitHFElectrons(iEvent, iSetup);
+        //InitNTElectrons(iEvent, iSetup);
 
         // Sort our electrons and set e0, e1 as the two with the highest pt
         std::sort(reco_electrons_.begin(), reco_electrons_.end(), SortByPTHighLow);
@@ -205,12 +205,6 @@ namespace zf {
         for(unsigned int i = 0; i < els_h->size(); ++i) {
             // Get the electron and set put it into the electrons vector
             reco::GsfElectron electron = els_h->at(i);
-            // We enforce a minimum quality cut
-            if (electron.pt() < 20) {
-                continue;
-            }
-            ZFinderElectron* zf_electron = AddRecoElectron(electron);
-
             // get reference to electron and the electron
             reco::GsfElectronRef ele_ref(els_h, i);
 
@@ -218,12 +212,24 @@ namespace zf {
             const double ISO_CH = (*(isoVals)[0])[ele_ref];
             const double ISO_EM = (*(isoVals)[1])[ele_ref];
             const double ISO_NH = (*(isoVals)[2])[ele_ref];
+            const bool MEDIUM = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::MEDIUM, ele_ref, conversions_h, beamSpot, vtx_h, ISO_CH, ISO_EM, ISO_NH, RHO_ISO);
+            const bool EE_LOOSE = TriggerMatch(iEvent, ET_ET_LOOSE, electron.eta(), electron.phi(), TRIG_DR_);
+            // We enforce a minimum quality cut
+            if (
+                    electron.pt() < 20
+                    || MEDIUM == false
+                    || EE_LOOSE == false
+                    || fabs(electron.eta()) > 2.4
+                    ) {
+                continue;
+            }
+            ZFinderElectron* zf_electron = AddRecoElectron(electron);
+
 
             // test ID
             // working points
             const bool VETO = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::VETO, ele_ref, conversions_h, beamSpot, vtx_h, ISO_CH, ISO_EM, ISO_NH, RHO_ISO);
             const bool LOOSE = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::LOOSE, ele_ref, conversions_h, beamSpot, vtx_h, ISO_CH, ISO_EM, ISO_NH, RHO_ISO);
-            const bool MEDIUM = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::MEDIUM, ele_ref, conversions_h, beamSpot, vtx_h, ISO_CH, ISO_EM, ISO_NH, RHO_ISO);
             const bool TIGHT = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::TIGHT, ele_ref, conversions_h, beamSpot, vtx_h, ISO_CH, ISO_EM, ISO_NH, RHO_ISO);
 
             // eop/fbrem cuts for extra tight ID
@@ -247,7 +253,6 @@ namespace zf {
 
             // Check for trigger matching
             const bool EE_TIGHT = TriggerMatch(iEvent, ET_ET_TIGHT, zf_electron->eta, zf_electron->phi, TRIG_DR_);
-            const bool EE_LOOSE = TriggerMatch(iEvent, ET_ET_LOOSE, zf_electron->eta, zf_electron->phi, TRIG_DR_);
             const bool EE_DZ = TriggerMatch(iEvent, ET_ET_DZ, zf_electron->eta, zf_electron->phi, TRIG_DR_);
             const bool EENT_TIGHT = TriggerMatch(iEvent, ET_NT_ET_TIGHT, zf_electron->eta, zf_electron->phi, TRIG_DR_);
             const bool EEHF_TIGHT = EENT_TIGHT;
