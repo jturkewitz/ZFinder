@@ -90,6 +90,7 @@ class ZFinder : public edm::EDAnalyzer {
         std::vector<zf::ZDefinitionPlotter*> zdef_plotters_;
         std::vector<zf::ZDefinitionWorkspace*> zdef_workspaces_;
         zf::ZEfficiencies zeffs_;
+        zf::ZFinderPlotter *zfp_jpsi, *zfp_jpsi1, *zfp_jpsi2;
 
 };
 
@@ -116,6 +117,26 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
     // Setup plotters
     edm::Service<TFileService> fs;
 
+    //TODO testing set up Z+jpsi plotter, give better names
+    
+    TFileDirectory tdir_zd(fs->mkdir("JPSI_All"));
+    TFileDirectory tdir_zd1(fs->mkdir("JPSI_Dimuon"));
+    TFileDirectory tdir_zd2(fs->mkdir("JPSI_MassWindow"));
+    // Make our TFileDirectory for the plotter
+    //TFileDirectory t_subdir = tdir_zd.mkdir("JPSI", "JPSI");
+    zfp_jpsi = new zf::ZFinderPlotter(tdir_zd);  // False = do not plot Truth
+
+    //TFileDirectory t_subdir1 = tdir_zd.mkdir("JPSI_Electron", "JPSI_Electron");
+    zfp_jpsi1 = new zf::ZFinderPlotter(tdir_zd1);  // False = do not plot Truth
+
+    //TFileDirectory t_subdir2 = tdir_zd.mkdir("JPSI_Electron2", "JPSI_Electron2");
+    zfp_jpsi2 = new zf::ZFinderPlotter(tdir_zd2);  // False = do not plot Truth
+
+    //zf::ZFinderPlotter* zfp_jpsi = new zf::ZFinderPlotter(tdir_z_jpsi_dir, false);  // False = do not plot Truth
+
+
+
+    /*
     // Setup ZDefinitions and plotters
     zdef_psets_ = iConfig.getUntrackedParameter<std::vector<edm::ParameterSet> >("ZDefinitions");
     for (auto& i_pset : zdef_psets_) {
@@ -141,6 +162,7 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
         zf::ZDefinitionWorkspace* zdw_truth = new zf::ZDefinitionWorkspace(*zd, tdir_zd_truth, true, true);
         zdef_workspaces_.push_back(zdw_truth);
     }
+    */
 }
 
 ZFinder::~ZFinder() {
@@ -158,7 +180,26 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
     using namespace edm;
 
     zf::ZFinderEvent zfe(iEvent, iSetup, iConfig_);
-    if (zfe.reco_z.m > -1 && zfe.e0 != NULL && zfe.e1 != NULL) {  // We have a good Z
+
+    bool found_dimuon = false;
+    if (zfe.reco_jpsi.m.size() > 0 ) {
+        found_dimuon = true;
+    }
+    bool found_jpsi = false;
+    for (unsigned int i = 0; i < zfe.reco_jpsi.m.size() ; ++i ) {
+        if (zfe.reco_jpsi.m.at(i) < 3.2 && zfe.reco_jpsi.m.at(i) > 3.0 ) {
+            found_jpsi = true;
+        }
+    }
+    //TODO clean this code up
+    bool found_dielectron = false;
+    //if (zfe.reco_z.m > -1 && zfe.e0 != NULL && zfe.e1 != NULL && zfe.mu0 != NULL && zfe.mu1 != NULL) {
+    if (zfe.reco_z.m > -1 && zfe.e0 != NULL && zfe.e1 != NULL) {
+        found_dielectron = true;
+    }
+    
+    if (found_dielectron) {  // We have a good Z, plus a jpsi
+        /*
         // Set all cuts
         for (auto& i_set : setters_) {
             i_set->SetCuts(&zfe);
@@ -181,6 +222,16 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
         for (auto& i_zdefw : zdef_workspaces_) {
             i_zdefw->Fill(zfe);
         }
+        */
+        if (zfe.e0->pt > 20 && zfe.e1->pt > 20) {
+            zfp_jpsi->Fill(zfe);
+            if (found_dimuon) {
+                zfp_jpsi1->Fill(zfe);
+                if (found_jpsi ) {
+                    zfp_jpsi2->Fill(zfe);
+                }
+            }
+        }
     }
 }
 
@@ -191,9 +242,12 @@ void ZFinder::beginJob() {
 // ------------ method called once each job just after ending the event loop  ------------
 void ZFinder::endJob() {
     // Write all ZDef workspaces
+    /*
     for (auto& i_zdefw : zdef_workspaces_) {
         i_zdefw->Write();
     }
+    */
+    //zfp_jpsi->Print("jpsi");
 }
 
 // ------------ method called when starting to processes a run  ------------

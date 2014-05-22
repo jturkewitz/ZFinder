@@ -4,6 +4,7 @@
 #include <algorithm>  // std::sort, std::swap
 #include <iostream>  // std::cout, std::endl
 
+//TODO clean up unneeded includes
 // CMSSW
 #include "DataFormats/Common/interface/Handle.h"  // edm::Handle
 #include "DataFormats/EgammaCandidates/interface/PhotonFwd.h"  // reco::PhotonCollection
@@ -12,14 +13,35 @@
 #include "DataFormats/EgammaReco/interface/HFEMClusterShapeFwd.h"  // reco::HFEMClusterShapeRef,
 #include "DataFormats/EgammaReco/interface/SuperClusterFwd.h"  // reco::SuperClusterCollection, reco::SuperClusterRef
 #include "DataFormats/RecoCandidate/interface/RecoEcalCandidateFwd.h"  // reco::RecoEcalCandidateCollection
+#include "DataFormats/MuonReco/interface/MuonFwd.h" // reco::MuonCollection
 #include "EgammaAnalysis/ElectronTools/interface/EGammaCutBasedEleId.h"  // EgammaCutBasedEleId::PassWP, EgammaCutBasedEleId::*
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"  // PileupSummaryInfo
 #include "DataFormats/HLTReco/interface/TriggerEvent.h" // trigger::TriggerEvent
+#include "DataFormats/TrackReco/interface/Track.h" //reco::Track
+
+// for vertexing                                                                                                                                                                                        
+#include "FWCore/Framework/interface/ESHandle.h"
+#include "TrackingTools/TransientTrack/interface/TransientTrack.h"
+#include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
+#include "TrackingTools/Records/interface/TransientTrackRecord.h"
+
+#include "DataFormats/GsfTrackReco/interface/GsfTrack.h"
+#include "DataFormats/GsfTrackReco/interface/GsfTrackFwd.h"
+#include "DataFormats/MuonReco/interface/MuonSelectors.h"
+
+#include "RecoVertex/VertexTools/interface/VertexDistance3D.h"
 
 // ZFinder
 #include "ZFinder/Event/interface/PDGID.h"  // PDGID enum (ELECTRON, POSITRON, etc.)
 #include "ZFinder/Event/interface/TriggerList.h"  // ET_ET_TIGHT, ET_ET_DZ, ET_ET_LOOSE, ET_NT_ET_TIGHT, ET_HF_ET_TIGHT, ET_HF_ET_LOOSE, ET_HF_HF_TIGHT, ET_HF_HF_LOOSE, SINGLE_ELECTRON_TRIGGER, ALL_TRIGGERS
 
+//Math
+#include "Math/GenVector/VectorUtil.h"
+#include <math.h>
+#include <TMath.h>
+
+#include <TVector.h>
+#include <TMatrix.h>
 
 namespace zf {
     /*
@@ -29,6 +51,8 @@ namespace zf {
     // Electrons are considered matched to a trigger object if close than this
     // value
     const double ZFinderEvent::TRIG_DR_ = 0.3;
+    const double MIN_MUON_PT = 3.0; //TODO probably should be 5 GeV based on efficiency plot of tight muons, but is eta dependent
+    const double MIN_VERTEX_PROB = 0.005; //from double jpsi paper (I think - TODO verify this)
 
     ZFinderEvent::ZFinderEvent(const edm::Event& iEvent, const edm::EventSetup& iSetup, const edm::ParameterSet& iConfig) {
         /* Given an event, parses them for the information needed to make the
@@ -52,6 +76,7 @@ namespace zf {
         inputtags_.ecal_electron = iConfig.getParameter<edm::InputTag>("ecalElectronsInputTag");
         inputtags_.nt_electron = iConfig.getParameter<edm::InputTag>("ntElectronsInputTag");
         inputtags_.hf_electron = iConfig.getParameter<edm::InputTag>("hfElectronsInputTag");
+        inputtags_.muon = iConfig.getParameter<edm::InputTag>("muonsInputTag");
         inputtags_.hf_clusters = iConfig.getParameter<edm::InputTag>("hfClustersInputTag");
         inputtags_.conversion = iConfig.getParameter<edm::InputTag>("conversionsInputTag");
         inputtags_.beamspot = iConfig.getParameter<edm::InputTag>("beamSpotInputTag");
@@ -78,6 +103,7 @@ namespace zf {
         iEvent.getByLabel(inputtags_.vertex, reco_vertices);
         reco_vert.num = 0;
         bool first_vertex = true;
+        reco::Vertex primary_vertex;
         for(unsigned int vertex=0; vertex < reco_vertices->size(); ++vertex) {
             if (    // Criteria copied from twiki
                     !((*reco_vertices)[vertex].isFake())
@@ -87,8 +113,10 @@ namespace zf {
                ) {
                 reco_vert.num++;
                 // Store first good vertex as "primary"
+                // TODO verify that first_vertex is highest pt vertex
                 if (first_vertex) {
                     first_vertex = false;
+                    primary_vertex = (*reco_vertices)[vertex];
                     reco_vert.x = (*reco_vertices)[vertex].x();
                     reco_vert.y = (*reco_vertices)[vertex].y();
                     reco_vert.z = (*reco_vertices)[vertex].z();
@@ -105,19 +133,111 @@ namespace zf {
 
         /* Find electrons */
         InitGSFElectrons(iEvent, iSetup);
-        InitHFElectrons(iEvent, iSetup);
-        InitNTElectrons(iEvent, iSetup);
+        //TODO verify this/clean up code
+        //for now don't use any non GSF electrons - need tracker to determine vertex
+        //InitHFElectrons(iEvent, iSetup);
+        //InitNTElectrons(iEvent, iSetup);
+
+        /* Find muons */
+        //InitMuons(iEvent, iSetup);
 
         // Sort our electrons and set e0, e1 as the two with the highest pt
-        std::sort(reco_electrons_.begin(), reco_electrons_.end(), SortByPTHighLow);
+        std::sort(reco_electrons_.begin(), reco_electrons_.end(), SortByPTHighLowElectron);
+        std::sort(reco_anti_electrons_.begin(), reco_anti_electrons_.end(), SortByPTHighLowElectron);
 
         // For Zs
+        // TODO clean up vertex code (combine into a function to avoid duplicating code)
+
+
         n_reco_electrons = reco_electrons_.size();
-        if (n_reco_electrons >= 2) {
+        n_reco_anti_electrons = reco_anti_electrons_.size();
+        //TODO clean up this code
+        //if (n_reco_electrons >= 2) {
+        if (n_reco_electrons >= 1 && n_reco_anti_electrons >=1) {
             // Set our internal electrons
-            set_both_e(reco_electrons_[0], reco_electrons_[1]);
+            //set_both_e(reco_electrons_[0], reco_electrons_[1]);
+            //highest pT electron, and highest pT antielectron
+            set_both_e(reco_electrons_[0], reco_anti_electrons_[0]);
             // Set up the Z
-            InitZ();
+            InitZ(iEvent, iSetup);
+        }
+
+        //TODO clean this up
+        //std::sort(reco_muons_.begin(), reco_muons_.end(), SortByPTHighLowMuon);
+        //n_reco_muons = reco_muons_.size();
+        //n_reco_muons = reco_muons_.size();
+        // For JPsis
+        //TODO clean and improve this code
+
+        edm::ESHandle<TransientTrackBuilder> track_builder;
+        iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder", track_builder);
+        std::vector<reco::TransientTrack> transient_tracks;
+        //testing - for now don't use ZFinderMuon class
+
+        edm::Handle<reco::MuonCollection> muons_h;
+        iEvent.getByLabel(inputtags_.muon, muons_h);
+        n_reco_muons = muons_h->size();
+        //TODO clean this up
+        if (n_reco_muons >= 2 && n_reco_electrons >= 1 && n_reco_anti_electrons >= 1  ) {
+            //TODO maybe keep highest pt muons - for now keep j/psi muons
+            //set_both_mu(reco_muons_[0], reco_muons_[1]);
+
+            // Set up the JPsi
+            // TODO modify this s.t. it takes muons/antimuons
+            if ( reco_z.m >= 60 && reco_z.m <= 120) {
+                for ( int i=0 ; i < (n_reco_muons - 1) ; ++i ) {
+                    const reco::Muon muon0 = muons_h->at(i);
+                    if ( muon0.pt() < MIN_MUON_PT ) {
+                        continue;
+                    }
+                    //if (!muon::isTightMuon(muon0, primary_vertex)) {
+                    if (!muon::isSoftMuon(muon0, primary_vertex)) {
+                        continue;
+                    }
+                    for ( int j=i+1 ; j < n_reco_muons ; ++j ) {
+                        const reco::Muon muon1 = muons_h->at(j);
+                        if ( muon1.pt() < MIN_MUON_PT ) {
+                            continue;
+                        }
+                        //if ( muon0.charge() ==  muon1.charge() ) {
+                        //TODO testing same sign muons
+                        if ( muon0.charge() ==  muon1.charge() ) {
+                            continue;
+                        }
+                        //if (!muon::isTightMuon(muon1, primary_vertex)) {
+                        if (!muon::isSoftMuon(muon1, primary_vertex)) {
+                            continue;
+                        }
+
+                        reco::TrackRef muon_track0 = GetMuonTrackRef( muon0 );
+                        reco::TrackRef muon_track1 = GetMuonTrackRef( muon1 );
+                        transient_tracks.clear();
+                        transient_tracks.push_back( (*track_builder).build(muon_track0.get()));
+                        transient_tracks.push_back( (*track_builder).build(muon_track1.get()));
+                        TransientVertex dimuon_vertex;
+                        if (transient_tracks.size() > 1) {
+                            KalmanVertexFitter kalman_fitter;
+                            dimuon_vertex = kalman_fitter.vertex(transient_tracks);
+                            if ( !dimuon_vertex.isValid()) {
+                                continue;
+                            }
+                            double vertex_probability = TMath::Prob(dimuon_vertex.totalChiSquared(), int(dimuon_vertex.degreesOfFreedom()));
+                            if ( vertex_probability < MIN_VERTEX_PROB ) {
+                                continue;
+                            }
+                        }
+                        //TODO clean up this code
+                        //std::cout << "distance " << distance << " dist_err " << dist_err << " chi2 " << chi2 << std::endl;
+                        //std::cout << "dimuon_vertex.position() " << dimuon_vertex.position() << std::endl;
+                        InitJPsi( muon0, muon1, dimuon_vertex );
+                        //TODO - figure out how best to handle events with multiple j/psis
+                        //set_both_mu(muon0, muon1);
+                        //TODO how should I handle multiple j/psi in same event?
+                        mu0.push_back( muon0 );
+                        mu1.push_back( muon1 );
+                    }
+                }
+            }
         }
     }
 
@@ -161,7 +281,10 @@ namespace zf {
         for(unsigned int i = 0; i < els_h->size(); ++i) {
             // Get the electron and set put it into the electrons vector
             reco::GsfElectron electron = els_h->at(i);
-            ZFinderElectron* zf_electron = AddRecoElectron(electron);
+            //TODO for now hardcoding the requirement for medium electrons
+
+            //ZFinderElectron* zf_electron = AddRecoElectron(electron);
+            ZFinderElectron* zf_electron = new ZFinderElectron(electron);
 
             // get reference to electron and the electron
             reco::GsfElectronRef ele_ref(els_h, i);
@@ -213,6 +336,17 @@ namespace zf {
             zf_electron->AddCutResult("trig(et_hf_tight)", EEHF_TIGHT, WEIGHT);
             zf_electron->AddCutResult("trig(et_hf_loose)", EEHF_LOOSE, WEIGHT);
             zf_electron->AddCutResult("trig(single_ele)", SINGLE_E, WEIGHT);
+
+            if ( zf_electron->CutPassed("eg_medium") ) {
+                //AddRecoElectron(*zf_electron);
+                //TODO clean up this code/put into a function
+                if (zf_electron->charge == 1) {
+                    reco_electrons_.push_back(zf_electron);
+                }
+                if (zf_electron->charge == -1) {
+                    reco_anti_electrons_.push_back(zf_electron);
+                }
+            }
         }
     }
 
@@ -304,21 +438,143 @@ namespace zf {
             }
         }
     }
+    //TODO implement this if so desired
+//    void ZFinderEvent::InitMuons(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
+//        // Muons
+//        edm::Handle<reco::MuonCollection> muons_h;
+//        iEvent.getByLabel(inputtags_.muon, muons_h);
+//
+//        // Loop over all muons
+//        for(unsigned int i = 0; i < muons_h->size(); ++i) {
+//            reco::Muon muon = muons_h->at(i);
+//            AddRecoMuon(muon);
+//            //TODO remove this and below comment
+//            //ZFinderMuon* zf_muon = AddRecoMuon(muon);
+//        }
+//    }
 
-    void ZFinderEvent::InitZ() {
+    void ZFinderEvent::InitZ(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
         if (e0 != NULL && e1 != NULL) {
-            // Set Z properties
-            const double ELECTRON_MASS = 5.109989e-4;
-            math::PtEtaPhiMLorentzVector e0lv(e0->pt, e0->eta, e0->phi, ELECTRON_MASS);
-            math::PtEtaPhiMLorentzVector e1lv(e1->pt, e1->eta, e1->phi, ELECTRON_MASS);
-            math::PtEtaPhiMLorentzVector zlv;
-            zlv = e0lv + e1lv;
+            //TODO make a function to handle vertex getting
+            edm::ESHandle<TransientTrackBuilder> track_builder_e;
+            iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder", track_builder_e);
+            std::vector<reco::TransientTrack> transient_tracks_e;
 
-            reco_z.m = zlv.mass();
-            reco_z.y = zlv.Rapidity();
-            reco_z.pt = zlv.pt();
-            reco_z.phistar = ReturnPhistar(e0->eta, e0->phi, e1->eta, e1->phi);
-            reco_z.eta = zlv.eta();
+            //reco::TrackRef electron_track0 = GetElectronTrackRef( e0->gsf_elec_ );
+            //reco::TrackRef electron_track1 = GetElectronTrackRef( e1->gsf_elec_ );
+            
+            reco::GsfTrackRef electron_track0 = e0->gsf_elec_.gsfTrack() ;
+            reco::GsfTrackRef electron_track1 = e1->gsf_elec_.gsfTrack() ;
+            transient_tracks_e.clear();
+            transient_tracks_e.push_back( (*track_builder_e).build(electron_track0.get()));
+            transient_tracks_e.push_back( (*track_builder_e).build(electron_track1.get()));
+            TransientVertex dielectron_vertex;
+            if (transient_tracks_e.size() > 1) {
+                KalmanVertexFitter kalman_fitter_e;
+                dielectron_vertex = kalman_fitter_e.vertex(transient_tracks_e);
+                if ( dielectron_vertex.isValid()) {
+                    reco_z.vtx_prob = TMath::Prob(dielectron_vertex.totalChiSquared(), int(dielectron_vertex.degreesOfFreedom()));
+                }
+            }
+            // Set Z properties
+            if (reco_z.vtx_prob >= MIN_VERTEX_PROB) {
+                const double ELECTRON_MASS = 5.109989e-4;
+                math::PtEtaPhiMLorentzVector e0lv(e0->pt, e0->eta, e0->phi, ELECTRON_MASS);
+                math::PtEtaPhiMLorentzVector e1lv(e1->pt, e1->eta, e1->phi, ELECTRON_MASS);
+                math::PtEtaPhiMLorentzVector zlv;
+                zlv = e0lv + e1lv;
+
+                reco_z.vtx_x = dielectron_vertex.position().x();
+                reco_z.vtx_y = dielectron_vertex.position().y();
+                reco_z.vtx_z = dielectron_vertex.position().z();
+
+                reco_z.m = zlv.mass();
+                reco_z.y = zlv.Rapidity();
+                reco_z.pt = zlv.pt();
+                reco_z.phistar = ReturnPhistar(e0->eta, e0->phi, e1->eta, e1->phi);
+                reco_z.eta = zlv.eta();
+                reco_z.vtx = dielectron_vertex;
+            }
+        }
+    }
+
+    //void ZFinderEvent::InitJPsi(zf::ZFinderMuon* mu0, zf::ZFinderMuon* mu1) {
+    //TODO make this take event, event setup as opposed to two muons
+    void ZFinderEvent::InitJPsi(const reco::Muon &mu0, const reco::Muon &mu1, const TransientVertex &dimuon_vertex) {
+        const double MUON_MASS = 0.1056583715;
+        const double C = 29.979245800; // cm/ns
+        math::PtEtaPhiMLorentzVector mu0lv(mu0.pt(), mu0.eta(), mu0.phi(), MUON_MASS);
+        math::PtEtaPhiMLorentzVector mu1lv(mu1.pt(), mu1.eta(), mu1.phi(), MUON_MASS);
+        math::PtEtaPhiMLorentzVector jpsi_lv;
+        jpsi_lv = mu0lv + mu1lv;
+
+        VertexDistance3D vertTool;
+        double distance = vertTool.distance(reco_z.vtx, dimuon_vertex).value();
+        double dist_err = vertTool.distance(reco_z.vtx, dimuon_vertex).error();
+        double chi2 = vertTool.compatibility(reco_z.vtx, dimuon_vertex);
+
+        double pos_x = dimuon_vertex.position().x();
+        double pos_y = dimuon_vertex.position().y();
+        double pos_z = dimuon_vertex.position().z();
+
+        reco_jpsi.distance.push_back (distance);
+        reco_jpsi.dist_err.push_back (dist_err);
+        reco_jpsi.chi2.push_back (chi2);
+
+        reco_jpsi.vtx_x.push_back (pos_x);
+        reco_jpsi.vtx_y.push_back (pos_y);
+        reco_jpsi.vtx_z.push_back (pos_z);
+
+        reco_jpsi.m.push_back (jpsi_lv.mass());
+        reco_jpsi.y.push_back (jpsi_lv.Rapidity());
+        reco_jpsi.pt.push_back (jpsi_lv.pt());
+        reco_jpsi.phistar.push_back (ReturnPhistar(mu0.eta(), mu0.phi(), mu1.eta(), mu1.phi()));
+        reco_jpsi.eta.push_back (jpsi_lv.eta());
+
+        //TODO use a better vector class, implement it as the early J/Psi paper did
+        //std::cout << "pt " << jpsi_lv.pt() << " px " << jpsi_lv.px() << " py " << jpsi_lv.py() << " pz " << jpsi_lv.pz() << std::endl;
+        //TVectorD v1(0 , 1 , jpsi_lv.px() / jpsi_lv.pt() , jpsi_lv.py() / jpsi_lv.pt() , "END");
+        //v1.Print();
+        //std::cout << "v1.x " << v1(0) << std::endl;
+        //TVectorD vx( 0 , 1 , (pos_x - reco_z.vtx.position().x() ) , (pos_y - reco_z.vtx.position().y() ) , "END" );
+        //vx.Print();
+        //TMatrix m1 = dimuon_vertex.vertexState().fullCovariance(); 
+        //m1.Print();
+        //TODO do this with actual vectors, which I am pretty sick of right now
+        // for now follow Atlas paper as it is simpler
+
+        double x = (pos_x - reco_z.vtx.position().x() );
+        double y = (pos_y - reco_z.vtx.position().y() );
+        //double z = (pos_z - reco_z.vtx.position().z() );
+        double px = jpsi_lv.px();
+        double py = jpsi_lv.py();
+        //double pz = jpsi_lv.pz();
+        double pt = jpsi_lv.pt();
+        //double LP = ((x * px) + (y * py) + (pz * z) );
+        double LP = ((x * px) + (y * py)) ; // 2d
+
+        double tau = jpsi_lv.mass() * LP / (pt * pt) / C; // ns
+
+        reco_jpsi.tau.push_back (tau);
+
+
+        if(mu0.isPFIsolationValid()){
+            reco_jpsi.iso_sum_charged_hadron_pt_mu0 = mu0.pfIsolationR04().sumChargedHadronPt;
+            reco_jpsi.iso_sum_charged_particle_pt_mu0 = mu0.pfIsolationR04().sumChargedParticlePt;
+            reco_jpsi.iso_sum_neutral_hadron_et_mu0 = mu0.pfIsolationR04().sumNeutralHadronEt;
+            reco_jpsi.iso_sum_photon_et_mu0 = mu0.pfIsolationR04().sumPhotonEtHighThreshold;
+            reco_jpsi.iso_sum_pileup_pt_mu0 = mu0.pfIsolationR04().sumPUPt;
+            reco_jpsi.iso_mu0 = (reco_jpsi.iso_sum_charged_hadron_pt_mu0 + reco_jpsi.iso_sum_neutral_hadron_et_mu0 +
+                                 reco_jpsi.iso_sum_photon_et_mu0 ) / mu0.pt();
+        }
+        if(mu1.isPFIsolationValid()){
+            reco_jpsi.iso_sum_charged_hadron_pt_mu1 = mu1.pfIsolationR04().sumChargedHadronPt;
+            reco_jpsi.iso_sum_charged_particle_pt_mu1 = mu1.pfIsolationR04().sumChargedParticlePt;
+            reco_jpsi.iso_sum_neutral_hadron_et_mu1 = mu1.pfIsolationR04().sumNeutralHadronEt;
+            reco_jpsi.iso_sum_photon_et_mu1 = mu1.pfIsolationR04().sumPhotonEtHighThreshold;
+            reco_jpsi.iso_sum_pileup_pt_mu1 = mu1.pfIsolationR04().sumPUPt;
+            reco_jpsi.iso_mu1 = (reco_jpsi.iso_sum_charged_hadron_pt_mu1 + reco_jpsi.iso_sum_neutral_hadron_et_mu1 +
+                                 reco_jpsi.iso_sum_photon_et_mu1 ) / mu1.pt();
         }
     }
 
@@ -349,11 +605,34 @@ namespace zf {
         reco_z.pt = -1;
         reco_z.phistar = -1;
         reco_z.eta = -1000;
+        reco_z.vtx_prob = -1000;
+        reco_z.vtx_x = -100;
+        reco_z.vtx_y = -100;
+        reco_z.vtx_z = -100;
         truth_z.m = -1;
         truth_z.y = -1000;
         truth_z.pt = -1;
         truth_z.phistar = -1;
         truth_z.eta = -1000;
+
+        // JPsi Data TODO erase this if keep vector method
+        //reco_jpsi.m = -1;
+        //reco_jpsi.y = -1000;
+        //reco_jpsi.pt = -1;
+        //reco_jpsi.phistar = -1;
+        //reco_jpsi.eta = -1000;
+        reco_jpsi.iso_mu0 = -1.0;
+        reco_jpsi.iso_sum_charged_hadron_pt_mu0 = -1.0;
+        reco_jpsi.iso_sum_charged_particle_pt_mu0 = -1.0;
+        reco_jpsi.iso_sum_neutral_hadron_et_mu0 = -1.0;
+        reco_jpsi.iso_sum_photon_et_mu0 = -1.0;
+        reco_jpsi.iso_sum_pileup_pt_mu0 = -1.0;
+        reco_jpsi.iso_mu1 = -1.0;
+        reco_jpsi.iso_sum_charged_hadron_pt_mu1 = -1.0;
+        reco_jpsi.iso_sum_charged_particle_pt_mu1 = -1.0;
+        reco_jpsi.iso_sum_neutral_hadron_et_mu1 = -1.0;
+        reco_jpsi.iso_sum_photon_et_mu1 = -1.0;
+        reco_jpsi.iso_sum_pileup_pt_mu1 = -1.0;
 
         // Electrons
         e0 = NULL;
@@ -363,6 +642,11 @@ namespace zf {
         e1_truth = NULL;
         e0_trig = NULL;
         e1_trig = NULL;
+
+        // Muons
+        //mu0 = NULL;
+        //mu1 = NULL;
+        n_reco_muons = -1;
 
         // Is Data
         is_real_data = false;
@@ -467,8 +751,24 @@ namespace zf {
 
     ZFinderElectron* ZFinderEvent::AddRecoElectron(reco::GsfElectron electron) {
         ZFinderElectron* zf_electron = new ZFinderElectron(electron);
-        reco_electrons_.push_back(zf_electron);
+        if (zf_electron->charge == 1) {
+            reco_electrons_.push_back(zf_electron);
+        }
+        if (zf_electron->charge == -1) {
+            reco_anti_electrons_.push_back(zf_electron);
+        }
         return zf_electron;
+    }
+
+    void ZFinderEvent::AddRecoElectron(zf::ZFinderElectron zf_electron) {
+        //TODO clean/fix this up
+        //ZFinderElectron* zf_electron = new ZFinderElectron(electron);
+        if (zf_electron.charge == 1) {
+            reco_electrons_.push_back(&zf_electron);
+        }
+        if (zf_electron.charge == -1) {
+            reco_anti_electrons_.push_back(&zf_electron);
+        }
     }
 
     ZFinderElectron* ZFinderEvent::AddRecoElectron(reco::RecoEcalCandidate electron) {
@@ -494,6 +794,37 @@ namespace zf {
         hlt_electrons_.push_back(zf_electron);
         return zf_electron;
     }
+
+    void ZFinderEvent::AddRecoMuon(reco::Muon muon) {
+        ZFinderMuon* zf_muon = new ZFinderMuon(muon);
+        reco_muons_.push_back(zf_muon);
+        //TODO remove this and below comment
+        //return zf_muon;
+    }
+
+    //TODO fix this up
+    //reco::TrackRef ZFinderEvent::GetMuonTrackRef(const reco::Muon & mu) {
+    reco::TrackRef ZFinderEvent::GetMuonTrackRef(const reco::Muon & mu) {
+        reco::TrackRef track;
+        if(mu.isStandAloneMuon()) {
+            track = mu.outerTrack();
+        }
+        if(mu.isTrackerMuon()) {
+            track = mu.innerTrack();
+        }
+        if(mu.isGlobalMuon()) {
+            track = mu.globalTrack();
+        }
+        return track;
+    }
+    //TODO improve this code
+
+    //reco::TrackRef ZFinderEvent::GetElectronTrackRef(const zf::ZFinderElectron & e) {
+    //reco::TrackRef ZFinderEvent::GetElectronTrackRef(const reco::GsfElectron & e) {
+    //    reco::TrackRef track;
+    //    track = e.gsfTrack();
+    //    return track;
+    //}
 
     double ZFinderEvent::ReturnPhistar(const double& eta0, const double& phi0, const double& eta1, const double& phi1) {
         /* Calculate phi star */

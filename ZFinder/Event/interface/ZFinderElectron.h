@@ -47,6 +47,8 @@ namespace zf {
             // Other physical properties
             int charge;
 
+            reco::GsfElectron gsf_elec_;
+
             // Handling cuts
             const CutResult* GetCutResult(const std::string& cut_name) const;
             void AddCutResult(const std::string& cut_name, const bool passed, const double weight=1.);
@@ -71,7 +73,6 @@ namespace zf {
             ElectronType candidate_type_;
 
             // Used to store a copy of the object used to create the ZFElectron
-            reco::GsfElectron gsf_elec_;
             reco::GenParticle gen_elec_;
             reco::RecoEcalCandidate recan_elec_;
             reco::Photon photon_elec_;

@@ -4,7 +4,13 @@ process = cms.Process("Demo")
 
 # Set up message output and logging
 process.load("FWCore.MessageService.MessageLogger_cfi")
-process.MessageLogger.cerr.FwkReport.reportEvery = 100  # Report status ever 100 events
+process.load("TrackingTools/TransientTrack/TransientTrackBuilder_cfi")
+process.load("Configuration.Geometry.GeometryIdeal_cff")
+process.load("Configuration.StandardSequences.MagneticField_cff")
+process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
+process.GlobalTag.globaltag = 'FT53_V21A_AN6::All'
+#process.MessageLogger.cerr.FwkReport.reportEvery = 100  # Report status ever 100 events
+process.MessageLogger.cerr.FwkReport.reportEvery = 1000  # Report status ever 100 events
 
 # Number of events from each file to process. It should be -1 (all) when
 # running for an analysis
@@ -16,14 +22,14 @@ process.maxEvents = cms.untracked.PSet(
         )
 
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring( 
-#        'file:/local/cms/phedex/store/mc/Summer12_DR53X/DYToEE_M-20_CT10_TuneZ2star_8TeV-powheg-pythia6/AODSIM/PU_S10_START53_V7A-v1/0000/AC6646E7-36F0-E111-B2F8-00259073E3FC.root'
-    'file:/local/cms/phedex/store/data/Run2012A/DoubleElectron/AOD/22Jan2013-v1/20000/003EC246-5E67-E211-B103-00259059642E.root'
-    )
+    ##fileNames = cms.untracked.vstring( 'file:/home/user1/turkewitz/Work/CMSSW_5_3_13_ZJPsi/src/JPsiFilter/jpsiSkim.root')
+    fileNames = cms.untracked.vstring( 'file:/hdfs/cms/user/turkewitz/ZPhysics/JPsiSkim/DoubleElectron/jpsiSkim/jpsiSkim_000-pool.root')
+    ##fileNames = cms.untracked.vstring( 'file:/home/user1/turkewitz/Work/CMSSW_5_3_13_ZJPsi/src/JPsiFilter/jpsiSkim.root')
+    ##fileNames = cms.untracked.vstring( 'file:/local/cms/phedex/store/data/Run2012A/DoubleElectron/AOD/22Jan2013-v1/20000/003EC246-5E67-E211-B103-00259059642E.root')
 )
 
 process.TFileService = cms.Service("TFileService",
-        fileName = cms.string("test.root")
+        fileName = cms.string("test9.root")
         )
 
 #
@@ -42,7 +48,6 @@ from CommonTools.ParticleFlow.Tools.pfIsolation import setupPFElectronIso, setup
 process.eleIsoSequence = setupPFElectronIso(process, 'gsfElectrons')
 process.pfiso = cms.Sequence(process.pfParticleSelectionSequence + process.eleIsoSequence)
 
-
 #
 # ZFinder
 #
@@ -53,6 +58,7 @@ from ZFinder.Event.ZDefinitions_cfi import zdefs
 process.ZFinder = cms.EDAnalyzer('ZFinder',
         # General tags
         ecalElectronsInputTag  = cms.InputTag("gsfElectrons"),
+        muonsInputTag          = cms.InputTag("muons"),
         hfElectronsInputTag    = cms.InputTag("hfRecoEcalCandidate"),
         hfClustersInputTag     = cms.InputTag("hfEMClusters"),
         conversionsInputTag    = cms.InputTag("allConversions"),
