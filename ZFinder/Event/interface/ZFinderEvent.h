@@ -11,6 +11,7 @@
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"  // reco::GsfElectron
 #include "DataFormats/EgammaCandidates/interface/Photon.h"  // reco::Photon
 #include "DataFormats/MuonReco/interface/Muon.h" // reco::Muon
+#include "DataFormats/JetReco/interface/PFJet.h" //
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"  // reco::GenParticle
 #include "DataFormats/RecoCandidate/interface/RecoEcalCandidate.h"  // reco::RecoEcalCandidate
 #include "FWCore/Framework/interface/Event.h"  // edm::Event, edm::EventSetup
@@ -79,9 +80,13 @@ namespace zf {
             // Primary vertexes
             struct Vertexes{
                 unsigned int num;
-                double x;
-                double y;
-                double z;
+                std::vector<double> x;
+                std::vector<double> y;
+                std::vector<double> z;
+                double primary_x;
+                double primary_y;
+                double primary_z;
+                reco::Vertex primary_vert;
             } truth_vert, reco_vert;
 
             // Event ID
@@ -96,6 +101,7 @@ namespace zf {
                 double m;
                 double pt;
                 double y;
+                double phi;
                 double phistar;
                 double eta;
                 double vtx_prob;
@@ -104,7 +110,6 @@ namespace zf {
                 double vtx_z;
                 TransientVertex vtx;
             } reco_z, truth_z;
-
             // JPsi Data
             // TODO isolation - higher threshhold of et for neutral hadrons?
             struct JPsiData{
@@ -113,26 +118,46 @@ namespace zf {
                 std::vector<double> y;
                 std::vector<double> phistar;
                 std::vector<double> eta;
-                std::vector<double> tau;
+                std::vector<double> phi;
+                std::vector<double> tau_xy;
+                std::vector<double> tau_z;
+                std::vector<double> distance_x;
+                std::vector<double> distance_y;
+                std::vector<double> distance_z;
                 std::vector<double> distance;
                 std::vector<double> dist_err;
                 std::vector<double> chi2;
+                std::vector<double> distance_xy;
+                std::vector<double> dist_err_xy;
+                std::vector<double> chi2_xy;
                 std::vector<double> vtx_x;
                 std::vector<double> vtx_y;
                 std::vector<double> vtx_z;
-                double iso_mu0;
-                double iso_sum_charged_hadron_pt_mu0;
-                double iso_sum_charged_particle_pt_mu0;
-                double iso_sum_neutral_hadron_et_mu0;
-                double iso_sum_photon_et_mu0;
-                double iso_sum_pileup_pt_mu0;
-                double iso_mu1;
-                double iso_sum_charged_hadron_pt_mu1;
-                double iso_sum_charged_particle_pt_mu1;
-                double iso_sum_neutral_hadron_et_mu1;
-                double iso_sum_photon_et_mu1;
-                double iso_sum_pileup_pt_mu1;
+                std::vector<double> vtx_prob;
+                std::vector<double> muons_delta_phi;
+                std::vector<double> muons_delta_eta;
+                std::vector<double> muons_deltaR;
+                std::vector<double> z_delta_phi;
+                std::vector<double> iso_mu0;
+                std::vector<double> iso_sum_charged_hadron_pt_mu0;
+                std::vector<double> iso_sum_charged_particle_pt_mu0;
+                std::vector<double> iso_sum_neutral_hadron_et_mu0;
+                std::vector<double> iso_sum_photon_et_mu0;
+                std::vector<double> iso_sum_pileup_pt_mu0;
+                std::vector<double> iso_mu1;
+                std::vector<double> iso_sum_charged_hadron_pt_mu1;
+                std::vector<double> iso_sum_charged_particle_pt_mu1;
+                std::vector<double> iso_sum_neutral_hadron_et_mu1;
+                std::vector<double> iso_sum_photon_et_mu1;
+                std::vector<double> iso_sum_pileup_pt_mu1;
             } reco_jpsi;
+            
+            struct Jets{
+                std::vector<double> pt;
+                std::vector<double> phi;
+                std::vector<double> eta;
+                std::vector<double> btag_discriminator;
+            } reco_jets, reco_muon_jets;
 
             // These are the special, selected electrons used to make the Z
             ZFinderElectron* e0;
@@ -166,6 +191,8 @@ namespace zf {
             std::vector<ZFinderElectron*>* AllElectrons() { return FilteredElectrons(); }
             std::vector<ZFinderElectron*>* FilteredElectrons(const std::string& cut_name);
 
+            //std::vector<reco::PFJet> jets;
+
             // Number of Electrons
             int n_reco_electrons;
 
@@ -174,6 +201,10 @@ namespace zf {
 
             // Number of Muons
             int n_reco_muons;
+
+            // Number of Jets
+            int n_reco_jets;
+            int n_reco_muon_jets;
 
             //reco::TrackRef GetElectronTrackRef(const reco::GsfElectron & e);
             reco::TrackRef GetMuonTrackRef(const reco::Muon & mu);
@@ -215,6 +246,8 @@ namespace zf {
 
             // Update the JPsi Info from two muons
             void InitJPsi(const reco::Muon& mu0, const reco::Muon& mu1, const TransientVertex &dimuon_vertex);
+            
+            void InitJets(const edm::Event& iEvent, const edm::EventSetup& iSetup) ;
 
             // Initialize all variables to safe values
             void InitVariables();
@@ -224,6 +257,7 @@ namespace zf {
                 edm::InputTag ecal_electron;
                 edm::InputTag nt_electron;
                 edm::InputTag muon;
+                edm::InputTag jet;
                 edm::InputTag conversion;
                 edm::InputTag beamspot;
                 edm::InputTag rho_iso;

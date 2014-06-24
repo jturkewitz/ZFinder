@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
-// Package:    JPsiFilter
-// Class:      JPsiFilter
+// Package:    JPsiTriggerFilter
+// Class:      JPsiTriggerFilter
 // 
-/**\class JPsiFilter JPsiFilter.cc JPsiFilter/JPsiFilter/src/JPsiFilter.cc
+/**\class JPsiTriggerFilter JPsiTriggerFilter.cc JPsiTriggerFilter/JPsiTriggerFilter/src/JPsiTriggerFilter.cc
 
  Description: [one line class summary]
 
@@ -41,10 +41,10 @@
 // class declaration
 //
 
-class JPsiFilter : public edm::EDFilter {
+class JPsiTriggerFilter : public edm::EDFilter {
    public:
-      explicit JPsiFilter(const edm::ParameterSet&);
-      ~JPsiFilter();
+      explicit JPsiTriggerFilter(const edm::ParameterSet&);
+      ~JPsiTriggerFilter();
 
       static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
@@ -72,14 +72,14 @@ class JPsiFilter : public edm::EDFilter {
 //
 // constructors and destructor
 //
-JPsiFilter::JPsiFilter(const edm::ParameterSet& iConfig)
+JPsiTriggerFilter::JPsiTriggerFilter(const edm::ParameterSet& iConfig)
 {
    //now do what ever initialization is needed
 
 }
 
 
-JPsiFilter::~JPsiFilter()
+JPsiTriggerFilter::~JPsiTriggerFilter()
 {
  
    // do anything here that needs to be done at desctruction time
@@ -94,7 +94,7 @@ JPsiFilter::~JPsiFilter()
 
 // ------------ method called on each new Event  ------------
 bool
-JPsiFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
+JPsiTriggerFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
    using namespace edm;
    bool found_two_muons = false;
@@ -160,46 +160,46 @@ JPsiFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 // ------------ method called once each job just before starting event loop  ------------
 void 
-JPsiFilter::beginJob()
+JPsiTriggerFilter::beginJob()
 {
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
 void 
-JPsiFilter::endJob() {
+JPsiTriggerFilter::endJob() {
 }
 
 // ------------ method called when starting to processes a run  ------------
 bool 
-JPsiFilter::beginRun(edm::Run&, edm::EventSetup const&)
+JPsiTriggerFilter::beginRun(edm::Run&, edm::EventSetup const&)
 { 
   return true;
 }
 
 // ------------ method called when ending the processing of a run  ------------
 bool 
-JPsiFilter::endRun(edm::Run&, edm::EventSetup const&)
+JPsiTriggerFilter::endRun(edm::Run&, edm::EventSetup const&)
 {
   return true;
 }
 
 // ------------ method called when starting to processes a luminosity block  ------------
 bool 
-JPsiFilter::beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
+JPsiTriggerFilter::beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
 {
   return true;
 }
 
 // ------------ method called when ending the processing of a luminosity block  ------------
 bool 
-JPsiFilter::endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
+JPsiTriggerFilter::endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
 {
   return true;
 }
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
 void
-JPsiFilter::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+JPsiTriggerFilter::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   //The following says we do not know what parameters are allowed so do no validation
   // Please change this to state exactly what you do use, even if it is no parameters
   edm::ParameterSetDescription desc;
@@ -207,4 +207,4 @@ JPsiFilter::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   descriptions.addDefault(desc);
 }
 //define this as a plug-in
-DEFINE_FWK_MODULE(JPsiFilter);
+DEFINE_FWK_MODULE(JPsiTriggerFilter);

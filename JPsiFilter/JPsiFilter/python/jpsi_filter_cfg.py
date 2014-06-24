@@ -17,7 +17,7 @@ process.maxEvents = cms.untracked.PSet(
         )
 
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring( 'file:/local/cms/phedex/store/data/Run2012A/DoubleElectron/AOD/22Jan2013-v1/20000/D21CAFBE-6B67-E211-91E1-002618943970.root')
+    fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/ZPhysics/tmp/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball_00037C53-AAD1-E111-B1BE-003048D45F38.root')
     #fileNames = cms.untracked.vstring( 'file:/local/cms/phedex/store/data/Run2012A/DoubleElectron/AOD/22Jan2013-v1/20000/003EC246-5E67-E211-B103-00259059642E.root')
 )
 
@@ -32,7 +32,7 @@ process.mypath = cms.Path(process.jpsiFilter)
 ##process.schedule = cms.Schedule(process.p)
 
 process.out = cms.OutputModule("PoolOutputModule",
-                               fileName = cms.untracked.string('jpsiSkimUpdated4.root'),
+                               fileName = cms.untracked.string('jpsiSkimMCUpdated.root'),
                                # save only events passing the full path
                                SelectEvents=cms.untracked.PSet(SelectEvents=cms.vstring('mypath')),
                                outputCommands = cms.untracked.vstring(
