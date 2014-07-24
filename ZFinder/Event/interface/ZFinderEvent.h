@@ -19,6 +19,7 @@
 #include "FWCore/Utilities/interface/InputTag.h"  // edm::InputTag
 #include "DataFormats/HLTReco/interface/TriggerObject.h"  // trigger::TriggerObject
 #include "RecoVertex/VertexTools/interface/VertexDistance3D.h"
+#include "PhysicsTools/Utilities/interface/LumiReWeighting.h" // edm::LumiReWeighting
 
 #include "TrackingTools/TransientTrack/interface/TransientTrack.h"
 #include "RecoVertex/KalmanVertexFit/interface/KalmanVertexFitter.h"
@@ -26,6 +27,7 @@
 // ZFinder
 #include "ZFinder/Event/interface/ZFinderElectron.h"  // ZFinderElectron, ZFinderElectron
 #include "ZFinder/Event/interface/ZFinderMuon.h"  // ZFinderMuon, ZFinderMuon
+#include "ZFinder/Event/interface/ZFinderCuts.h"  // ZFinderMuon, ZFinderMuon
 
 namespace zf {
 
@@ -38,12 +40,14 @@ namespace zf {
             t0p1_eff = 1.;
             t1p0_pass = false;
             t1p0_eff = 1.;
+            event_weight = 1.;
         }
         bool pass;
         bool t0p1_pass;
         bool t1p0_pass;
         double t0p1_eff;
         double t1p0_eff;
+        double event_weight;
     };
 
 
@@ -66,6 +70,8 @@ namespace zf {
                     const edm::EventSetup& iSetup,
                     const edm::ParameterSet& iConfig
                     );
+            // Destructor
+            ~ZFinderEvent();
 
             // Data or MC
             bool is_real_data;
@@ -150,7 +156,7 @@ namespace zf {
                 std::vector<double> iso_sum_neutral_hadron_et_mu1;
                 std::vector<double> iso_sum_photon_et_mu1;
                 std::vector<double> iso_sum_pileup_pt_mu1;
-            } reco_jpsi;
+            } reco_jpsi, truth_jpsi;
             
             struct Jets{
                 std::vector<double> pt;
@@ -158,6 +164,12 @@ namespace zf {
                 std::vector<double> eta;
                 std::vector<double> btag_discriminator;
             } reco_jets, reco_muon_jets;
+            // Event weight, used for things like pileup reweighting. Most
+            // other weights are cut dependent (efficiencies for example) and
+            // so are store with the cuts in each electron, with a combined
+            // efficiency calculated in ZDefinition.
+            double event_weight;
+            
 
             // These are the special, selected electrons used to make the Z
             ZFinderElectron* e0;
@@ -179,6 +191,8 @@ namespace zf {
             // These are the special, selected muons used to make the JPsi TODO implement/clean up this
             //ZFinderMuon* mu0;
             //ZFinderMuon* mu1;
+            std::vector<const reco::Candidate*> jpsi_muon0;
+            std::vector<const reco::Candidate*> jpsi_muon1;
             std::vector<reco::Muon> mu0;
             std::vector<reco::Muon> mu1;
             //void set_mu0(ZFinderMuon* muon) { mu0 = muon; }
@@ -228,6 +242,8 @@ namespace zf {
             // These variables are defined at the top of ZFinderEvent.cc to
             // avoid compilation issues
             static const double TRIG_DR_;
+
+            void SetEventWeight(const edm::Event& iEvent);
 
             // Called by the constructor to handle MC and Data separately
             void InitReco(const edm::Event& iEvent, const edm::EventSetup& iSetup);
@@ -319,6 +335,8 @@ namespace zf {
 
             // Store ZDefinition Information
             std::map<std::string, cutlevel_vector> zdef_map_;
+            // Pileup reweighting
+            static edm::LumiReWeighting* lumi_weights_;
 
     };
 }  // namespace zf

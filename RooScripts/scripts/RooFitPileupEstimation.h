@@ -1,5 +1,5 @@
-#ifndef ROOFITLIFETIME_H_
-#define ROOFITLIFETIME_H_
+#ifndef ROOFITPILEUPESTIMATION_H_
+#define ROOFITPILEUPESTIMATION_H_
 
 // Standard Library
 #include <string>
@@ -10,23 +10,15 @@
 
 //using namespace RooStats;
 
-// Set up the TCanvas
-TCanvas* get_tcanvas(const int X_DIM = 1280, const int Y_DIM = 640);
-
 // Multiple ways to call the function in ROOT
 //int RooFitter(
 //        const std::string& DATA_FILE,
 //        const std::string& OUT_DIR
 //        );
 
-std::vector<double> RooFitLifetime(
+int RooFitPileupEstimation(
         TFile* const DATA_FILE_1,
-        TFile* const DATA_FILE_2,
-        const std::string& OUT_DIR,
-        const int PT_SLICE,
-        const bool USE_PT_SLICES,
-        const int RAP_SLICE,
-        const bool USE_RAP_SLICES
+        const std::string& OUT_DIR
         );
 
 // Main, used only on the command line

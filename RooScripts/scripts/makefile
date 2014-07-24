@@ -8,13 +8,23 @@ CC=g++ -g -O2
 CC11=${CC} -std=gnu++0x
 CCC=${CC} -c
 
-all: RooFitLifetime.exe
+all: RooFitLifetime.exe RooFitPileupProb.exe RooFitPileupEstimation.exe
 
 RooFitLifetime.exe: RooFitLifetime.cpp
 	${CC} \
 	${ROO_INCLUDES} \
 	-o RooFitLifetime.exe \
 	RooFitLifetime.cpp
+RooFitPileupEstimation.exe: RooFitPileupEstimation.cpp
+	${CC} \
+	${ROO_INCLUDES} \
+	-o RooFitPileupEstimation.exe \
+	RooFitPileupEstimation.cpp
+RooFitPileupProb.exe: RooFitPileupProb.cpp
+	${CC} \
+	${ROO_INCLUDES} \
+	-o RooFitPileupProb.exe \
+	RooFitPileupProb.cpp
 
 # All .o files rely on the .cpp files
 %.o:%.cpp
@@ -26,3 +36,5 @@ RooFitLifetime.exe: RooFitLifetime.cpp
 
 clean:
 	rm RooFitLifetime_cpp.d RooFitLifetime_cpp.so
+	rm RooFitPileupProb_cpp.d RooFitPileupProb_cpp.so
+	rm RooFitPileupEstimation_cpp.d RooFitPileupEstimation_cpp.so

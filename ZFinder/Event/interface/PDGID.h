@@ -60,7 +60,9 @@ enum PDGID {
     WMINUS = -24,
     WMINUSBOSON = -24,
     HIGGS = 25,
-    HIGGSBOSON = 25
+    HIGGSBOSON = 25,
+    //Mesons
+    JPSI = 443
 };
 
 #endif  // ZFINDER_PDFID_H_
