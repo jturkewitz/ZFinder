@@ -23,4 +23,4 @@ int RooFitPileupEstimation(
 
 // Main, used only on the command line
 int main(int argc, char* argv[]);
-#endif // ROOFITLIFETIME_H_
+#endif // ROOFITPILEUPESTIMATION_H_

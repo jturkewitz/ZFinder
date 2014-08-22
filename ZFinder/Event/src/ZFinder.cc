@@ -44,6 +44,10 @@ Implementation:
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
 #include "DataFormats/ParticleFlowReco/interface/PFBlock.h"
 
+//Muons
+#include "DataFormats/MuonReco/interface/Muon.h" // reco::Muon
+#include "DataFormats/MuonReco/interface/MuonSelectors.h" //muon::isSoftMuon
+
 // Electrons
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"  // GsfElectron
 #include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"  // GenParticle
@@ -91,8 +95,8 @@ class ZFinder : public edm::EDAnalyzer {
     std::vector<zf::ZDefinitionPlotter*> zdef_plotters_;
     std::vector<zf::ZDefinitionWorkspace*> zdef_workspaces_;
     zf::ZEfficiencies zeffs_;
-    zf::ZFinderPlotter *zfp_all, *zfp_dielectron, *zfp_dimuon_and_dielectron, *zfp_jpsi_and_dielectron, *zfp_jpsi_and_z;
-    zf::ZFinderPlotter *zfp_jpsi_and_z_same_vertex, *zfp_jpsi, *zfp_jpsi_primary_vertex;
+    zf::ZFinderPlotter *zfp_all, *zfp_dimuon, *zfp_dimuon_soft, *zfp_dimuon_vtx_compatible, *zfp_dielectron, *zfp_dimuon_and_dielectron, *zfp_jpsi_and_dielectron, *zfp_jpsi_and_z;
+    zf::ZFinderPlotter *zfp_jpsi_and_z_same_vertex, *zfp_jpsi, *zfp_dimuon_primary_vertex;
     zf::ZFinderPlotter *zfp_all_mc, *zfp_jpsi_mc;
 };
 
@@ -122,8 +126,11 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
   //TODO testing set up Z+jpsi plotter, give better names
 
   TFileDirectory tdir_all(fs->mkdir("All"));
+  TFileDirectory tdir_dimuon(fs->mkdir("Dimuon"));
+  TFileDirectory tdir_dimuon_soft(fs->mkdir("Dimuon_Soft"));
+  TFileDirectory tdir_dimuon_vtx_compatible(fs->mkdir("Dimuon_Vertex_Compatible"));
+  TFileDirectory tdir_dimuon_primary_vertex(fs->mkdir("Dimuon_Primary_Vertex"));
   TFileDirectory tdir_jpsi(fs->mkdir("Jpsi"));
-  TFileDirectory tdir_jpsi_primary_vertex(fs->mkdir("Jpsi_Primary_Vertex"));
   TFileDirectory tdir_dielectron(fs->mkdir("Dielectron"));
   TFileDirectory tdir_dimuon_and_dielectron(fs->mkdir("Dimuon_And_Dielectron"));
   TFileDirectory tdir_jpsi_and_dielectron(fs->mkdir("Jpsi_And_Dielectron"));
@@ -139,20 +146,30 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
   //TFileDirectory t_subdir1 = tdir_zd.mkdir("JPSI_Electron", "JPSI_Electron");
   const bool USE_MC = true;
   const bool APPLY_MUON_MIN_PT = true;
+  const bool APPLY_SOFT_MUONS = true;
+  const bool APPLY_DIMUON_VTX_COMPATIBILITY = true;
   const bool APPLY_JPSI_MASS_WINDOW = true;
   const bool APPLY_VERTEX_Z_POS_WINDOW = true;
 
+  //TODO fix the ugliness of the code
+  //go to complicated base ZFinder method?
+  //dimuon => muon pt cut for now
+  //TODO decide on order of cuts?
+  //TODO define an integer that corresponds to a cut level to make this code less ugly
   zfp_all = new zf::ZFinderPlotter(tdir_all);
-  zfp_jpsi = new zf::ZFinderPlotter(tdir_jpsi, !USE_MC, APPLY_MUON_MIN_PT,  APPLY_JPSI_MASS_WINDOW);
-  zfp_jpsi_primary_vertex = new zf::ZFinderPlotter(tdir_jpsi_primary_vertex, !USE_MC, APPLY_MUON_MIN_PT, APPLY_JPSI_MASS_WINDOW, APPLY_VERTEX_Z_POS_WINDOW);
+  zfp_dimuon = new zf::ZFinderPlotter(tdir_dimuon, !USE_MC, APPLY_MUON_MIN_PT);
+  zfp_dimuon_soft = new zf::ZFinderPlotter(tdir_dimuon_soft, !USE_MC, APPLY_MUON_MIN_PT, APPLY_SOFT_MUONS);
+  zfp_dimuon_vtx_compatible = new zf::ZFinderPlotter(tdir_dimuon_vtx_compatible, !USE_MC, APPLY_MUON_MIN_PT, APPLY_SOFT_MUONS, APPLY_DIMUON_VTX_COMPATIBILITY);
+  zfp_dimuon_primary_vertex = new zf::ZFinderPlotter(tdir_dimuon_primary_vertex, !USE_MC, APPLY_MUON_MIN_PT, APPLY_SOFT_MUONS, APPLY_DIMUON_VTX_COMPATIBILITY, !APPLY_JPSI_MASS_WINDOW, APPLY_VERTEX_Z_POS_WINDOW);
+  zfp_jpsi = new zf::ZFinderPlotter(tdir_jpsi, !USE_MC, APPLY_MUON_MIN_PT, APPLY_SOFT_MUONS, APPLY_DIMUON_VTX_COMPATIBILITY, APPLY_JPSI_MASS_WINDOW);
   zfp_dielectron = new zf::ZFinderPlotter(tdir_dielectron);
-  zfp_dimuon_and_dielectron = new zf::ZFinderPlotter(tdir_dimuon_and_dielectron);
-  zfp_jpsi_and_dielectron = new zf::ZFinderPlotter(tdir_jpsi_and_dielectron, !USE_MC, APPLY_MUON_MIN_PT, APPLY_JPSI_MASS_WINDOW);
-  zfp_jpsi_and_z = new zf::ZFinderPlotter(tdir_jpsi_and_z, !USE_MC, APPLY_MUON_MIN_PT, APPLY_JPSI_MASS_WINDOW);
-  zfp_jpsi_and_z_same_vertex = new zf::ZFinderPlotter(tdir_jpsi_and_z_same_vertex, !USE_MC, APPLY_MUON_MIN_PT, APPLY_JPSI_MASS_WINDOW, APPLY_VERTEX_Z_POS_WINDOW);
+  zfp_dimuon_and_dielectron = new zf::ZFinderPlotter(tdir_dimuon_and_dielectron, !USE_MC, APPLY_MUON_MIN_PT );
+  zfp_jpsi_and_dielectron = new zf::ZFinderPlotter(tdir_jpsi_and_dielectron, !USE_MC, APPLY_MUON_MIN_PT, APPLY_SOFT_MUONS, APPLY_DIMUON_VTX_COMPATIBILITY, APPLY_JPSI_MASS_WINDOW);
+  zfp_jpsi_and_z = new zf::ZFinderPlotter(tdir_jpsi_and_z, !USE_MC, APPLY_MUON_MIN_PT, APPLY_SOFT_MUONS, APPLY_DIMUON_VTX_COMPATIBILITY, APPLY_JPSI_MASS_WINDOW);
+  zfp_jpsi_and_z_same_vertex = new zf::ZFinderPlotter(tdir_jpsi_and_z_same_vertex, !USE_MC, APPLY_MUON_MIN_PT, APPLY_SOFT_MUONS, APPLY_DIMUON_VTX_COMPATIBILITY, APPLY_JPSI_MASS_WINDOW, APPLY_VERTEX_Z_POS_WINDOW);
 
   zfp_all_mc = new zf::ZFinderPlotter(tdir_all_mc, USE_MC);
-  zfp_jpsi_mc = new zf::ZFinderPlotter(tdir_jpsi_mc, USE_MC, APPLY_MUON_MIN_PT, APPLY_JPSI_MASS_WINDOW);
+  zfp_jpsi_mc = new zf::ZFinderPlotter(tdir_jpsi_mc, USE_MC, APPLY_MUON_MIN_PT, !APPLY_SOFT_MUONS, APPLY_JPSI_MASS_WINDOW);
 
   //zf::ZFinderPlotter* zfp_jpsi = new zf::ZFinderPlotter(tdir_z_jpsi_dir, false);  // False = do not plot Truth
 
@@ -192,18 +209,19 @@ ZFinder::~ZFinder() {
   // (e.g. close files, deallocate resources etc.)
 
   // Delete our heap variables
-  for (auto& i_set : setters_) {
-    delete i_set;
-  }
-  for (auto& i_zdef : zdefs_) {
-    delete i_zdef;
-  }
-  for (auto& i_zdefp : zdef_plotters_) {
-    delete i_zdefp;
-  }
-  for (auto& i_zdefw : zdef_workspaces_) {
-    delete i_zdefw;
-  }
+  // TODO decide if this is needed
+  //for (auto& i_set : setters_) {
+  //  delete i_set;
+  //}
+  //for (auto& i_zdef : zdefs_) {
+  //  delete i_zdef;
+  //}
+  //for (auto& i_zdefp : zdef_plotters_) {
+  //  delete i_zdefp;
+  //}
+  //for (auto& i_zdefw : zdef_workspaces_) {
+  //  delete i_zdefw;
+  //}
 }
 
 
@@ -219,63 +237,59 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
   zf::ZFinderEvent zfe(iEvent, iSetup, iConfig_);
 
   bool found_dimuon = false;
-  if (zfe.reco_jpsi.m.size() > 0 ) {
-    for (unsigned int i = 0; i < zfe.reco_jpsi.m.size() ; ++i ) {
-      if ( zfe.mu0.at(i).pt() >= MIN_MUON_PT && zfe.mu1.at(i).pt() >= MIN_MUON_PT ) {
-        found_dimuon = true;
+  bool is_soft_dimuon = false;
+  bool is_dimuon_vtx_compatible = false;
+  bool is_dimuon_primary_vtx_z_compatible = false;
+  bool found_jpsi = false;
+
+  //TODO also decide if soft muons is a good criterion, maybe rename the bool
+  //TODO decide if want behavior of associating with primary vertex when no z is found
+  for (unsigned int i = 0; i < zfe.reco_jpsi.m.size() ; ++i ) {
+    if ( zfe.mu0.at(i).pt() >= MIN_MUON_PT && zfe.mu1.at(i).pt() >= MIN_MUON_PT ) {
+      found_dimuon = true;
+      if (muon::isSoftMuon(zfe.mu0.at(i), zfe.reco_vert.primary_vert ) 
+          && muon::isSoftMuon(zfe.mu1.at(i), zfe.reco_vert.primary_vert) ) {
+        is_soft_dimuon = true;
+        if ( zfe.reco_jpsi.vtx_prob.at(i) >= MIN_VERTEX_PROB ) {
+          is_dimuon_vtx_compatible = true;
+          if ( fabs(zfe.reco_vert.primary_z - zfe.reco_jpsi.vtx_z.at(i)) <= MAX_JPSI_VERTEX_Z_DISPLACEMENT ) {
+            is_dimuon_primary_vtx_z_compatible = true;
+            if (zfe.reco_jpsi.m.at(i) <= MAX_JPSI_MASS && zfe.reco_jpsi.m.at(i) >= MIN_JPSI_MASS ) {
+              found_jpsi = true;
+            }
+          }
+        }
       }
     }
   }
   bool found_truth_dimuon = false;
+  bool found_truth_jpsi = false;
   if (zfe.truth_jpsi.m.size() > 0 ) {
     for (unsigned int i = 0; i < zfe.truth_jpsi.m.size() ; ++i ) {
       if ( zfe.jpsi_muon0.at(i)->pt() >= MIN_MUON_PT && zfe.jpsi_muon1.at(i)->pt() >= MIN_MUON_PT ) {
         found_truth_dimuon = true;
+        if (zfe.truth_jpsi.m.at(i) <= MAX_JPSI_MASS && zfe.truth_jpsi.m.at(i) >= MIN_JPSI_MASS ) {
+          found_truth_jpsi = true;
+        }
       }
     }
   }
 
-  bool found_jpsi = false;
-  for (unsigned int i = 0; i < zfe.reco_jpsi.m.size() ; ++i ) {
-    if (zfe.reco_jpsi.m.at(i) <= MAX_JPSI_MASS && zfe.reco_jpsi.m.at(i) >= MIN_JPSI_MASS ) {
-      found_jpsi = true;
-    }
-  }
-  bool found_truth_jpsi = false;
-  for (unsigned int i = 0; i < zfe.truth_jpsi.m.size() ; ++i ) {
-    if (zfe.truth_jpsi.m.at(i) <= MAX_JPSI_MASS && zfe.truth_jpsi.m.at(i) >= MIN_JPSI_MASS ) {
-      found_truth_jpsi = true;
-    }
-  }
 
-  bool is_vtx_z_compatible = false;
   //TODO fix case of multiple jpsis handling
   //TODO decide if want behavior of associating with primary vertex when no z is found
-  for (unsigned int i = 0; i < zfe.reco_jpsi.m.size() ; ++i ) {
-    if ( fabs(zfe.reco_jpsi.distance_z.at(i)) <= MAX_JPSI_VERTEX_Z_DISPLACEMENT ) {
-      is_vtx_z_compatible = true;
-    }
-  }
-
-  bool is_jpsi_primary_vtx_z_compatible = false;
-  //TODO fix case of multiple jpsis handling
-  //TODO decide if want behavior of associating with primary vertex when no z is found
-  for (unsigned int i = 0; i < zfe.reco_jpsi.m.size() ; ++i ) {
-    if ( fabs(zfe.reco_jpsi.distance_z.at(i)) <= MAX_JPSI_VERTEX_Z_DISPLACEMENT ) {
-      is_jpsi_primary_vtx_z_compatible = true;
-    }
-  }
 
   //TODO clean this code up
   bool found_dielectron = false;
-  if (zfe.reco_z.m > -1 && zfe.e0 != NULL && zfe.e1 != NULL) {
-    found_dielectron = true;
-  }
   bool found_z = false;
-  if (zfe.reco_z.m >= MIN_Z_MASS && zfe.reco_z.m <= MAX_Z_MASS && zfe.e0 != NULL && zfe.e1 != NULL) {
-    found_z = true;
+  if (zfe.reco_z.m > -1 && zfe.e0->pt >= MIN_ELECTRON_PT && zfe.e1->pt >= MIN_ELECTRON_PT ) {
+    found_dielectron = true;
+    if (zfe.reco_z.m >= MIN_Z_MASS && zfe.reco_z.m <= MAX_Z_MASS ) {
+      found_z = true;
+    }
   }
 
+  //Fill histograms
   zfp_all->Fill(zfe);
   zfp_all_mc->Fill(zfe);
 
@@ -284,26 +298,33 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
   }
 
   //TODO dimuon has minimum muon pT cut - do we want this?
-  if ( found_dimuon && found_jpsi ) {
-    zfp_jpsi->Fill(zfe);
-    if (is_jpsi_primary_vtx_z_compatible) {
-      zfp_jpsi_primary_vertex->Fill(zfe);
+  if ( found_dimuon ) {
+    zfp_dimuon->Fill(zfe);
+    if ( is_soft_dimuon ) {
+      zfp_dimuon_soft->Fill(zfe);
+      if ( is_dimuon_vtx_compatible ) {
+        zfp_dimuon_vtx_compatible->Fill(zfe);
+        if (is_dimuon_primary_vtx_z_compatible) {
+          zfp_dimuon_primary_vertex->Fill(zfe);
+          if (found_jpsi ) { 
+            zfp_jpsi->Fill(zfe);
+          }
+        }
+      }
     }
   }
 
   //TODO fix how electron pt is accessed as opposed to how muon pt is accessed () vs no ()
   if (found_dielectron) {
-    if (zfe.e0->pt >= MIN_ELECTRON_PT && zfe.e1->pt >= MIN_ELECTRON_PT) {
-      zfp_dielectron->Fill(zfe);
-      if (found_dimuon) {
-        zfp_dimuon_and_dielectron->Fill(zfe);
-        if (found_jpsi ) {
-          zfp_jpsi_and_dielectron->Fill(zfe);
-          if (found_z) {
-            zfp_jpsi_and_z->Fill(zfe);
-            if ( is_vtx_z_compatible ) {
-              zfp_jpsi_and_z_same_vertex->Fill(zfe);
-            }
+    zfp_dielectron->Fill(zfe);
+    if (found_dimuon) {
+      zfp_dimuon_and_dielectron->Fill(zfe);
+      if (is_dimuon_vtx_compatible && is_soft_dimuon && found_jpsi ) {
+        zfp_jpsi_and_dielectron->Fill(zfe);
+        if (found_z) {
+          zfp_jpsi_and_z->Fill(zfe);
+          if ( is_dimuon_primary_vtx_z_compatible ) {
+            zfp_jpsi_and_z_same_vertex->Fill(zfe);
           }
         }
       }

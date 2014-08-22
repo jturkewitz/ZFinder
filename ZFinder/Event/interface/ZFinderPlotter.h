@@ -7,6 +7,8 @@
 
 // CMSSW
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
+#include "DataFormats/MuonReco/interface/Muon.h" // reco::Muon
+#include "DataFormats/MuonReco/interface/MuonSelectors.h" //muon::isSoftMuon
 
 // ZFinder Code
 #include "ZFinderEvent.h"  // ZFinderEvent
@@ -16,7 +18,8 @@ namespace zf {
     class ZFinderPlotter{
         public:
             // Constructor
-            ZFinderPlotter(TFileDirectory& tdir, const bool USE_MC = false, const bool APPLY_MUON_MIN_PT = false, const bool APPLY_JPSI_MASS_WINDOW = false, const bool APPLY_VERTEX_Z_POS_WINDOW = false);
+            ZFinderPlotter(TFileDirectory& tdir, const bool USE_MC = false, const bool APPLY_MUON_MIN_PT = false, const bool APPLY_SOFT_MUONS = false,
+                const bool APPLY_DIMUON_VTX_COMPATIBILITY = false, const bool APPLY_JPSI_MASS_WINDOW = false, const bool APPLY_VERTEX_Z_POS_WINDOW = false);
 
             // Add events
             void Fill(
@@ -52,47 +55,51 @@ namespace zf {
             TH1D* pileup_;
             TH1D* nelectrons_;
 
-            TH1D* jpsi0_mass_all_;
-            TH1D* jpsi0_mass_coarse_;
-            TH1D* jpsi0_mass_fine_;
-            TH1D* jpsi0_rapidity_;
-            TH1D* jpsi0_pt_;
-            TH2D* jpsi0_pt_vs_rap_;
-            TH1D* jpsi0_distance_;
-            TH1D* jpsi0_dist_err_;
-            TH1D* jpsi0_chi2_;
-            TH1D* jpsi0_distance_xy_;
-            TH1D* jpsi0_dist_err_xy_;
-            TH1D* jpsi0_chi2_xy_;
-            TH1D* jpsi0_tau_xy_;
-            TH1D* jpsi0_tau_xy_fine_;
-            TH1D* jpsi0_tau_xy_very_fine_;
+            TH1D* jpsi_mass_all_;
+            TH1D* jpsi_mass_coarse_;
+            TH1D* jpsi_mass_fine_;
+            TH1D* jpsi_rapidity_;
+            TH1D* jpsi_pt_;
+            TH2D* jpsi_pt_vs_rap_;
+            TH1D* jpsi_distance_;
+            TH1D* jpsi_dist_err_;
+            TH1D* jpsi_chi2_;
+            TH1D* jpsi_distance_xy_;
+            TH1D* jpsi_dist_err_xy_;
+            TH1D* jpsi_chi2_xy_;
+            TH1D* jpsi_tau_xy_;
+            TH1D* jpsi_tau_xy_fine_;
+            TH1D* jpsi_tau_xy_very_fine_;
 
-            TH1D* jpsi0_tau_xy_very_fine_ptUnder10_;
-            TH1D* jpsi0_tau_xy_very_fine_pt10to15_;
-            TH1D* jpsi0_tau_xy_very_fine_pt15to20_;
-            TH1D* jpsi0_tau_xy_very_fine_pt20to25_;
-            TH1D* jpsi0_tau_xy_very_fine_pt25to30_;
-            TH1D* jpsi0_tau_xy_very_fine_ptAbove20_;
-            TH1D* jpsi0_tau_xy_very_fine_ptAbove30_;
+            TH1D* jpsi_tau_xy_very_fine_ptUnder10_;
+            TH1D* jpsi_tau_xy_very_fine_pt10to15_;
+            TH1D* jpsi_tau_xy_very_fine_pt15to20_;
+            TH1D* jpsi_tau_xy_very_fine_pt20to25_;
+            TH1D* jpsi_tau_xy_very_fine_pt25to30_;
+            TH1D* jpsi_tau_xy_very_fine_ptAbove20_;
+            TH1D* jpsi_tau_xy_very_fine_ptAbove30_;
 
-            TH1D* jpsi0_tau_xy_very_fine_rap0_0to0_3_;
-            TH1D* jpsi0_tau_xy_very_fine_rap0_3to0_6_;
-            TH1D* jpsi0_tau_xy_very_fine_rap0_6to0_9_;
-            TH1D* jpsi0_tau_xy_very_fine_rap0_9to1_2_;
-            TH1D* jpsi0_tau_xy_very_fine_rap1_2to1_5_;
-            TH1D* jpsi0_tau_xy_very_fine_rap1_5to1_8_;
-            TH1D* jpsi0_tau_xy_very_fine_rap1_8to2_1_;
-            TH1D* jpsi0_tau_xy_very_fine_rap2_1to2_4_;
+            TH1D* jpsi_tau_xy_very_fine_rap0_0to0_3_;
+            TH1D* jpsi_tau_xy_very_fine_rap0_3to0_6_;
+            TH1D* jpsi_tau_xy_very_fine_rap0_6to0_9_;
+            TH1D* jpsi_tau_xy_very_fine_rap0_9to1_2_;
+            TH1D* jpsi_tau_xy_very_fine_rap1_2to1_5_;
+            TH1D* jpsi_tau_xy_very_fine_rap1_5to1_8_;
+            TH1D* jpsi_tau_xy_very_fine_rap1_8to2_1_;
+            TH1D* jpsi_tau_xy_very_fine_rap2_1to2_4_;
 
-            TH1D* jpsi0_tau_xy_very_fine_rap0_0to0_9pt10to15_;
-            TH1D* jpsi0_tau_xy_very_fine_rap0_9to1_2pt10to15_;
-            TH1D* jpsi0_tau_xy_very_fine_rap1_2to2_1pt10to15_;
+            TH1D* jpsi_tau_xy_very_fine_rap0_0to0_9pt10to15_;
+            TH1D* jpsi_tau_xy_very_fine_rap0_9to1_2pt10to15_;
+            TH1D* jpsi_tau_xy_very_fine_rap1_2to2_1pt10to15_;
 
-            TH1D* jpsi0_tau_z_;
-            TH1D* jpsi0_tau_z_fine_;
-            TH1D* jpsi0_tau_z_very_fine_;
-            TH1D* jpsi0_zpt_difference_;
+            TH1D* jpsi_tau_xy_very_fine_above_12_tracker_layers_;
+
+            TH1D* jpsi_tau_xy_very_fine_similar_pt_muons_;
+
+            TH1D* jpsi_tau_z_;
+            TH1D* jpsi_tau_z_fine_;
+            TH1D* jpsi_tau_z_very_fine_;
+            TH1D* jpsi_zpt_difference_;
 
             TH1D* dimuon_vtx_prob_;
             TH1D* dimuon_delta_phi_;
@@ -109,6 +116,11 @@ namespace zf {
             TH1D* mu1_phi_;
             TH1D* mu0_charge_;
             TH1D* mu1_charge_;
+            TH1D* mu0_tracker_layers_;
+            TH1D* mu1_tracker_layers_;
+            TH1D* mu0_deltaR_truth_;
+            TH1D* mu1_deltaR_truth_;
+            TH1D* n_truth_matched_jpsi_muons_;
 
             TH1D* jet_pt_;
             TH1D* jet_eta_;
@@ -143,10 +155,10 @@ namespace zf {
             TH1D* jpsi_iso_sum_photon_et_mu1_;
             TH1D* jpsi_iso_sum_pileup_pt_mu1_;
 
-            TH2D* jpsi0_mass_vs_chi2_;
-            TH2D* jpsi0_tau_xy_vs_tau_z_;
-            TH2D* jpsi0_tau_xy_vs_distance_z_;
-            TH2D* jpsi0_tau_z_vs_distance_z_;
+            TH2D* jpsi_mass_vs_chi2_;
+            TH2D* jpsi_tau_xy_vs_tau_z_;
+            TH2D* jpsi_tau_xy_vs_distance_z_;
+            TH2D* jpsi_tau_z_vs_distance_z_;
 
             TH1D* vtx_x_;
             TH1D* vtx_y_;
@@ -176,6 +188,8 @@ namespace zf {
             // Use the MC or reco data
             const bool USE_MC_;
             const bool APPLY_MUON_MIN_PT_;
+            const bool APPLY_SOFT_MUONS_;
+            const bool APPLY_DIMUON_VTX_COMPATIBILITY_;
             const bool APPLY_JPSI_MASS_WINDOW_;
             const bool APPLY_VERTEX_Z_POS_WINDOW_;
             // Plotting variables

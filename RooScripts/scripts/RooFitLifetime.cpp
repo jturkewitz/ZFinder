@@ -27,6 +27,7 @@
 #include "RooDecay.h"
 #include "RooKeysPdf.h"
 #include "RooGenericPdf.h"
+#include "RooHist.h"
 #include "RooHistPdf.h"
 #include "RooPlot.h"
 #include "RooRealVar.h"
@@ -105,8 +106,11 @@ std::vector<double> RooFitLifetime(
     "jpsi_tau_xy_very_fine_pt_10_to_15",
     "jpsi_tau_xy_very_fine_pt_15_to_20",
     "jpsi_tau_xy_very_fine_pt_20_to_25",
+    //TODO revert to normal
     "jpsi_tau_xy_very_fine_pt_25_to_30",
+    //"jpsi_tau_xy_very_fine_above_12_tracker_layers_",
     "jpsi_tau_xy_very_fine_ptAbove20",
+    //"jpsi_tau_xy_very_fine_similar_pt_muons_",
     "jpsi_tau_xy_very_fine_ptAbove30"};
 
   const std::string rap_slice_list[8] = {
@@ -131,7 +135,9 @@ std::vector<double> RooFitLifetime(
 
 //  std::string inclusive_jpsi_hist = "ZFinder/Jpsi/";
 //  std::string zjpsi_hist = "ZFinder/Jpsi_And_Z/";
-  std::string inclusive_jpsi_hist = "ZFinder/Jpsi_Primary_Vertex/";
+//  std::string inclusive_jpsi_hist = "ZFinder/Jpsi_Primary_Vertex/";
+//  std::string zjpsi_hist = "ZFinder/Jpsi_And_Z_Same_Vertex/";
+  std::string inclusive_jpsi_hist = "ZFinder/Jpsi/";
   std::string zjpsi_hist = "ZFinder/Jpsi_And_Z_Same_Vertex/";
   std::string jpsi_hist_name = "";
   std::string zjpsi_hist_name = "z";
@@ -179,6 +185,7 @@ std::vector<double> RooFitLifetime(
   RooRealVar gauss_prompt_sigma_2("gauss_prompt_sigma_2", "Width of the Prompt Gaussian_2", 0.01, 0.008, 0.4);
   RooGaussian prompt_gauss_2("prompt_gauss_2", "Gaussian_2 of the Prompt Peak", tau_xy, gauss_prompt_mean, gauss_prompt_sigma_2);
 
+  //TODO testing ---------------------------
   RooRealVar prompt_sharp_fraction("prompt_sharp_fraction", "prompt_sharp_fraction" , 0.5 , 0.0, 1.);
 //  TODO decide whether or not to use double gaussian fit, if so also figure out how to fix which one is prompt or not
 //  RooRealVar prompt_sharp_fraction("prompt_sharp_fraction", "prompt_sharp_fraction" , 1.0);
@@ -260,15 +267,32 @@ std::vector<double> RooFitLifetime(
   tau_xy_fitpdf.plotOn(tau_xy_fitframe, Components(prompt_gauss), LineColor(kBlue-2));
   tau_xy_fitpdf.plotOn(tau_xy_fitframe, Components(prompt_gauss_2), LineColor(kOrange-2));
   tau_xy_fitpdf.plotOn(tau_xy_fitframe, LineColor(kRed-2));
-  //tau_xy_fitpdf.plotOn(tau_xy_fitframe, LineColor(kGreen-2), NumCPU(N_CPU));
 
   tau_xy_fitframe->Draw();
+
 
   std::string jpsi_image_name = OUT_DIR;
   jpsi_image_name.append(jpsi_hist_name);
   jpsi_image_name.append(".png");
   canvas->Print(jpsi_image_name.c_str() , "png");
   canvas->Close();
+
+  TCanvas *canvas2 = new TCanvas("canvas2", "canvas2", 2000, 750);
+  canvas2->cd();
+  RooHist* hpull = tau_xy_fitframe->pullHist() ;
+  std::string pull_hist_name = jpsi_hist_name;
+  pull_hist_name.append("_Pull");
+
+  RooPlot* frame2 = tau_xy.frame( Title(pull_hist_name.c_str()) , Range(tau_xy_min, tau_xy_max )) ;
+  frame2->addPlotable(hpull, "P") ;
+  //frame2->setMinimum(-5) ;
+  //frame2->setMaximum(+5) ;
+  frame2->Draw() ; 
+  std::string test_image_name = OUT_DIR;
+  test_image_name.append(pull_hist_name);
+  test_image_name.append(".png");
+  canvas2->Print(test_image_name.c_str() , "png");
+  canvas2->Close();
 
   RooFitResult * zjpsi_fitres = zjpsi_tau_xy_fitpdf.fitTo(zjpsi_tau_xy_data_hist, Range(tau_xy_min, tau_xy_max), NumCPU(N_CPU), Verbose(false), PrintLevel(-1) , Save());
 

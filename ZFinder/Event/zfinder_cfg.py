@@ -24,6 +24,10 @@ process.maxEvents = cms.untracked.PSet(
         input = cms.untracked.int32(N_EVENTS_TO_PROCESS)
         )
 
+process.options = cms.untracked.PSet(
+    wantSummary = cms.untracked.bool(True)
+)
+
 process.source = cms.Source("PoolSource",
     ##fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/ZPhysics/JpsiSkim/jpsiSkimUpdated.root')
     ##fileNames = cms.untracked.vstring( 'file:/hdfs/cms/user/turkewitz/ZPhysics/JPsiSkim/DoubleElectron/2012B/jpsiSkimUpdated/jpsiSkimUpdated_999-pool.root')
@@ -31,7 +35,8 @@ process.source = cms.Source("PoolSource",
     ##fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/ZPhysics/PromptJpsi/JpsiMM_8TeV_cfi_py_GEN_SIM_DIGI_L1_DIGI2RAW_HLT_RAW2DIGI_RECO.root')
     ##fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/ZPhysics/tmp/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball_00037C53-AAD1-E111-B1BE-003048D45F38.root')
     ##fileNames = cms.untracked.vstring( 'file:/hdfs/cms/user/turkewitz/tmp/jpsi_inclusive_mc_test_file.root')
-    fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/ZPhysics/tmp/0012F37A-CE09-E211-ABDA-00261894396F.root')
+    ###fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/ZPhysics/tmp/0012F37A-CE09-E211-ABDA-00261894396F.root')
+    fileNames = cms.untracked.vstring( 'file:/home/user1/turkewitz/Work/CMSSW_5_3_13_ZJPsi/src/jpsiSkimMuonsUpdated.root')
     ##fileNames = cms.untracked.vstring( 'root://xrootd.unl.edu//store/mc/Summer12_DR53X/JPsiToMuMu_2MuPtEtaFilter_tuneD6T_8TeV-pythia6-evtgen/AODSIM/PU_S10_START53_V7A-v2/00000/0012F37A-CE09-E211-ABDA-00261894396F.root')
     ## fileNames = cms.untracked.vstring( 'file:/hdfs/cms/user/turkewitz/ZPhysics/JPsiSkim/DoubleElectron/jpsiSkim/jpsiSkim_000-pool.root')
     ##fileNames = cms.untracked.vstring( 'file:/home/user1/turkewitz/Work/CMSSW_5_3_13_ZJPsi/src/JPsiFilter/jpsiSkim.root')
@@ -39,7 +44,7 @@ process.source = cms.Source("PoolSource",
 )
 
 process.TFileService = cms.Service("TFileService",
-        fileName = cms.string("test9d10.root")
+        fileName = cms.string("test9d14.root")
         )
 
 #
