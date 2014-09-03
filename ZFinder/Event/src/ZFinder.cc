@@ -97,6 +97,7 @@ class ZFinder : public edm::EDAnalyzer {
     zf::ZEfficiencies zeffs_;
     zf::ZFinderPlotter *zfp_all, *zfp_dimuon, *zfp_dimuon_soft, *zfp_dimuon_vtx_compatible, *zfp_dielectron, *zfp_dimuon_and_dielectron, *zfp_jpsi_and_dielectron, *zfp_jpsi_and_z;
     zf::ZFinderPlotter *zfp_jpsi_and_z_same_vertex, *zfp_jpsi, *zfp_dimuon_primary_vertex;
+    zf::ZFinderPlotter *zfp_four_muons, *zfp_jpsi_and_two_muons, *zfp_jpsi_and_two_tight_muons, *zfp_jpsi_and_z_from_muons;
     zf::ZFinderPlotter *zfp_all_mc, *zfp_jpsi_mc;
 };
 
@@ -137,6 +138,11 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
   TFileDirectory tdir_jpsi_and_z(fs->mkdir("Jpsi_And_Z"));
   TFileDirectory tdir_jpsi_and_z_same_vertex(fs->mkdir("Jpsi_And_Z_Same_Vertex"));
 
+  TFileDirectory tdir_four_muons(fs->mkdir("Four_Muons"));
+  TFileDirectory tdir_jpsi_and_two_muons(fs->mkdir("Jpsi_And_Two_Muons"));
+  TFileDirectory tdir_jpsi_and_two_tight_muons(fs->mkdir("Jpsi_And_Two_Tight_Muons"));
+  TFileDirectory tdir_jpsi_and_z_from_muons(fs->mkdir("Jpsi_And_Z_From_Muons"));
+
   TFileDirectory tdir_all_mc(fs->mkdir("MC_All"));
   TFileDirectory tdir_jpsi_mc(fs->mkdir("MC_Jpsi"));
 
@@ -156,6 +162,8 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
   //dimuon => muon pt cut for now
   //TODO decide on order of cuts?
   //TODO define an integer that corresponds to a cut level to make this code less ugly
+  //TODO order of cuts - JPsi mass cut should probably be the last cut made
+  //TODO there must be a better way to do this - very brute forced right now
   zfp_all = new zf::ZFinderPlotter(tdir_all);
   zfp_dimuon = new zf::ZFinderPlotter(tdir_dimuon, !USE_MC, APPLY_MUON_MIN_PT);
   zfp_dimuon_soft = new zf::ZFinderPlotter(tdir_dimuon_soft, !USE_MC, APPLY_MUON_MIN_PT, APPLY_SOFT_MUONS);
@@ -168,13 +176,15 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
   zfp_jpsi_and_z = new zf::ZFinderPlotter(tdir_jpsi_and_z, !USE_MC, APPLY_MUON_MIN_PT, APPLY_SOFT_MUONS, APPLY_DIMUON_VTX_COMPATIBILITY, APPLY_JPSI_MASS_WINDOW);
   zfp_jpsi_and_z_same_vertex = new zf::ZFinderPlotter(tdir_jpsi_and_z_same_vertex, !USE_MC, APPLY_MUON_MIN_PT, APPLY_SOFT_MUONS, APPLY_DIMUON_VTX_COMPATIBILITY, APPLY_JPSI_MASS_WINDOW, APPLY_VERTEX_Z_POS_WINDOW);
 
+  zfp_four_muons = new zf::ZFinderPlotter(tdir_four_muons, !USE_MC);
+  zfp_jpsi_and_two_muons = new zf::ZFinderPlotter(tdir_jpsi_and_two_muons, !USE_MC, APPLY_MUON_MIN_PT, APPLY_SOFT_MUONS, APPLY_DIMUON_VTX_COMPATIBILITY, APPLY_JPSI_MASS_WINDOW);
+  zfp_jpsi_and_two_tight_muons = new zf::ZFinderPlotter(tdir_jpsi_and_two_tight_muons, !USE_MC, APPLY_MUON_MIN_PT, APPLY_SOFT_MUONS, APPLY_DIMUON_VTX_COMPATIBILITY, APPLY_JPSI_MASS_WINDOW);
+  zfp_jpsi_and_z_from_muons = new zf::ZFinderPlotter(tdir_jpsi_and_z_from_muons, !USE_MC, APPLY_MUON_MIN_PT, APPLY_SOFT_MUONS, APPLY_DIMUON_VTX_COMPATIBILITY, APPLY_JPSI_MASS_WINDOW);
+
   zfp_all_mc = new zf::ZFinderPlotter(tdir_all_mc, USE_MC);
   zfp_jpsi_mc = new zf::ZFinderPlotter(tdir_jpsi_mc, USE_MC, APPLY_MUON_MIN_PT, !APPLY_SOFT_MUONS, APPLY_JPSI_MASS_WINDOW);
 
   //zf::ZFinderPlotter* zfp_jpsi = new zf::ZFinderPlotter(tdir_z_jpsi_dir, false);  // False = do not plot Truth
-
-
-
   /*
   // Setup ZDefinitions and plotters
   zdef_psets_ = iConfig.getUntrackedParameter<std::vector<edm::ParameterSet> >("ZDefinitions");
@@ -242,8 +252,14 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
   bool is_dimuon_primary_vtx_z_compatible = false;
   bool found_jpsi = false;
 
+  //TODO default for this is true, does this make sense?
+  bool found_distinct_z_muons = true;
+
+
   //TODO also decide if soft muons is a good criterion, maybe rename the bool
   //TODO decide if want behavior of associating with primary vertex when no z is found
+  //TODO move this code to ZFinderPlotter? then initialize Fill with bools that are desired?
+  //i.e. zf::Plotter::Fill(zfe,JPSI) would fill at the JPSI cut level
   for (unsigned int i = 0; i < zfe.reco_jpsi.m.size() ; ++i ) {
     if ( zfe.mu0.at(i).pt() >= MIN_MUON_PT && zfe.mu1.at(i).pt() >= MIN_MUON_PT ) {
       found_dimuon = true;
@@ -256,12 +272,22 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
             is_dimuon_primary_vtx_z_compatible = true;
             if (zfe.reco_jpsi.m.at(i) <= MAX_JPSI_MASS && zfe.reco_jpsi.m.at(i) >= MIN_JPSI_MASS ) {
               found_jpsi = true;
+              if (zfe.reco_jpsi.muon0_deltaR_to_z_muons.at(i) <= MIN_DELTAR_DISTINCT_Z_JPSI_MUONS ||
+                  zfe.reco_jpsi.muon1_deltaR_to_z_muons.at(i) <= MIN_DELTAR_DISTINCT_Z_JPSI_MUONS ) {
+                found_distinct_z_muons = false;
+              }
+              //TODO verify this is what is desired -- I think this handles case of multiple jpsi, if z candidate
+              //matches one jpsi but not the other than it is not distinct
+              //else {
+              //  found_distinct_z_muons = false;
+              //}
             }
           }
         }
       }
     }
   }
+
   bool found_truth_dimuon = false;
   bool found_truth_jpsi = false;
   if (zfe.truth_jpsi.m.size() > 0 ) {
@@ -282,12 +308,33 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
   //TODO clean this code up
   bool found_dielectron = false;
   bool found_z = false;
-  if (zfe.reco_z.m > -1 && zfe.e0->pt >= MIN_ELECTRON_PT && zfe.e1->pt >= MIN_ELECTRON_PT ) {
-    found_dielectron = true;
-    if (zfe.reco_z.m >= MIN_Z_MASS && zfe.reco_z.m <= MAX_Z_MASS ) {
-      found_z = true;
+  if (zfe.reco_z.m > -1 && zfe.e0 != NULL && zfe.e1 != NULL) {
+    if ( zfe.e0->pt >= MIN_ELECTRON_PT && zfe.e1->pt >= MIN_ELECTRON_PT ) {
+      found_dielectron = true;
+      if (zfe.reco_z.m >= MIN_Z_MASS && zfe.reco_z.m <= MAX_Z_MASS ) {
+        found_z = true;
+      }
     }
   }
+
+  bool found_four_muons = false;
+  if (zfe.n_reco_muons >= 4) {
+    found_four_muons = true;
+  }
+  bool found_z_from_muons = false;
+  //TODO implement good_muons_from_z
+  //TODO move requirements into ZFinderCuts.h
+  bool found_good_muons_from_z = false;
+  if (zfe.reco_z_from_muons.m > -1 ) {
+    if (zfe.z_muon0.pt() > 20 && zfe.z_muon1.pt() > 20 && (muon::isTightMuon(zfe.z_muon0, zfe.reco_vert.primary_vert ) &&
+          muon::isTightMuon(zfe.z_muon1, zfe.reco_vert.primary_vert ) ) ) {
+      found_good_muons_from_z = true;
+      if (zfe.reco_z_from_muons.m >= MIN_Z_MASS && zfe.reco_z_from_muons.m <= MAX_Z_MASS ) {
+        found_z_from_muons = true;
+      }
+    }
+  }
+
 
   //Fill histograms
   zfp_all->Fill(zfe);
@@ -297,7 +344,12 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
     zfp_jpsi_mc->Fill(zfe);
   }
 
+  if (found_four_muons) {
+    zfp_four_muons->Fill(zfe);
+  }
+
   //TODO dimuon has minimum muon pT cut - do we want this?
+  //TODO is switch easier or better?
   if ( found_dimuon ) {
     zfp_dimuon->Fill(zfe);
     if ( is_soft_dimuon ) {
@@ -306,8 +358,17 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
         zfp_dimuon_vtx_compatible->Fill(zfe);
         if (is_dimuon_primary_vtx_z_compatible) {
           zfp_dimuon_primary_vertex->Fill(zfe);
-          if (found_jpsi ) { 
+          if (found_jpsi) { 
             zfp_jpsi->Fill(zfe);
+            if (found_four_muons && found_distinct_z_muons) {
+              zfp_jpsi_and_two_muons->Fill(zfe);
+              if (found_good_muons_from_z) {
+                zfp_jpsi_and_two_tight_muons->Fill(zfe);
+                if (found_z_from_muons) {
+                  zfp_jpsi_and_z_from_muons->Fill(zfe);
+                }
+              }
+            }
           }
         }
       }

@@ -116,20 +116,22 @@ namespace zf {
         double vtx_y;
         double vtx_z;
         TransientVertex vtx;
-      } reco_z, truth_z;
-      struct ZFromMuonsData{
-        std::vector<double> m;
-        std::vector<double> pt;
-        std::vector<double> y;
-        std::vector<double> phi;
-        std::vector<double> phistar;
-        std::vector<double> eta;
-        std::vector<double> vtx_prob;
-        std::vector<double> vtx_x;
-        std::vector<double> vtx_y;
-        std::vector<double> vtx_z;
-        std::vector<TransientVertex> vtx;
-      } reco_z_from_muons;
+      } reco_z, reco_z_from_muons, truth_z;
+
+      //TODO clean up this code
+      //struct ZFromMuonsData{
+      //  std::vector<double> m;
+      //  std::vector<double> pt;
+      //  std::vector<double> y;
+      //  std::vector<double> phi;
+      //  std::vector<double> phistar;
+      //  std::vector<double> eta;
+      //  std::vector<double> vtx_prob;
+      //  std::vector<double> vtx_x;
+      //  std::vector<double> vtx_y;
+      //  std::vector<double> vtx_z;
+      //  std::vector<TransientVertex> vtx;
+      //} reco_z_from_muons;
 
       // JPsi Data
       // TODO isolation - higher threshhold of et for neutral hadrons?
@@ -159,6 +161,10 @@ namespace zf {
         std::vector<double> muons_delta_eta;
         std::vector<double> muons_deltaR;
         std::vector<double> z_delta_phi;
+        std::vector<reco::Muon> muon0;
+        std::vector<reco::Muon> muon1;
+        std::vector<double> muon0_deltaR_to_z_muons;
+        std::vector<double> muon1_deltaR_to_z_muons;
         std::vector<double> iso_mu0;
         std::vector<double> iso_sum_charged_hadron_pt_mu0;
         std::vector<double> iso_sum_charged_particle_pt_mu0;
@@ -193,6 +199,10 @@ namespace zf {
       // These are the special, selected electrons used to make the Z
       ZFinderElectron* e0;
       ZFinderElectron* e1;
+
+      reco::Muon z_muon0;
+      reco::Muon z_muon1;
+
       void set_e0(ZFinderElectron* electron) { e0 = electron; }
       void set_e1(ZFinderElectron* electron) { e1 = electron; }
       void set_both_e(ZFinderElectron* electron0, ZFinderElectron* electron1) { e0 = electron0; e1 = electron1; }
@@ -278,7 +288,7 @@ namespace zf {
 
       // Update the Z Info from e0, e1
       void InitZ(const edm::Event& iEvent, const edm::EventSetup& iSetup);
-      void InitZFromMuons(const reco::Muon& mu0, const reco::Muon& mu1, const TransientVertex &dimuon_vertex);
+      void InitZFromMuons(const edm::Event& iEvent, const edm::EventSetup& iSetup);
 
       // Update the JPsi Info from two muons
       void InitJPsi(const reco::Muon& mu0, const reco::Muon& mu1, const TransientVertex &dimuon_vertex);
@@ -323,6 +333,7 @@ namespace zf {
           );
 
       double JpsiMuonTruthMatch(const reco::Muon&);
+      double JpsiMuonZMuonMatch(const reco::Muon&);
 
       // A list of all electrons, split into reco and gen
       std::vector<ZFinderElectron*> reco_electrons_;

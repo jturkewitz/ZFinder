@@ -53,7 +53,7 @@ namespace zf {
                         } else if (i_cutlevel.second.t1p0_pass) {
                             weight = i_cutlevel.second.t1p0_eff;
                         }
-                        i_map->second.Fill(zf_event, electron_0, electron_1, weight);
+                        i_map->second.Fill(zf_event, weight);
                     }
                 } else {  // We stop at the first failed cut
                     break;

@@ -24,14 +24,9 @@ namespace zf {
             // Add events
             void Fill(
                     const ZFinderEvent& zf_event,
-                    const int first_electron = 0,
-                    const int second_electron = 1,
-                    const int first_muon = 0,
-                    const int second_muon = 1,
                     const double EVENT_WEIGHT = 1.
                     );
-            // Make PNGs
-            void Print(const std::string& basename);
+            //void CalculateJpsiLifetime( const ZFinderEvent::JPsiData& , const ZFinderEvent::ZFromMuonsData& ); 
 
         protected:
             // Histograms
@@ -42,6 +37,24 @@ namespace zf {
             TH1D* z0_rapidity_;
             TH1D* z0_pt_;
             TH1D* z_vtx_prob_;
+            TH1D* phistar_;
+
+            TH1D* z_from_muons_mass_all_;
+            TH1D* z_from_muons_mass_coarse_;
+            TH1D* z_from_muons_mass_fine_;
+            TH1D* z_from_muons_rapidity_;
+            TH1D* z_from_muons_pt_;
+            TH1D* z_from_muons_vtx_prob_;
+            TH1D* z_from_muons_phistar_;
+
+            TH1D* muon0_from_z_pt_;
+            TH1D* muon1_from_z_pt_;
+            TH1D* muon0_from_z_eta_;
+            TH1D* muon1_from_z_eta_;
+            TH1D* muon0_from_z_phi_;
+            TH1D* muon1_from_z_phi_;
+            TH1D* muon0_from_z_charge_;
+            TH1D* muon1_from_z_charge_;
 
             TH1D* e0_pt_;
             TH1D* e1_pt_;
@@ -51,7 +64,7 @@ namespace zf {
             TH1D* e1_phi_;
             TH1D* e0_charge_;
             TH1D* e1_charge_;
-            TH1D* phistar_;
+
             TH1D* pileup_;
             TH1D* nelectrons_;
 
@@ -120,6 +133,8 @@ namespace zf {
             TH1D* mu1_tracker_layers_;
             TH1D* mu0_deltaR_truth_;
             TH1D* mu1_deltaR_truth_;
+            TH1D* mu0_deltaR_z_muon_;
+            TH1D* mu1_deltaR_z_muon_;
             TH1D* n_truth_matched_jpsi_muons_;
 
             TH1D* jet_pt_;
@@ -171,6 +186,10 @@ namespace zf {
             TH1D* z_vtx_x_;
             TH1D* z_vtx_y_;
             TH1D* z_vtx_z_;
+
+            TH1D* z_from_muons_vtx_x_;
+            TH1D* z_from_muons_vtx_y_;
+            TH1D* z_from_muons_vtx_z_;
 
             TH1D* dimuon_vtx_x_;
             TH1D* dimuon_vtx_y_;

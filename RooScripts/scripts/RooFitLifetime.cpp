@@ -137,8 +137,11 @@ std::vector<double> RooFitLifetime(
 //  std::string zjpsi_hist = "ZFinder/Jpsi_And_Z/";
 //  std::string inclusive_jpsi_hist = "ZFinder/Jpsi_Primary_Vertex/";
 //  std::string zjpsi_hist = "ZFinder/Jpsi_And_Z_Same_Vertex/";
+
+
   std::string inclusive_jpsi_hist = "ZFinder/Jpsi/";
-  std::string zjpsi_hist = "ZFinder/Jpsi_And_Z_Same_Vertex/";
+  //std::string zjpsi_hist = "ZFinder/Jpsi_And_Z_Same_Vertex/";
+  std::string zjpsi_hist = "ZFinder/Jpsi_And_Z_From_Muons/";
   std::string jpsi_hist_name = "";
   std::string zjpsi_hist_name = "z";
 

@@ -12,5 +12,6 @@ namespace zf {
   const double MIN_VERTEX_PROB = 0.005; //from double jpsi paper (I think - TODO verify this)
   //const double MAX_DELTAR_TRUTH_MATCHED_JPSI_MUONS = 0.01; 
   const double MAX_DELTAR_TRUTH_MATCHED_JPSI_MUONS = 0.015; 
+  const double MIN_DELTAR_DISTINCT_Z_JPSI_MUONS = 0.015; 
 }
 #endif  // ZFINDER_ZFINDERCUTS_H_

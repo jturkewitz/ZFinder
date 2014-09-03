@@ -121,6 +121,7 @@ namespace zf {
     if (!is_real_data) {
       InitTruth(iEvent, iSetup);  // MC
     }
+    //TODO check if this is the right place for this?
     InitReco(iEvent, iSetup);  // Data
     InitTrigger(iEvent, iSetup);  // Trigger Matching
   }
@@ -205,13 +206,47 @@ namespace zf {
 
     n_reco_electrons = reco_electrons_.size();
     n_reco_anti_electrons = reco_anti_electrons_.size();
+
+    edm::Handle<reco::MuonCollection> muons_h;
+    iEvent.getByLabel(inputtags_.muon, muons_h);
+    n_reco_muons = muons_h->size();
+    double leading_muon_pt = -1.0;
+    double sub_leading_muon_pt = -1.0;
+
     //TODO clean up this code
     //if (n_reco_electrons >= 2) {}
-    if (n_reco_electrons >= 1 && n_reco_anti_electrons >=1) {
+    //std::cout << z_muon1.pt() << std::endl;
+    //Make list of muons for the Z
+    //TODO check -- should this require 4 muons???
+    if ( n_reco_muons >= 2 ) {
+      for ( int i=0 ; i < n_reco_muons ; ++i ) {
+        const reco::Muon muon_temp = muons_h->at(i);
+        if ( muon_temp.pt() >= leading_muon_pt ) {
+          z_muon0 = muon_temp;
+          leading_muon_pt = z_muon0.pt();
+        }
+      }
+      for ( int j=0 ; j < n_reco_muons ; ++j ) {
+        const reco::Muon muon_temp = muons_h->at(j);
+        if (muon_temp.pt() >= sub_leading_muon_pt && muon_temp.pt() < leading_muon_pt && (muon_temp.charge() != z_muon0.charge() )) {
+          z_muon1 = muon_temp;
+          sub_leading_muon_pt = z_muon1.pt();
+        }
+      }
+      if (leading_muon_pt > -1 && sub_leading_muon_pt > -1) {
+        InitZFromMuons(iEvent, iSetup);
+      }
+    }
+    if (n_reco_electrons >= 1 && n_reco_anti_electrons >=1 ) {
       // Set our internal electrons
       //set_both_e(reco_electrons_[0], reco_electrons_[1]);
       //highest pT electron, and highest pT antielectron
-      set_both_e(reco_electrons_[0], reco_anti_electrons_[0]);
+      if (reco_electrons_[0]->pt >= reco_anti_electrons_[0]->pt) {
+        set_both_e(reco_electrons_[0], reco_anti_electrons_[0]);
+      }
+      else {
+        set_both_e(reco_anti_electrons_[0], reco_electrons_[0]);
+      }
       // Set up the Z
       InitZ(iEvent, iSetup);
     }
@@ -228,9 +263,6 @@ namespace zf {
     std::vector<reco::TransientTrack> transient_tracks;
     //testing - for now don't use ZFinderMuon class
 
-    edm::Handle<reco::MuonCollection> muons_h;
-    iEvent.getByLabel(inputtags_.muon, muons_h);
-    n_reco_muons = muons_h->size();
     //TODO clean this up
     if (n_reco_muons >= 2 ) {
       //TODO maybe keep highest pt muons - for now keep j/psi muons
@@ -301,20 +333,22 @@ namespace zf {
           //TODO clean up this code
           //std::cout << "distance " << distance << " dist_err " << dist_err << " chi2 " << chi2 << std::endl;
           //std::cout << "dimuon_vertex.position() " << dimuon_vertex.position() << std::endl;
-          InitZFromMuons( muon0, muon1, dimuon_vertex );
-          InitJPsi( muon0, muon1, dimuon_vertex );
+          
           //TODO - figure out how best to handle events with multiple j/psis
           //set_both_mu(muon0, muon1);
           //TODO how should I handle multiple j/psi in same event?
 
+          //TODO make muons be a part of the Jpsi struct
           //ensure muon0 is higher pt muon
           if (muon0.pt() >= muon1.pt() ) {
             mu0.push_back( muon0 );
             mu1.push_back( muon1 );
+            InitJPsi( muon0, muon1, dimuon_vertex );
           }
           else {
             mu0.push_back( muon1 );
             mu1.push_back( muon0 );
+            InitJPsi( muon1, muon0, dimuon_vertex );
           }
         }
       }
@@ -589,41 +623,57 @@ namespace zf {
         reco_z.vtx = dielectron_vertex;
       }
     }
+  }
+  //TODO put this inside the initZ function??
+  //rename reco_z to reco_z_from_electrons or something to avoid conflicts
+  void ZFinderEvent::InitZFromMuons (const edm::Event& iEvent, const edm::EventSetup& iSetup) {
     //TODO testing ------------------------
     //want to go to Z->mumu + JPSI, for now just use highest pT muons for the Z?
+    //TODO make a function to handle vertex getting
+    edm::ESHandle<TransientTrackBuilder> track_builder_muon;
+    iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder", track_builder_muon);
+    std::vector<reco::TransientTrack> transient_tracks_muon;
+    reco::TrackRef muon_track0 = GetMuonTrackRef( z_muon0 );
+    reco::TrackRef muon_track1 = GetMuonTrackRef( z_muon1 );
+    transient_tracks_muon.clear();
+    transient_tracks_muon.push_back( (*track_builder_muon).build(muon_track0.get()));
+    transient_tracks_muon.push_back( (*track_builder_muon).build(muon_track1.get()));
+    TransientVertex dimuon_vertex;
+    if (transient_tracks_muon.size() > 1) {
+      KalmanVertexFitter kalman_fitter;
+      dimuon_vertex = kalman_fitter.vertex(transient_tracks_muon);
+      if ( dimuon_vertex.isValid()) {
+        reco_z_from_muons.vtx_prob = TMath::Prob(dimuon_vertex.totalChiSquared(), int(dimuon_vertex.degreesOfFreedom()));
+      }
+    }
+
+    //TODO move this cut to another part of the code
+    if (reco_z_from_muons.vtx_prob >= MIN_VERTEX_PROB) {
+      const double MUON_MASS = 0.1056583715;
+      math::PtEtaPhiMLorentzVector muon0lv(z_muon0.pt(), z_muon0.eta(), z_muon0.phi(), MUON_MASS);
+      math::PtEtaPhiMLorentzVector muon1lv(z_muon1.pt(), z_muon1.eta(), z_muon1.phi(), MUON_MASS);
+      math::PtEtaPhiMLorentzVector zlv;
+      zlv = muon0lv + muon1lv;
+
+      reco_z_from_muons.vtx_x = dimuon_vertex.position().x();
+      reco_z_from_muons.vtx_y = dimuon_vertex.position().y();
+      reco_z_from_muons.vtx_z = dimuon_vertex.position().z();
+
+      reco_z_from_muons.m = zlv.mass();
+      reco_z_from_muons.y = zlv.Rapidity();
+      reco_z_from_muons.phi = zlv.phi();
+      reco_z_from_muons.pt = zlv.pt();
+      reco_z_from_muons.phistar = ReturnPhistar(z_muon0.eta(), z_muon0.phi(), z_muon1.eta(), z_muon1.phi());
+      reco_z_from_muons.eta = zlv.eta();
+      reco_z_from_muons.vtx = dimuon_vertex;
+
+    }
   }
 
   //TODO decide best way to handle this, rename things that need renaming for clarity now that we are going
+  //suggestion - don't need every possible muon combo, can take for now top two muon in pT, then later verify/check
+  //how many overlap with viable jpsi candidates
   //to Z->mumu
-  void ZFinderEvent::InitZFromMuons(const reco::Muon &mu0, const reco::Muon &mu1, const TransientVertex &dimuon_vertex) {
-    const double MUON_MASS = 0.1056583715;
-    //const double C = 29.979245800; // cm/ns
-    math::PtEtaPhiMLorentzVector mu0lv(mu0.pt(), mu0.eta(), mu0.phi(), MUON_MASS);
-    math::PtEtaPhiMLorentzVector mu1lv(mu1.pt(), mu1.eta(), mu1.phi(), MUON_MASS);
-    math::PtEtaPhiMLorentzVector zlv;
-    zlv = mu0lv + mu1lv;
-
-    double pos_x = -99999;
-    double pos_y = -99999;
-    double pos_z = -99999;
-    //TODO is this check needed here??
-    if ( dimuon_vertex.isValid()) {
-      pos_x = dimuon_vertex.position().x();
-      pos_y = dimuon_vertex.position().y();
-      pos_z = dimuon_vertex.position().z();
-    }
-    reco_z_from_muons.vtx_x.push_back(pos_x);
-    reco_z_from_muons.vtx_y.push_back(pos_y);
-    reco_z_from_muons.vtx_z.push_back(pos_z);
-
-    reco_z_from_muons.m.push_back(zlv.mass());
-    reco_z_from_muons.y.push_back(zlv.Rapidity());
-    reco_z_from_muons.phi.push_back(zlv.phi());
-    reco_z_from_muons.pt.push_back(zlv.pt());
-    reco_z_from_muons.phistar.push_back(ReturnPhistar(mu0.eta(), mu0.phi(), mu1.eta(), mu1.phi()));
-    reco_z_from_muons.eta.push_back(zlv.eta());
-    reco_z_from_muons.vtx.push_back(dimuon_vertex);
-  }
 
 
   //TODO make this take event, event setup as opposed to two muons
@@ -634,7 +684,6 @@ namespace zf {
     math::PtEtaPhiMLorentzVector mu1lv(mu1.pt(), mu1.eta(), mu1.phi(), MUON_MASS);
     math::PtEtaPhiMLorentzVector jpsi_lv;
     jpsi_lv = mu0lv + mu1lv;
-
   
     double pos_x = -99999;
     double pos_y = -99999;
@@ -668,12 +717,9 @@ namespace zf {
     double py = jpsi_lv.py();
     double pz = jpsi_lv.pz();
     double pt = jpsi_lv.pt();
-
-
-
  
     //TODO testing Z from muons --------------------
-    bool use_z_from_muons = true;
+    bool use_z_from_muons = false;
     if (!use_z_from_muons) {
       if ( reco_z.vtx_x != -100 ) {
         x = (pos_x - reco_z.vtx.position().x() );
@@ -731,67 +777,73 @@ namespace zf {
     }
     //TODO combine these into a function or something?
     //using z from muons
-    else { 
-      if ( reco_z.vtx_x != -100 ) {
-        x = (pos_x - reco_z.vtx.position().x() );
-        y = (pos_y - reco_z.vtx.position().y() );
-        z = (pos_z - reco_z.vtx.position().z() );
-        LP_XY = ((x * px) + (y * py)) ; // 2d
-        tau_xy = jpsi_lv.mass() * LP_XY / (pt * pt) / C; // ns
+    //else { 
+    //  if ( reco_z.vtx_x != -100 ) {
+    //    x = (pos_x - reco_z.vtx.position().x() );
+    //    y = (pos_y - reco_z.vtx.position().y() );
+    //    z = (pos_z - reco_z.vtx.position().z() );
+    //    LP_XY = ((x * px) + (y * py)) ; // 2d
+    //    tau_xy = jpsi_lv.mass() * LP_XY / (pt * pt) / C; // ns
 
-        LP_Z = z * pz ; // 2d
-        tau_z = jpsi_lv.mass() * LP_Z / (pz * pz) / C; // ns
+    //    LP_Z = z * pz ; // 2d
+    //    tau_z = jpsi_lv.mass() * LP_Z / (pz * pz) / C; // ns
 
-        if ( dimuon_vertex.isValid()) {
-          VertexDistance3D vertTool;
-          distance = vertTool.distance(reco_z.vtx, dimuon_vertex).value();
-          dist_err = vertTool.distance(reco_z.vtx, dimuon_vertex).error();
-          //TODO figure out why this causes errors occassionally
-          //chi2 = vertTool.compatibility(reco_z.vtx, dimuon_vertex);
+    //    if ( dimuon_vertex.isValid()) {
+    //      VertexDistance3D vertTool;
+    //      distance = vertTool.distance(reco_z.vtx, dimuon_vertex).value();
+    //      dist_err = vertTool.distance(reco_z.vtx, dimuon_vertex).error();
+    //      //TODO figure out why this causes errors occassionally
+    //      //chi2 = vertTool.compatibility(reco_z.vtx, dimuon_vertex);
 
-          VertexDistanceXY vertTool_xy;
-          distance_xy = vertTool_xy.distance(reco_z.vtx, dimuon_vertex).value();
-          dist_err_xy = vertTool_xy.distance(reco_z.vtx, dimuon_vertex).error();
-          chi2_xy = vertTool_xy.compatibility(reco_z.vtx, dimuon_vertex);
-        }
-      }
-      else if ( reco_vert.primary_x != -100 )
-      {
-        x = (pos_x - reco_vert.primary_vert.position().x() );
-        y = (pos_y - reco_vert.primary_vert.position().y() );
-        z = (pos_z - reco_vert.primary_vert.position().z() );
-        LP_XY = ((x * px) + (y * py)) ; // 2d
-        tau_xy = jpsi_lv.mass() * LP_XY / (pt * pt) / C; // ns
+    //      VertexDistanceXY vertTool_xy;
+    //      distance_xy = vertTool_xy.distance(reco_z.vtx, dimuon_vertex).value();
+    //      dist_err_xy = vertTool_xy.distance(reco_z.vtx, dimuon_vertex).error();
+    //      chi2_xy = vertTool_xy.compatibility(reco_z.vtx, dimuon_vertex);
+    //    }
+    //  }
+    //  else if ( reco_vert.primary_x != -100 )
+    //  {
+    //    x = (pos_x - reco_vert.primary_vert.position().x() );
+    //    y = (pos_y - reco_vert.primary_vert.position().y() );
+    //    z = (pos_z - reco_vert.primary_vert.position().z() );
+    //    LP_XY = ((x * px) + (y * py)) ; // 2d
+    //    tau_xy = jpsi_lv.mass() * LP_XY / (pt * pt) / C; // ns
 
-        LP_Z = z * pz ; // 2d
-        tau_z = jpsi_lv.mass() * LP_Z / (pz * pz) / C; // ns
+    //    LP_Z = z * pz ; // 2d
+    //    tau_z = jpsi_lv.mass() * LP_Z / (pz * pz) / C; // ns
 
-        if ( dimuon_vertex.isValid()) {
-          VertexDistance3D vertTool;
-          distance = vertTool.distance(reco_vert.primary_vert, dimuon_vertex).value();
-          dist_err = vertTool.distance(reco_vert.primary_vert, dimuon_vertex).error();
-          //chi2 = vertTool.compatibility(reco_vert.primary_vert, dimuon_vertex);
-          //TODO figure out why this causes an error occsionally
+    //    if ( dimuon_vertex.isValid()) {
+    //      VertexDistance3D vertTool;
+    //      distance = vertTool.distance(reco_vert.primary_vert, dimuon_vertex).value();
+    //      dist_err = vertTool.distance(reco_vert.primary_vert, dimuon_vertex).error();
+    //      //chi2 = vertTool.compatibility(reco_vert.primary_vert, dimuon_vertex);
+    //      //TODO figure out why this causes an error occsionally
 
-          VertexDistanceXY vertTool_xy;
-          distance_xy = vertTool_xy.distance(reco_vert.primary_vert, dimuon_vertex).value();
-          dist_err_xy = vertTool_xy.distance(reco_vert.primary_vert, dimuon_vertex).error();
-          chi2_xy = vertTool_xy.compatibility(reco_vert.primary_vert, dimuon_vertex);
-        }
-      }
-      if (reco_z.phi != -1000) {
-        reco_jpsi.z_delta_phi.push_back ( fabs( deltaPhi( reco_z.phi , jpsi_lv.phi() ) ) );
-      }
-      else {
-        reco_jpsi.z_delta_phi.push_back ( -1000 );
-      }
-    }
+    //      VertexDistanceXY vertTool_xy;
+    //      distance_xy = vertTool_xy.distance(reco_vert.primary_vert, dimuon_vertex).value();
+    //      dist_err_xy = vertTool_xy.distance(reco_vert.primary_vert, dimuon_vertex).error();
+    //      chi2_xy = vertTool_xy.compatibility(reco_vert.primary_vert, dimuon_vertex);
+    //    }
+    //  }
+    //  if (reco_z.phi != -1000) {
+    //    reco_jpsi.z_delta_phi.push_back ( fabs( deltaPhi( reco_z.phi , jpsi_lv.phi() ) ) );
+    //  }
+    //  else {
+    //    reco_jpsi.z_delta_phi.push_back ( -1000 );
+    //  }
+    //}
     //TODO --------------------------------------------------
 
     if ( dimuon_vertex.isValid()) {
       vertex_probability = TMath::Prob(dimuon_vertex.totalChiSquared(), int(dimuon_vertex.degreesOfFreedom()));
     }
 
+    //Muon 0 should be higher, cause of how initJpsi is called, TODO explicit check of this
+    //TODO is this needed?
+    reco_jpsi.muon0.push_back (mu0);
+    reco_jpsi.muon1.push_back (mu1);
+    reco_jpsi.muon0_deltaR_to_z_muons.push_back(JpsiMuonZMuonMatch(mu0));
+    reco_jpsi.muon1_deltaR_to_z_muons.push_back(JpsiMuonZMuonMatch(mu1));
 
     reco_jpsi.tau_xy.push_back (tau_xy);
     reco_jpsi.tau_z.push_back (tau_z);
@@ -825,8 +877,6 @@ namespace zf {
     reco_jpsi.muons_delta_eta.push_back ( fabs( mu0.eta() -  mu1.eta() ) );
     reco_jpsi.muons_deltaR.push_back ( fabs( deltaR( mu0.p4() , mu1.p4() ) ) );
 
-
-
     //TODO use a better vector class, implement it as the early J/Psi paper did
     //std::cout << "pt " << jpsi_lv.pt() << " px " << jpsi_lv.px() << " py " << jpsi_lv.py() << " pz " << jpsi_lv.pz() << std::endl;
     //TVectorD v1(0 , 1 , jpsi_lv.px() / jpsi_lv.pt() , jpsi_lv.py() / jpsi_lv.pt() , "END");
@@ -838,9 +888,6 @@ namespace zf {
     //m1.Print();
     //TODO do this with actual vectors, which I am pretty sick of right now
     // for now follow Atlas paper as it is simpler
-
-
-
     if(mu0.isPFIsolationValid()){
       reco_jpsi.iso_sum_charged_hadron_pt_mu0.push_back ( mu0.pfIsolationR04().sumChargedHadronPt);
       reco_jpsi.iso_sum_charged_particle_pt_mu0.push_back ( mu0.pfIsolationR04().sumChargedParticlePt);
@@ -990,6 +1037,18 @@ namespace zf {
     reco_z.vtx_x = -100;
     reco_z.vtx_y = -100;
     reco_z.vtx_z = -100;
+
+    reco_z_from_muons.m = -1;
+    reco_z_from_muons.y = -1000;
+    reco_z_from_muons.phi = -1000;
+    reco_z_from_muons.pt = -1;
+    reco_z_from_muons.phistar = -1;
+    reco_z_from_muons.eta = -1000;
+    reco_z_from_muons.vtx_prob = -1000;
+    reco_z_from_muons.vtx_x = -100;
+    reco_z_from_muons.vtx_y = -100;
+    reco_z_from_muons.vtx_z = -100;
+
     truth_z.m = -1;
     truth_z.y = -1000;
     truth_z.pt = -1;
@@ -1508,12 +1567,36 @@ namespace zf {
     double dr0 = 9999.;
     double dr1 = 9999.;
     //TODO decide what to do about case when have 2 Jpsi MC truth, will this ever happen? 
+    //TODO charge matching
 
     if (jpsi_muon0.size() == 1 ) {
       dr0 = deltaR( jpsi_muon0.at(0)->eta(), jpsi_muon0.at(0)->phi(), muon.eta(), muon.phi());
     }
     if (jpsi_muon1.size() == 1 ) {
       dr1 = deltaR( jpsi_muon1.at(0)->eta(), jpsi_muon1.at(0)->phi(), muon.eta(), muon.phi());
+    }
+    if ( dr0 <= dr1 ) {
+      return dr0;
+    }
+    else {
+      return dr1;
+    }
+  }
+
+  double ZFinderEvent::JpsiMuonZMuonMatch(const reco::Muon &muon)
+  {
+    if (reco_z_from_muons.m == -1) {
+      return 9999.0;
+    }
+    double dr0 = 9999.;
+    double dr1 = 9999.;
+    //TODO charge matching
+
+    if (muon.charge() == z_muon0.charge() ) {
+      dr0 = deltaR( z_muon0.eta(), z_muon0.phi(), muon.eta(), muon.phi());
+    }
+    if (muon.charge() == z_muon1.charge() ) {
+      dr1 = deltaR( z_muon1.eta(), z_muon1.phi(), muon.eta(), muon.phi());
     }
     if ( dr0 <= dr1 ) {
       return dr0;
