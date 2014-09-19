@@ -30,12 +30,11 @@ namespace zf {
 
         protected:
             // Histograms
-            // TODO why z0? there is only ever 1 Z in code
-            TH1D* z0_mass_all_;
-            TH1D* z0_mass_coarse_;
-            TH1D* z0_mass_fine_;
-            TH1D* z0_rapidity_;
-            TH1D* z0_pt_;
+            TH1D* z_mass_all_;
+            TH1D* z_mass_coarse_;
+            TH1D* z_mass_fine_;
+            TH1D* z_rapidity_;
+            TH1D* z_pt_;
             TH1D* z_vtx_prob_;
             TH1D* phistar_;
 
@@ -65,6 +64,7 @@ namespace zf {
             TH1D* e0_charge_;
             TH1D* e1_charge_;
 
+            TH1D* baseweights_;
             TH1D* pileup_;
             TH1D* nelectrons_;
 

@@ -26,7 +26,6 @@
 
 // ZFinder
 #include "ZFinder/Event/interface/ZFinderElectron.h"  // ZFinderElectron, ZFinderElectron
-#include "ZFinder/Event/interface/ZFinderMuon.h"  // ZFinderMuon, ZFinderMuon
 #include "ZFinder/Event/interface/ZFinderCuts.h"  // ZFinderMuon, ZFinderMuon
 
 namespace zf {
@@ -102,7 +101,6 @@ namespace zf {
         unsigned int event_num;
       } id;
 
-      //TODO synchronize how muons and electrons are handled?
       // Z Data
       struct ZData{
         double m;
@@ -118,23 +116,7 @@ namespace zf {
         TransientVertex vtx;
       } reco_z, reco_z_from_muons, truth_z;
 
-      //TODO clean up this code
-      //struct ZFromMuonsData{
-      //  std::vector<double> m;
-      //  std::vector<double> pt;
-      //  std::vector<double> y;
-      //  std::vector<double> phi;
-      //  std::vector<double> phistar;
-      //  std::vector<double> eta;
-      //  std::vector<double> vtx_prob;
-      //  std::vector<double> vtx_x;
-      //  std::vector<double> vtx_y;
-      //  std::vector<double> vtx_z;
-      //  std::vector<TransientVertex> vtx;
-      //} reco_z_from_muons;
-
       // JPsi Data
-      // TODO isolation - higher threshhold of et for neutral hadrons?
       struct JPsiData{
         std::vector<double> m;
         std::vector<double> pt;
@@ -165,6 +147,8 @@ namespace zf {
         std::vector<reco::Muon> muon1;
         std::vector<double> muon0_deltaR_to_z_muons;
         std::vector<double> muon1_deltaR_to_z_muons;
+        std::vector<double> muon0_deltaR_to_truth_muons;
+        std::vector<double> muon1_deltaR_to_truth_muons;
         std::vector<double> iso_mu0;
         std::vector<double> iso_sum_charged_hadron_pt_mu0;
         std::vector<double> iso_sum_charged_particle_pt_mu0;
@@ -177,11 +161,12 @@ namespace zf {
         std::vector<double> iso_sum_neutral_hadron_et_mu1;
         std::vector<double> iso_sum_photon_et_mu1;
         std::vector<double> iso_sum_pileup_pt_mu1;
+        std::vector<bool> has_high_pt_muons;
+        std::vector<bool> has_soft_id_muons;
+        std::vector<bool> has_muons_with_compatible_vertex;
+        std::vector<bool> has_dimuon_vertex_compatible_with_primary_vertex;
+        std::vector<bool> is_within_jpsi_mass_window;
       } reco_jpsi, truth_jpsi;
-
-      struct JPsiMuonData{
-        std::vector<double> deltaR_truth;
-      } reco_jpsi_muon0, reco_jpsi_muon1;
 
       struct Jets{
         std::vector<double> pt;
@@ -217,13 +202,8 @@ namespace zf {
       void set_e1_trig(ZFinderElectron* electron) { e1_trig = electron; }
       void set_both_e_trig(ZFinderElectron* electron0, ZFinderElectron* electron1) { e0_trig = electron0; e1_trig = electron1; }
 
-      // These are the special, selected muons used to make the JPsi TODO implement/clean up this
-      //ZFinderMuon* mu0;
-      //ZFinderMuon* mu1;
       std::vector<const reco::Candidate*> jpsi_muon0;
       std::vector<const reco::Candidate*> jpsi_muon1;
-      std::vector<reco::Muon> mu0;
-      std::vector<reco::Muon> mu1;
       //void set_mu0(ZFinderMuon* muon) { mu0 = muon; }
       //void set_mu1(ZFinderMuon* muon) { mu1 = muon; }
       //void set_both_mu(ZFinderMuon* muon0, ZFinderMuon* muon1) { mu0 = muon0; mu1 = muon1; }
@@ -249,11 +229,23 @@ namespace zf {
       int n_reco_jets;
       int n_reco_muon_jets;
 
+      bool found_four_muons;
+      bool found_z_to_muons;
+      bool found_good_muons_from_z;
+
+      bool found_z_to_electrons;
+      bool found_good_electrons_from_z;
+
+      bool found_dimuon_with_high_pt_muons;
+      bool found_dimuon_with_soft_id_and_high_pt_muons;
+      bool found_dimuon_with_good_muons_and_compatible_muon_vertex;
+      bool found_good_dimuon_compatible_with_primary_vertex;
+      bool found_jpsi;
+
+      bool found_truth_jpsi_with_high_pt_muons;
+
       //reco::TrackRef GetElectronTrackRef(const reco::GsfElectron & e);
       reco::TrackRef GetMuonTrackRef(const reco::Muon & mu);
-
-      //TODO testing
-      //KalmanVertexFitter kalman_fitter;
 
       // Output
       void PrintElectrons(const int TYPE = 0, const bool PRINT_CUTS = false);  // 0 is reco, 1 is truth, 2 is trig
@@ -272,7 +264,8 @@ namespace zf {
       // avoid compilation issues
       static const double TRIG_DR_;
 
-      void SetEventWeight(const edm::Event& iEvent);
+      void SetLumiEventWeight(const edm::Event& iEvent);
+      void SetMCEventWeight(const edm::Event& iEvent);
 
       // Called by the constructor to handle MC and Data separately
       void InitReco(const edm::Event& iEvent, const edm::EventSetup& iSetup);
@@ -283,11 +276,8 @@ namespace zf {
       void InitHFElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup);
       void InitNTElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup);
 
-      //TODO clean this up
-      //void InitMuons(const edm::Event& iEvent, const edm::EventSetup& iSetup);
-
       // Update the Z Info from e0, e1
-      void InitZ(const edm::Event& iEvent, const edm::EventSetup& iSetup);
+      void InitZFromElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup);
       void InitZFromMuons(const edm::Event& iEvent, const edm::EventSetup& iSetup);
 
       // Update the JPsi Info from two muons
@@ -334,6 +324,7 @@ namespace zf {
 
       double JpsiMuonTruthMatch(const reco::Muon&);
       double JpsiMuonZMuonMatch(const reco::Muon&);
+      double sumPtSquared(const reco::Vertex&);
 
       // A list of all electrons, split into reco and gen
       std::vector<ZFinderElectron*> reco_electrons_;
@@ -349,19 +340,11 @@ namespace zf {
       std::vector<ZFinderElectron*> hlt_electrons_;
       ZFinderElectron* AddHLTElectron(trigger::TriggerObject electron);
 
-
-      // A list of all muons
-      std::vector<ZFinderMuon*> reco_muons_;
-      //TODO remove this and below comment
-      //ZFinderMuon* AddRecoMuon(reco::Muon muon);
-      void AddRecoMuon(reco::Muon muon);
-
       // Calculate phistar
       static double ReturnPhistar(const double& eta0, const double& phi0, const double& eta1, const double& phi1);
 
       // Sorting functions
       static bool SortByPTHighLowElectron(const ZFinderElectron* e0, const ZFinderElectron* e1) { return (e0->pt > e1->pt); }
-      static bool SortByPTHighLowMuon(const ZFinderMuon* mu0, const ZFinderMuon* mu1) { return (mu0->pt > mu1->pt); }
 
       // Print cuts
       void PrintCuts(ZFinderElectron* zf_elec);
