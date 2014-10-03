@@ -90,13 +90,14 @@ std::vector<double> RooFitLifetime(
   gErrorIgnoreLevel = kWarning;
 
   double tau_xy_min = -0.3;
+  //double tau_xy_max = 5.0;
   double tau_xy_max = 5.0;
   // Set up the variables we're going to read in from the files
   RooRealVar tau_xy("tau_xy", "tau_xy" , tau_xy_min, tau_xy_max, "ps");
   //tau_xy.setRange("range_tau_xy", -0.3, 5.0);
   std::vector<double> zjpsi_info ;
 
-  RooRealVar zjpsi_tau_xy("zjpsi_tau_xy", "zjpsi_tau_xy" , tau_xy_min, tau_xy_max, "ps");
+  RooRealVar zjpsi_tau_xy("zjpsi_tau_xy", "tau_xy" , tau_xy_min, tau_xy_max, "ps");
   //zjpsi_tau_xy.setRange("zjpsi_range_tau_xy", -0.3, 5.0);
 
   //TODO name this more script readable - maybe change ZFinder names
@@ -139,6 +140,7 @@ std::vector<double> RooFitLifetime(
 //  std::string zjpsi_hist = "ZFinder/Jpsi_And_Z_Same_Vertex/";
 
 
+  //TODO make this an input option
   std::string inclusive_jpsi_hist = "ZFinder/Jpsi/";
   //std::string zjpsi_hist = "ZFinder/Jpsi_And_Z_From_Muons/";
   std::string zjpsi_hist = "ZFinder/Jpsi_And_Z/";
@@ -261,9 +263,12 @@ std::vector<double> RooFitLifetime(
 
   // Plot the left side
   canvas->cd(1);
+
+  //TODO testing
   gPad->SetLogy();
   //RooPlot* tau_xy_fitframe = tau_xy.frame(-0.3,5.0);
-  RooPlot* tau_xy_fitframe = tau_xy.frame( Title(jpsi_hist_name.c_str()) , Range(tau_xy_min, tau_xy_max ));
+  //RooPlot* tau_xy_fitframe = tau_xy.frame( Title(jpsi_hist_name.c_str()) , Range(tau_xy_min, tau_xy_max ));
+  RooPlot* tau_xy_fitframe = tau_xy.frame( Title("J/Psi Lifetime") , Range(tau_xy_min, tau_xy_max ));
   //tau_xy_fitframe->SetName(0); // Unset title
   tau_xy_data_hist.plotOn(tau_xy_fitframe);
   tau_xy_fitpdf.plotOn(tau_xy_fitframe, Components(decay_exp), LineColor(kGreen-2));
@@ -297,7 +302,9 @@ std::vector<double> RooFitLifetime(
   canvas2->Print(test_image_name.c_str() , "png");
   canvas2->Close();
 
-  RooFitResult * zjpsi_fitres = zjpsi_tau_xy_fitpdf.fitTo(zjpsi_tau_xy_data_hist, Range(tau_xy_min, tau_xy_max), NumCPU(N_CPU), Verbose(false), PrintLevel(-1) , Save());
+  //RooFitResult * zjpsi_fitres = zjpsi_tau_xy_fitpdf.fitTo(zjpsi_tau_xy_data_hist, Range(tau_xy_min, tau_xy_max), NumCPU(N_CPU), Verbose(false), PrintLevel(-1) , Save());
+  //RooFitResult * zjpsi_fitres = zjpsi_tau_xy_fitpdf.fitTo(zjpsi_tau_xy_data_hist, Range(tau_xy_min, tau_xy_max), SumW2Error(kTRUE), NumCPU(N_CPU), Verbose(false), PrintLevel(-1) , Save());
+  RooFitResult * zjpsi_fitres = zjpsi_tau_xy_fitpdf.fitTo(zjpsi_tau_xy_data_hist, Range(tau_xy_min, tau_xy_max), SumW2Error(kFALSE), NumCPU(N_CPU), Verbose(false), PrintLevel(-1) , Save());
 
   std::cout << zjpsi_hist_name << std::endl;
   double zjpsi_prompt_events = 0.;
@@ -323,9 +330,13 @@ std::vector<double> RooFitLifetime(
 
   TCanvas *zjpsi_canvas = new TCanvas("zjpsi_canvas", "zjpsi_canvas", 2000, 750);
   zjpsi_canvas->cd(1);
-  gPad->SetLogy();
+
+  //TODO testing
+  //gPad->SetLogy();
   //RooPlot* tau_xy_fitframe = tau_xy.frame(-0.3,5.0);
-  RooPlot* zjpsi_tau_xy_fitframe = zjpsi_tau_xy.frame( Title(zjpsi_hist_name.c_str()) );
+  //RooPlot* zjpsi_tau_xy_fitframe = zjpsi_tau_xy.frame( Title(zjpsi_hist_name.c_str()) );
+  RooPlot* zjpsi_tau_xy_fitframe = zjpsi_tau_xy.frame( Title("J/Psi Lifetime (Z->ee + J/Psi)") );
+  //RooPlot* zjpsi_tau_xy_fitframe = zjpsi_tau_xy.frame( Title("J/Psi Lifetime (Z->mumu + J/Psi)") );
   //zjpsi_tau_xy_fitframe->SetName(0); // Unset title
   zjpsi_tau_xy_data_hist.plotOn(zjpsi_tau_xy_fitframe);
   zjpsi_tau_xy_fitpdf.plotOn(zjpsi_tau_xy_fitframe, Components(zjpsi_decay_exp), LineColor(kGreen-2) );

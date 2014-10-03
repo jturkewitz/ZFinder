@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-process = cms.Process("JpsiMuMu_Zee_Skim")
+process = cms.Process("JpsiToMuMuZToeeSkim")
 
 # Set up message output and logging
 process.load("FWCore.MessageService.MessageLogger_cfi")
@@ -16,8 +16,19 @@ process.maxEvents = cms.untracked.PSet(
         )
 
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring( 'file:/local/cms/phedex/store/data/Run2012A/DoubleElectron/AOD/22Jan2013-v1/20000/003EC246-5E67-E211-B103-00259059642E.root')
+    fileNames = cms.untracked.vstring( 'file:/hdfs/cms/phedex/store/data/Run2012B/DoubleElectron/AOD/22Jan2013-v1/20000/FE9BF84B-4269-E211-8A41-003048FFD75C.root')
 )
+
+# Run only on lumis specified in the lumi file
+# Recipe from:
+# https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePythonTips#Use_a_JSON_file_of_good_lumi_sec
+from FWCore.ParameterSet.Types import untracked, VLuminosityBlockRange
+from FWCore.PythonUtilities.LumiList import LumiList
+##json_file for electrons
+json_file = "/home/user1/turkewitz/Work/CMSSW_5_3_13_ZJPsi/src/Metadata/lumi_json/Run2012ABCD.json" # File location
+run_2012abcd_lumis = LumiList(filename = json_file).getCMSSWString().split(',')
+
+process.source.lumisToProcess = untracked(VLuminosityBlockRange(run_2012abcd_lumis))
 
 process.jpsiFilter = cms.EDFilter("JPsiFilter")
 

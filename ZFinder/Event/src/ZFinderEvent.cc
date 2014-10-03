@@ -276,50 +276,62 @@ namespace zf {
       InitZFromElectrons(iEvent, iSetup);
     }
 
+
+    //Z to muons cut levels
+    found_high_pt_muons_from_z = false;
+    found_good_muons_from_z = false;
+    found_dimuon_z_compatible_vertex = false;
+    found_z_to_muons = false;
+
+    if (reco_z_from_muons.m > -1 &&
+        z_muon0.pt() >= MIN_Z_MUON_PT && z_muon1.pt() >= MIN_Z_MUON_PT ) {
+      found_high_pt_muons_from_z = true;
+    }
+    if (reco_z_from_muons.m > -1 && 
+        muon::isTightMuon(z_muon0, reco_vert.primary_vert ) &&
+        muon::isTightMuon(z_muon1, reco_vert.primary_vert ) ) {
+      found_good_muons_from_z = true;
+    }
+    if (reco_z_from_muons.m > -1 && 
+        reco_z_from_muons.vtx_prob >= MIN_VERTEX_PROB ) {
+      found_dimuon_z_compatible_vertex = true;
+    }
+    if (reco_z_from_muons.m >= MIN_Z_MASS && reco_z_from_muons.m <= MAX_Z_MASS) {
+      found_z_to_muons = true;
+    }
+
+    //Z to electrons cut levels
+    found_high_pt_electrons_from_z = false;
+    found_good_electrons_from_z = false;
+    found_dielectron_z_compatible_vertex = false;
+    found_z_to_electrons = false;
+
+    if (reco_z.m > -1 && e0 != NULL && e1 != NULL) {
+      if ( e0->pt >= MIN_ELECTRON_PT && e1->pt >= MIN_ELECTRON_PT ) {
+        found_high_pt_electrons_from_z = true;
+      }
+    }
+    if (reco_z.m > -1 && e0 != NULL && e1 != NULL) {
+      if (e0->CutPassed("eg_medium") && e1->CutPassed("eg_medium") ) {
+        found_good_electrons_from_z = true;
+      }
+    }
+    if (reco_z.m > -1 && e0 != NULL && e1 != NULL) {
+      if (reco_z.vtx_prob >= MIN_VERTEX_PROB ) {
+        found_dielectron_z_compatible_vertex = true;
+      }
+    }
+    if (reco_z.m > -1 && e0 != NULL && e1 != NULL) {
+      if ( reco_z.m >= MIN_Z_MASS && reco_z.m <= MAX_Z_MASS ) {
+        found_z_to_electrons = true;
+      }
+    }
+
     // For JPsis
 
     edm::ESHandle<TransientTrackBuilder> track_builder;
     iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder", track_builder);
     std::vector<reco::TransientTrack> transient_tracks;
-
-    //TODO include other cut levels, such as vertex requirement
-    found_good_muons_from_z = false;
-    if (reco_z_from_muons.m > -1 && 
-        z_muon0.pt() >= MIN_Z_MUON_PT && z_muon1.pt() >= MIN_Z_MUON_PT && 
-        muon::isTightMuon(z_muon0, reco_vert.primary_vert ) &&
-        muon::isTightMuon(z_muon1, reco_vert.primary_vert ) &&
-        reco_z_from_muons.vtx_prob >= MIN_VERTEX_PROB ) {
-      found_good_muons_from_z = true;
-    }
-
-    found_z_to_muons = false;
-    if (reco_z_from_muons.m >= MIN_Z_MASS && reco_z_from_muons.m <= MAX_Z_MASS &&
-        reco_z_from_muons.vtx_prob >= MIN_VERTEX_PROB &&
-        muon::isTightMuon(z_muon0, reco_vert.primary_vert ) &&
-        muon::isTightMuon(z_muon1, reco_vert.primary_vert ) &&
-        z_muon0.pt() >= MIN_Z_MUON_PT &&
-        z_muon1.pt() >= MIN_Z_MUON_PT ) {
-      found_z_to_muons = true;
-    }
-
-    //TODO add different cut levels?
-
-    found_good_electrons_from_z = false;
-    if (reco_z.m > -1 && e0 != NULL && e1 != NULL) {
-      if ( e0->pt >= MIN_ELECTRON_PT && e1->pt >= MIN_ELECTRON_PT &&
-          e0->CutPassed("eg_medium") && e1->CutPassed("eg_medium")) {
-        found_good_electrons_from_z = true;
-      }
-    }
-
-    found_z_to_electrons = false;
-    if (reco_z.m > -1 && e0 != NULL && e1 != NULL) {
-      if ( e0->pt >= MIN_ELECTRON_PT && e1->pt >= MIN_ELECTRON_PT &&
-          reco_z.m >= MIN_Z_MASS && reco_z.m <= MAX_Z_MASS &&
-          e0->CutPassed("eg_medium") && e1->CutPassed("eg_medium")) {
-        found_z_to_electrons = true;
-      }
-    }
 
     if (n_reco_muons >= 2 ) {
       // Set up the JPsi
@@ -372,20 +384,20 @@ namespace zf {
     //Set cut level flags for jpsi candidates
     //Note that to pass multiple cut stages the same jpsi candidate should pass all stages
     
-    found_dimuon_with_high_pt_muons = false;
-    found_dimuon_with_soft_id_and_high_pt_muons = false;
-    found_dimuon_with_good_muons_and_compatible_muon_vertex = false;
-    found_good_dimuon_compatible_with_primary_vertex = false;
+    found_dimuon_jpsi_with_high_pt_muons = false;
+    found_dimuon_jpsi_with_soft_id_and_high_pt_muons = false;
+    found_dimuon_jpsi_with_good_muons_and_compatible_muon_vertex = false;
+    found_good_dimuon_jpsi_compatible_with_primary_vertex = false;
     found_jpsi = false;
     for (unsigned int i = 0; i < reco_jpsi.m.size() ; ++i ) {
       if ( reco_jpsi.has_high_pt_muons.at(i) ) {
-        found_dimuon_with_high_pt_muons = true;
+        found_dimuon_jpsi_with_high_pt_muons = true;
         if (reco_jpsi.has_soft_id_muons.at(i) ) {
-          found_dimuon_with_soft_id_and_high_pt_muons = true;
+          found_dimuon_jpsi_with_soft_id_and_high_pt_muons = true;
           if (reco_jpsi.has_muons_with_compatible_vertex.at(i) ) {
-            found_dimuon_with_good_muons_and_compatible_muon_vertex = true;
+            found_dimuon_jpsi_with_good_muons_and_compatible_muon_vertex = true;
             if (reco_jpsi.has_dimuon_vertex_compatible_with_primary_vertex.at(i)) {
-              found_good_dimuon_compatible_with_primary_vertex = true;
+              found_good_dimuon_jpsi_compatible_with_primary_vertex = true;
               if (reco_jpsi.is_within_jpsi_mass_window.at(i) ) {
                 found_jpsi = true;
               }
@@ -701,6 +713,7 @@ namespace zf {
     }
 
     //ensure muon0 is the higher pT muon
+    //TODO Is this needed??
     if (mu0.pt() >= mu1.pt() ) {
       reco_jpsi.muon0.push_back (mu0);
       reco_jpsi.muon1.push_back (mu1);

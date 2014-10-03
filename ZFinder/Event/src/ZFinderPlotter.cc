@@ -1119,7 +1119,7 @@ namespace zf {
         }
         n_truth_matched_jpsi_muons_->Fill (n_truth_matched_jpsi_muons, zfe.event_weight);
 
-        jpsi_iso_mu0_->Fill(zfe.reco_jpsi.iso_mu0.at(i) ) ;
+        jpsi_iso_mu0_->Fill(zfe.reco_jpsi.iso_mu0.at(i), zfe.event_weight ) ;
         jpsi_iso_sum_charged_hadron_pt_mu0_->Fill(zfe.reco_jpsi.iso_sum_charged_hadron_pt_mu0.at(i), zfe.event_weight ) ;
         jpsi_iso_sum_charged_particle_pt_mu0_->Fill(zfe.reco_jpsi.iso_sum_charged_particle_pt_mu0.at(i), zfe.event_weight ) ;
         jpsi_iso_sum_neutral_hadron_et_mu0_->Fill(zfe.reco_jpsi.iso_sum_neutral_hadron_et_mu0.at(i), zfe.event_weight ) ;
@@ -1143,20 +1143,21 @@ namespace zf {
         muon_jet_pt_diff_z_pt_->Fill(zfe.reco_z.pt - zfe.reco_muon_jets.pt.at(i), zfe.event_weight);
         muon_jet_pt_z_pt_->Fill(zfe.reco_z.pt , zfe.reco_muon_jets.pt.at(i), zfe.event_weight);
         muon_jet_phi_z_phi_->Fill(zfe.reco_z.phi , zfe.reco_muon_jets.phi.at(i), zfe.event_weight);
+        //TODO is this extra for loop needed?
         for (unsigned int j = 0; j < zfe.reco_jpsi.m.size() ; ++j ) {
-          if (APPLY_MUON_MIN_PT_ && !zfe.reco_jpsi.has_high_pt_muons.at(i) )  {
+          if (APPLY_MUON_MIN_PT_ && !zfe.reco_jpsi.has_high_pt_muons.at(j) )  {
             continue;
           }
-          if (APPLY_SOFT_MUONS_ && !zfe.reco_jpsi.has_soft_id_muons.at(i) ) {
+          if (APPLY_SOFT_MUONS_ && !zfe.reco_jpsi.has_soft_id_muons.at(j) ) {
             continue;
           }
-          if (APPLY_DIMUON_VTX_COMPATIBILITY_ && !zfe.reco_jpsi.has_muons_with_compatible_vertex.at(i) ) {
+          if (APPLY_DIMUON_VTX_COMPATIBILITY_ && !zfe.reco_jpsi.has_muons_with_compatible_vertex.at(j) ) {
             continue;
           }
-          if (APPLY_VERTEX_Z_POS_WINDOW_ && !zfe.reco_jpsi.has_dimuon_vertex_compatible_with_primary_vertex.at(i) ) {
+          if (APPLY_VERTEX_Z_POS_WINDOW_ && !zfe.reco_jpsi.has_dimuon_vertex_compatible_with_primary_vertex.at(j) ) {
             continue;
           }
-          if (APPLY_JPSI_MASS_WINDOW_ && !zfe.reco_jpsi.is_within_jpsi_mass_window.at(i) ) {
+          if (APPLY_JPSI_MASS_WINDOW_ && !zfe.reco_jpsi.is_within_jpsi_mass_window.at(j) ) {
             continue;
           }
           muon_jet_pt_diff_dimuon_pt_->Fill(zfe.reco_jpsi.pt.at(j) - zfe.reco_muon_jets.pt.at(i), zfe.event_weight);

@@ -230,16 +230,21 @@ namespace zf {
       int n_reco_muon_jets;
 
       bool found_four_muons;
-      bool found_z_to_muons;
+
+      bool found_high_pt_muons_from_z;
       bool found_good_muons_from_z;
+      bool found_dimuon_z_compatible_vertex; 
+      bool found_z_to_muons;
 
-      bool found_z_to_electrons;
+      bool found_high_pt_electrons_from_z;
       bool found_good_electrons_from_z;
+      bool found_dielectron_z_compatible_vertex; 
+      bool found_z_to_electrons;
 
-      bool found_dimuon_with_high_pt_muons;
-      bool found_dimuon_with_soft_id_and_high_pt_muons;
-      bool found_dimuon_with_good_muons_and_compatible_muon_vertex;
-      bool found_good_dimuon_compatible_with_primary_vertex;
+      bool found_dimuon_jpsi_with_high_pt_muons;
+      bool found_dimuon_jpsi_with_soft_id_and_high_pt_muons;
+      bool found_dimuon_jpsi_with_good_muons_and_compatible_muon_vertex;
+      bool found_good_dimuon_jpsi_compatible_with_primary_vertex;
       bool found_jpsi;
 
       bool found_truth_jpsi_with_high_pt_muons;

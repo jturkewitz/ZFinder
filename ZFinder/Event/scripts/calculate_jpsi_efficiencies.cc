@@ -20,10 +20,10 @@ void calculate_jpsi_efficiencies (string file_name )
   gStyle->SetOptStat(0);
 
   TH1D *h_n_truth_matched_muons_all = (TH1D*) theFile0->Get("ZFinder/All/N_truth_matched_jpsi_muons");
-  TH1D *h_n_truth_matched_muons_dimuon = (TH1D*) theFile0->Get("ZFinder/Dimuon/N_truth_matched_jpsi_muons");
-  TH1D *h_n_truth_matched_muons_dimuon_soft = (TH1D*) theFile0->Get("ZFinder/Dimuon_Soft/N_truth_matched_jpsi_muons");
-  TH1D *h_n_truth_matched_muons_dimuon_vtx_comp = (TH1D*) theFile0->Get("ZFinder/Dimuon_Vertex_Compatible/N_truth_matched_jpsi_muons");
-  TH1D *h_n_truth_matched_muons_dimuon_primary_vert = (TH1D*) theFile0->Get("ZFinder/Dimuon_Primary_Vertex/N_truth_matched_jpsi_muons");
+  TH1D *h_n_truth_matched_muons_dimuon = (TH1D*) theFile0->Get("ZFinder/Dimuon_Jpsi/N_truth_matched_jpsi_muons");
+  TH1D *h_n_truth_matched_muons_dimuon_soft = (TH1D*) theFile0->Get("ZFinder/Dimuon_Jpsi_Soft/N_truth_matched_jpsi_muons");
+  TH1D *h_n_truth_matched_muons_dimuon_vtx_comp = (TH1D*) theFile0->Get("ZFinder/Dimuon_Jpsi_Vertex_Compatible/N_truth_matched_jpsi_muons");
+  TH1D *h_n_truth_matched_muons_dimuon_primary_vert = (TH1D*) theFile0->Get("ZFinder/Dimuon_Jpsi_Primary_Vertex/N_truth_matched_jpsi_muons");
   TH1D *h_n_truth_matched_muons_jpsi = (TH1D*) theFile0->Get("ZFinder/Jpsi/N_truth_matched_jpsi_muons");
 
   TH1D *h_jpsi_mass_fine_jpsi_mc = (TH1D*) theFile0->Get("ZFinder/MC_Jpsi/jpsi Mass: Fine");
