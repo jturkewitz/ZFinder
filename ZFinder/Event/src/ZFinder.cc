@@ -192,7 +192,7 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
   }
 
   //TODO nested if might not be necessary here
-  if ( zfe.found_dimuon_jpsi_with_high_pt_muons ) {
+  if ( zfe.found_dimuon_jpsi_with_high_pt_muons && zfe.found_dimuon_jpsi_with_muons_in_eta_window ) {
     zfp_dimuon_jpsi->Fill(zfe);
     if ( zfe.found_dimuon_jpsi_with_soft_id_and_high_pt_muons ) {
       zfp_dimuon_jpsi_soft->Fill(zfe);
@@ -248,7 +248,6 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
       }
     }
   }
-
 }
 
 // ------------ method called once each job just before starting event loop  ------------

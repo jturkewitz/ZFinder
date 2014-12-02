@@ -23,6 +23,7 @@
 #include "RooFormulaVar.h"
 #include "RooGaussian.h"
 #include "RooExponential.h"
+#include "RooVoigtian.h"
 #include "RooCBShape.h"
 #include "RooGaussModel.h"
 #include "RooDecay.h"
@@ -66,9 +67,11 @@ int RooFitJpsiMass(
   RooMsgService::instance().setGlobalKillBelow(RooFit::WARNING) ;
   gErrorIgnoreLevel = kWarning;
 
-  double dimuon_mass_min = 2.85;
-  //double dimuon_mass_max = 3.15;
-  double dimuon_mass_max = 3.3;
+  //double dimuon_mass_min = 2.8;
+  //double dimuon_mass_max = 3.4;
+  double dimuon_mass_min = 3.0;
+  double dimuon_mass_max = 3.2;
+  //double dimuon_mass_max = 3.2;
   // Set up the variables we're going to read in from the files
   RooRealVar dimuon_mass("dimuon_mass", "dimuon_mass" , dimuon_mass_min, dimuon_mass_max, "GeV");
   //TODO clean up
@@ -80,8 +83,9 @@ int RooFitJpsiMass(
 
   //std::string inclusive_jpsi_hist = "ZFinder/Jpsi/";
   //std::string inclusive_jpsi_hist = "ZFinder/Dimuon/";
-  std::string inclusive_jpsi_hist = "ZFinder/Dimuon_Soft/";
-  inclusive_jpsi_hist.append( "jpsi Mass: Fine" );
+  std::string inclusive_jpsi_hist = "ZFinder/Dimuon_Jpsi_Primary_Vertex/";
+  //inclusive_jpsi_hist.append( "jpsi_mass" );
+  inclusive_jpsi_hist.append( "jpsi_mass_pt15to20" );
   std::string jpsi_hist_name = "";
   jpsi_hist_name.append( "dimuon_mass");
 
@@ -91,35 +95,26 @@ int RooFitJpsiMass(
 
   RooDataHist dimuon_mass_data_hist("dimuon_mass_data_hist", jpsi_hist_name.c_str(), dimuon_mass, h_dimuon_mass);
 
+  //RooRealVar mean("mean", "mean", 3.1, 3.00, 3.18);
+  //RooRealVar sigma("sigma", "sigma", 0.05, 0.001, 0.1);
+  //RooRealVar alpha("alpha", "alpha", 1.8, 1.0, 2.5);
+  //RooRealVar n("n", "n", 2., 1.0, 100.);
+  ////RooRealVar n("n", "n", 2.0);
+  //RooCBShape crystal_ball ("crystal_ball", "crystal_ball", dimuon_mass, mean, sigma, alpha, n );
+
   RooRealVar mean("mean", "mean", 3.1, 3.0, 3.2);
   RooRealVar sigma("sigma", "sigma", 0.1, 0.0001, 10.0);
-  RooRealVar alpha("alpha", "alpha", 0.01, 0.00001, 2.0);
-  RooRealVar n("n", "n", 3., 1.5, 4.);
-  RooCBShape crystal_ball ("crystal_ball", "crystal_ball", dimuon_mass, mean, sigma, alpha, n );
+  RooGaussian gauss ("gauss", "gauss", dimuon_mass, mean, sigma);
 
-
-  //RooRealVar mean("mean", "mean", 3.1, 3.0, 3.2);
-  //RooRealVar sigma("sigma", "sigma", 0.1, 0.0001, 10.0);
-  //RooGaussian crystal_ball ("crystal_ball", "crystal_ball", dimuon_mass, mean, sigma);
-
-  //RooRealVar sigma2("sigma2", "sigma2", 0.1, 0.0001, 1.0);
-  //RooRealVar alpha2("alpha2", "alpha2", 0., 0., 100);
-  //RooRealVar n2("n2", "n2", 0., 2., 5.);
-  //RooCBShape crystal_ball2 ("crystal_ball2", "crystal_ball2", dimuon_mass, mean, sigma2, alpha2, n2 );
-
-  ////RooRealVar cball_fraction("cball_fraction", "cball_fraction", 0., 0.0, 1.0);
-  //RooRealVar cball_fraction("cball_fraction", "cball_fraction", 1.);
-  //RooAddPdf crystal_balls("crystal_balls", "crystal_balls", RooArgList( crystal_ball, crystal_ball2), RooArgList(cball_fraction));
-
-  RooRealVar slope("slope", "slope", -0.1, -10., 100.);
-  //RooRealVar slope("slope", "slope", -0.1, -10., 0.);
+  RooRealVar slope("slope", "slope", -0.1, -100., 100.);
   RooExponential bg_exponential("bg_exponential", "bg_exponential", dimuon_mass, slope);
 
   RooRealVar signal_fraction("signal_fraction", "signal_fraction" , 0.9 , 0.0, 1.);
-  //RooAddPdf dimuon_mass_fitpdf("dimuon_mass_fitpdf", "dimuon_mass_fitpdf", RooArgList(crystal_balls, bg_exponential), RooArgList(signal_fraction));
-  RooAddPdf dimuon_mass_fitpdf("dimuon_mass_fitpdf", "dimuon_mass_fitpdf", RooArgList(crystal_ball, bg_exponential), RooArgList(signal_fraction));
+  //RooRealVar signal_fraction("signal_fraction", "signal_fraction" , 1.);
+  //RooAddPdf dimuon_mass_fitpdf("dimuon_mass_fitpdf", "dimuon_mass_fitpdf", RooArgList(crystal_ball, bg_exponential), RooArgList(signal_fraction));
+  RooAddPdf dimuon_mass_fitpdf("dimuon_mass_fitpdf", "dimuon_mass_fitpdf", RooArgList(gauss, bg_exponential), RooArgList(signal_fraction));
 
-  RooFitResult *jpsi_fitres = dimuon_mass_fitpdf.fitTo(dimuon_mass_data_hist, Range(dimuon_mass_min, dimuon_mass_max), NumCPU(N_CPU), Verbose(false), PrintLevel(-1), Save());
+  RooFitResult *jpsi_fitres = dimuon_mass_fitpdf.fitTo(dimuon_mass_data_hist, Range(dimuon_mass_min, dimuon_mass_max), NumCPU(N_CPU), Verbose(false), PrintLevel(-1), SumW2Error(kFALSE), Save());
 
   jpsi_fitres->Print();
 
@@ -128,10 +123,13 @@ int RooFitJpsiMass(
   // Plot the left side
   canvas->cd(1);
   gPad->SetLogy();
-  RooPlot* dimuon_mass_fitframe = dimuon_mass.frame( Title(jpsi_hist_name.c_str()) );
+  //RooPlot* dimuon_mass_fitframe = dimuon_mass.frame( Title(jpsi_hist_name.c_str()) );
+  RooPlot* dimuon_mass_fitframe = dimuon_mass.frame( Title("Inclusive J/Psi Trigger" ));
   //dimuon_mass_fitframe->SetName(0); // Unset title
   dimuon_mass_data_hist.plotOn(dimuon_mass_fitframe);
-  dimuon_mass_fitpdf.plotOn(dimuon_mass_fitframe, Components(crystal_ball), LineColor(kGreen-2));
+  //dimuon_mass_fitpdf.plotOn(dimuon_mass_fitframe, Components(voigtian), LineColor(kGreen-2));
+  //dimuon_mass_fitpdf.plotOn(dimuon_mass_fitframe, Components(crystal_ball), LineColor(kGreen-2));
+  dimuon_mass_fitpdf.plotOn(dimuon_mass_fitframe, Components(gauss), LineColor(kGreen-2));
   dimuon_mass_fitpdf.plotOn(dimuon_mass_fitframe, Components(bg_exponential), LineColor(kBlue-2));
   dimuon_mass_fitpdf.plotOn(dimuon_mass_fitframe, LineColor(kRed-2));
   dimuon_mass_fitframe->SetMinimum(0.5);

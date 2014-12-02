@@ -139,12 +139,18 @@ namespace zf {
         std::vector<double> vtx_y;
         std::vector<double> vtx_z;
         std::vector<double> vtx_prob;
+        std::vector<double> jpsi_efficiency;
+        std::vector<double> jpsi_scale_factor;
         std::vector<double> muons_delta_phi;
         std::vector<double> muons_delta_eta;
         std::vector<double> muons_deltaR;
         std::vector<double> z_delta_phi;
         std::vector<reco::Muon> muon0;
         std::vector<reco::Muon> muon1;
+        std::vector<double> muon0_efficiency;
+        std::vector<double> muon1_efficiency;
+        std::vector<double> muon0_scale_factor;
+        std::vector<double> muon1_scale_factor;
         std::vector<double> muon0_deltaR_to_z_muons;
         std::vector<double> muon1_deltaR_to_z_muons;
         std::vector<double> muon0_deltaR_to_truth_muons;
@@ -161,6 +167,7 @@ namespace zf {
         std::vector<double> iso_sum_neutral_hadron_et_mu1;
         std::vector<double> iso_sum_photon_et_mu1;
         std::vector<double> iso_sum_pileup_pt_mu1;
+        std::vector<bool> has_muons_in_eta_window;
         std::vector<bool> has_high_pt_muons;
         std::vector<bool> has_soft_id_muons;
         std::vector<bool> has_muons_with_compatible_vertex;
@@ -241,6 +248,7 @@ namespace zf {
       bool found_dielectron_z_compatible_vertex; 
       bool found_z_to_electrons;
 
+      bool found_dimuon_jpsi_with_muons_in_eta_window;
       bool found_dimuon_jpsi_with_high_pt_muons;
       bool found_dimuon_jpsi_with_soft_id_and_high_pt_muons;
       bool found_dimuon_jpsi_with_good_muons_and_compatible_muon_vertex;
@@ -258,6 +266,7 @@ namespace zf {
       void PrintRecoElectrons(const bool PRINT_CUTS = false) { PrintElectrons(0, PRINT_CUTS); }
       void PrintTrigElectrons(const bool PRINT_CUTS = false) { PrintElectrons(2, PRINT_CUTS); }
 
+      //TODO is this needed? Can it be safely cleaned up for J/Psi part of the code?
       // Access ZDefinition information
       void AddZDef(const std::string NAME, cutlevel_vector PASS_OBJ) { zdef_map_[NAME] = PASS_OBJ; }
       const cutlevel_vector* GetZDef(const std::string& NAME) const;
@@ -278,8 +287,6 @@ namespace zf {
       void InitTrigger(const edm::Event& iEvent, const edm::EventSetup& iSetup);
 
       void InitGSFElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup);
-      void InitHFElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup);
-      void InitNTElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup);
 
       // Update the Z Info from e0, e1
       void InitZFromElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup);
@@ -306,8 +313,6 @@ namespace zf {
         edm::InputTag pileup;
         edm::InputTag generator;
         std::vector<edm::InputTag> iso_vals;
-        edm::InputTag hf_electron;
-        edm::InputTag hf_clusters;
       } inputtags_;
 
       // Find matching trigger objects

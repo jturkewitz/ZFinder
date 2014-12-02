@@ -7,9 +7,6 @@
 // CMSSW
 #include "DataFormats/Common/interface/Handle.h"  // edm::Handle
 #include "DataFormats/EgammaCandidates/interface/PhotonFwd.h"  // reco::PhotonCollection
-#include "DataFormats/EgammaReco/interface/HFEMClusterShape.h"  // reco::HFEMClusterShape
-#include "DataFormats/EgammaReco/interface/HFEMClusterShapeAssociation.h"  // reco::HFEMClusterShapeAssociationCollection
-#include "DataFormats/EgammaReco/interface/HFEMClusterShapeFwd.h"  // reco::HFEMClusterShapeRef,
 #include "DataFormats/EgammaReco/interface/SuperClusterFwd.h"  // reco::SuperClusterCollection, reco::SuperClusterRef
 #include "DataFormats/RecoCandidate/interface/RecoEcalCandidateFwd.h"  // reco::RecoEcalCandidateCollection
 #include "DataFormats/MuonReco/interface/MuonFwd.h" // reco::MuonCollection
@@ -44,6 +41,8 @@
 #include "ZFinder/Event/interface/PDGID.h"  // PDGID enum (ELECTRON, POSITRON, etc.)
 #include "ZFinder/Event/interface/TriggerList.h"  // ET_ET_TIGHT, ET_ET_DZ, ET_ET_LOOSE, ET_NT_ET_TIGHT, ET_HF_ET_TIGHT, ET_HF_ET_LOOSE, ET_HF_HF_TIGHT, ET_HF_HF_LOOSE, SINGLE_ELECTRON_TRIGGER, ALL_TRIGGERS
 #include "ZFinder/Event/interface/PileupReweighting.h" // RUN_2012_ABCD_TRUE_PILEUP, SUMMER12_53X_MC_TRUE_PILEUP
+#include "ZFinder/Event/interface/MuonEfficiency.h"
+#include "ZFinder/Event/interface/JpsiEfficiencyTables.h"
 
 //Math
 #include <math.h>
@@ -67,9 +66,9 @@ namespace zf {
 
   ZFinderEvent::ZFinderEvent(const edm::Event& iEvent, const edm::EventSetup& iSetup, const edm::ParameterSet& iConfig) {
     /* Given an event, parses them for the information needed to make the
-     * classe.
+     * class.
      *
-     * It selects electrons based on a minimum level of hard-coded cuts.
+     * It selects Z and/or J/Psi from leptonic decay channels.
      */
     // Clear Events
     InitVariables();
@@ -85,11 +84,8 @@ namespace zf {
     // Get InputTags
     // Reco
     inputtags_.ecal_electron = iConfig.getParameter<edm::InputTag>("ecalElectronsInputTag");
-    inputtags_.nt_electron = iConfig.getParameter<edm::InputTag>("ntElectronsInputTag");
-    inputtags_.hf_electron = iConfig.getParameter<edm::InputTag>("hfElectronsInputTag");
     inputtags_.muon = iConfig.getParameter<edm::InputTag>("muonsInputTag");
     inputtags_.jet = iConfig.getParameter<edm::InputTag>("ak5PFJetsInputTag");
-    inputtags_.hf_clusters = iConfig.getParameter<edm::InputTag>("hfClustersInputTag");
     inputtags_.conversion = iConfig.getParameter<edm::InputTag>("conversionsInputTag");
     inputtags_.beamspot = iConfig.getParameter<edm::InputTag>("beamSpotInputTag");
     inputtags_.rho_iso = iConfig.getParameter<edm::InputTag>("rhoIsoInputTag");
@@ -384,22 +380,26 @@ namespace zf {
     //Set cut level flags for jpsi candidates
     //Note that to pass multiple cut stages the same jpsi candidate should pass all stages
     
+    found_dimuon_jpsi_with_muons_in_eta_window = false;
     found_dimuon_jpsi_with_high_pt_muons = false;
     found_dimuon_jpsi_with_soft_id_and_high_pt_muons = false;
     found_dimuon_jpsi_with_good_muons_and_compatible_muon_vertex = false;
     found_good_dimuon_jpsi_compatible_with_primary_vertex = false;
     found_jpsi = false;
     for (unsigned int i = 0; i < reco_jpsi.m.size() ; ++i ) {
-      if ( reco_jpsi.has_high_pt_muons.at(i) ) {
-        found_dimuon_jpsi_with_high_pt_muons = true;
-        if (reco_jpsi.has_soft_id_muons.at(i) ) {
-          found_dimuon_jpsi_with_soft_id_and_high_pt_muons = true;
-          if (reco_jpsi.has_muons_with_compatible_vertex.at(i) ) {
-            found_dimuon_jpsi_with_good_muons_and_compatible_muon_vertex = true;
-            if (reco_jpsi.has_dimuon_vertex_compatible_with_primary_vertex.at(i)) {
-              found_good_dimuon_jpsi_compatible_with_primary_vertex = true;
-              if (reco_jpsi.is_within_jpsi_mass_window.at(i) ) {
-                found_jpsi = true;
+      if (reco_jpsi.has_muons_in_eta_window.at(i) ) {
+        found_dimuon_jpsi_with_muons_in_eta_window = true;
+        if ( reco_jpsi.has_high_pt_muons.at(i) ) {
+          found_dimuon_jpsi_with_high_pt_muons = true;
+          if (reco_jpsi.has_soft_id_muons.at(i) ) {
+            found_dimuon_jpsi_with_soft_id_and_high_pt_muons = true;
+            if (reco_jpsi.has_muons_with_compatible_vertex.at(i) ) {
+              found_dimuon_jpsi_with_good_muons_and_compatible_muon_vertex = true;
+              if (reco_jpsi.has_dimuon_vertex_compatible_with_primary_vertex.at(i)) {
+                found_good_dimuon_jpsi_compatible_with_primary_vertex = true;
+                if (reco_jpsi.is_within_jpsi_mass_window.at(i) ) {
+                  found_jpsi = true;
+                }
               }
             }
           }
@@ -713,14 +713,34 @@ namespace zf {
     }
 
     //ensure muon0 is the higher pT muon
-    //TODO Is this needed??
+    //Is this needed??
+    double mu0_eff = GetEfficiency (SOFT_MUON_DATA_EFF_TABLE, mu0.eta(), mu0.pt() ) ;
+    double mu1_eff = GetEfficiency (SOFT_MUON_DATA_EFF_TABLE, mu1.eta(), mu1.pt() ) ;
+    double mu0_scale_factor = GetEfficiency (SOFT_MUON_SCALE_FACTOR_TABLE, mu0.eta(), mu0.pt());
+    double mu1_scale_factor = GetEfficiency (SOFT_MUON_SCALE_FACTOR_TABLE, mu1.eta(), mu1.pt());
+    //if ( mu0.pt() > 4 ) {
+    //  std::cout << "eta0: " << mu0.eta() << " pT: " << mu0.pt() << " eff " << mu0_eff <<  std::endl; 
+    //}
+    //if ( mu1.pt() > 4 ) {
+    //  std::cout << "eta1: " << mu1.eta() << " pT: " << mu1.pt() << " eff " << mu1_eff <<  std::endl; 
+    //}
+
+    
     if (mu0.pt() >= mu1.pt() ) {
       reco_jpsi.muon0.push_back (mu0);
       reco_jpsi.muon1.push_back (mu1);
+      reco_jpsi.muon0_efficiency.push_back ( mu0_eff ); 
+      reco_jpsi.muon1_efficiency.push_back ( mu1_eff ); 
+      reco_jpsi.muon0_scale_factor.push_back ( mu0_scale_factor ); 
+      reco_jpsi.muon1_scale_factor.push_back ( mu1_scale_factor ); 
     }
     else {
       reco_jpsi.muon0.push_back (mu1);
       reco_jpsi.muon1.push_back (mu0);
+      reco_jpsi.muon0_efficiency.push_back ( mu1_eff ); 
+      reco_jpsi.muon1_efficiency.push_back ( mu0_eff ); 
+      reco_jpsi.muon0_scale_factor.push_back ( mu1_scale_factor ); 
+      reco_jpsi.muon1_scale_factor.push_back ( mu0_scale_factor ); 
     }
 
     reco_jpsi.muon0_deltaR_to_z_muons.push_back(JpsiMuonZMuonMatch(mu0));
@@ -753,6 +773,8 @@ namespace zf {
     reco_jpsi.phistar.push_back (ReturnPhistar(mu0.eta(), mu0.phi(), mu1.eta(), mu1.phi()));
     reco_jpsi.eta.push_back (jpsi_lv.eta());
     reco_jpsi.phi.push_back (jpsi_lv.phi());
+    reco_jpsi.jpsi_efficiency.push_back ( mu0_eff * mu1_eff);
+    reco_jpsi.jpsi_scale_factor.push_back ( mu0_scale_factor * mu1_scale_factor);
 
     reco_jpsi.muons_delta_phi.push_back ( fabs( deltaPhi( mu0.phi() , mu1.phi() ) ) );
     reco_jpsi.muons_delta_eta.push_back ( fabs( mu0.eta() -  mu1.eta() ) );
@@ -778,11 +800,28 @@ namespace zf {
     }
 
     //Cut results
-    if ( mu0.pt() >= MIN_JPSI_MUON_PT && mu1.pt() >= MIN_JPSI_MUON_PT ) {
-      reco_jpsi.has_high_pt_muons.push_back(true);
+    if (mu0.pt() > mu1.pt() ) {
+      if ( mu0.pt() >= MIN_JPSI_LEADING_MUON_PT && mu1.pt() >= MIN_JPSI_SUBLEADING_MUON_PT ) {
+        reco_jpsi.has_high_pt_muons.push_back(true);
+      } 
+      else {
+        reco_jpsi.has_high_pt_muons.push_back(false);
+      }
     }
     else {
-      reco_jpsi.has_high_pt_muons.push_back(false);
+      if ( mu1.pt() >= MIN_JPSI_LEADING_MUON_PT && mu0.pt() >= MIN_JPSI_SUBLEADING_MUON_PT ) {
+        reco_jpsi.has_high_pt_muons.push_back(true);
+      } 
+      else {
+        reco_jpsi.has_high_pt_muons.push_back(false);
+      }
+    }
+    
+    if (fabs(mu0.eta()) < MAX_JPSI_MUON_ETA  && fabs(mu1.eta()) < MAX_JPSI_MUON_ETA ) {
+      reco_jpsi.has_muons_in_eta_window.push_back(true);
+    }
+    else {
+      reco_jpsi.has_muons_in_eta_window.push_back(false);
     }
 
     if ( muon::isSoftMuon(mu0, reco_vert.primary_vert )
@@ -1065,12 +1104,23 @@ namespace zf {
       const double JPSIEMP = jpsi.at(i)->energy() - jpsi.at(i)->pz();
       truth_jpsi.y.push_back( 0.5 * log(JPSIEPP / JPSIEMP));
       truth_jpsi.eta.push_back( jpsi.at(i)->eta());
-      if (jpsi_muon0.at(i)->pt() >= MIN_JPSI_MUON_PT && jpsi_muon1.at(i)->pt() >= MIN_JPSI_MUON_PT ) {
-        truth_jpsi.has_high_pt_muons.push_back( true );
+      if (jpsi_muon0.at(i)->pt() > jpsi_muon1.at(i)->pt() ) {
+        if (jpsi_muon0.at(i)->pt() >= MIN_JPSI_LEADING_MUON_PT && jpsi_muon1.at(i)->pt() >= MIN_JPSI_SUBLEADING_MUON_PT ) {
+          truth_jpsi.has_high_pt_muons.push_back( true );
+        }
+        else {
+          truth_jpsi.has_high_pt_muons.push_back( false );
+        }
       }
       else {
-        truth_jpsi.has_high_pt_muons.push_back( false );
+        if (jpsi_muon1.at(i)->pt() >= MIN_JPSI_LEADING_MUON_PT && jpsi_muon0.at(i)->pt() >= MIN_JPSI_SUBLEADING_MUON_PT ) {
+          truth_jpsi.has_high_pt_muons.push_back( true );
+        }
+        else {
+          truth_jpsi.has_high_pt_muons.push_back( false );
+        }
       }
+
 
       if (jpsi.at(i)->mass() <= MAX_JPSI_MASS && jpsi.at(i)->mass() >= MIN_JPSI_MASS ) {
         truth_jpsi.is_within_jpsi_mass_window.push_back( true );

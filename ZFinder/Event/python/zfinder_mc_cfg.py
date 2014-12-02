@@ -28,11 +28,17 @@ process.options = cms.untracked.PSet(
 )
 
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring( 'file:/hdfs/cms/user/turkewitz/tmp/jpsi_inclusive_mc_test_file.root')
+    ##fileNames = cms.untracked.vstring( 'file:/hdfs/cms/user/turkewitz/tmp/jpsi_inclusive_mc_test_file.root')
+    ##fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/tmp/0012F37A-CE09-E211-ABDA-00261894396F.root')
+    ##fileNames = cms.untracked.vstring( 'file:/home/user1/turkewitz/Work/CMSSW/CMSSW_5_3_7_patch6_ZbMCStudy/src/Jpsi_MM_step3_test.root')
+    ##fileNames = cms.untracked.vstring( 'file:/home/user1/turkewitz/Work/CMSSW/CMSSW_5_3_7_patch6_ZbMCStudy/src/Jpsi_MM_step3_test7.root')
+    ##fileNames = cms.untracked.vstring( 'file:/home/user1/turkewitz/Work/CMSSW/CMSSW_5_3_7_patch6_ZbMCStudy/src/Jpsi_MM_step2_test10.root')
+    fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/tmp/Jpsi_MM_step3_test15_pileup.root')
+    ##fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/tmp/Jpsi_MM_step3_test13_pileup.root')
 )
 
 process.TFileService = cms.Service("TFileService",
-        fileName = cms.string("test9mc.root")
+        fileName = cms.string("zfinder_mc.root")
         )
 
 #
@@ -62,8 +68,6 @@ process.ZFinder = cms.EDAnalyzer('ZFinder',
         # General tags
         ecalElectronsInputTag  = cms.InputTag("gsfElectrons"),
         muonsInputTag          = cms.InputTag("muons"),
-        hfElectronsInputTag    = cms.InputTag("hfRecoEcalCandidate"),
-        hfClustersInputTag     = cms.InputTag("hfEMClusters"),
         conversionsInputTag    = cms.InputTag("allConversions"),
         beamSpotInputTag       = cms.InputTag("offlineBeamSpot"),
         rhoIsoInputTag         = cms.InputTag("kt6PFJetsForIsolation", "rho"),
@@ -80,8 +84,8 @@ process.ZFinder = cms.EDAnalyzer('ZFinder',
         generatorInputTag = cms.InputTag("genParticles"),
         # ZDefinitions from ZFinder.ZFinder.ZDefinitions_cfi
         ZDefinitions = zdefs,
-        ##pileup_era = cms.string("ABCD") # defaults to ABCD
-        pileup_era = cms.string("B") # defaults to ABCD
+        pileup_era = cms.string("ABCD") # defaults to ABCD
+        ##pileup_era = cms.string("B") # defaults to ABCD
         )
 
 # RUN

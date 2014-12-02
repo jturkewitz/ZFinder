@@ -38,7 +38,7 @@ using namespace RooFit;
 int RooFitPileupProb() {
 
   double sigma = 5.;
-  double distance_cut = 1.;
+  double distance_cut = 1.0;
 
   TRandom3 random_1(0);
   TRandom3 random_2(0);

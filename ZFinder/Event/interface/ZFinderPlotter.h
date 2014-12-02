@@ -70,9 +70,20 @@ namespace zf {
 
             TH1D* jpsi_mass_all_;
             TH1D* jpsi_mass_coarse_;
+
             TH1D* jpsi_mass_fine_;
+            TH1D* jpsi_mass_fine_ptUnder10_;
+            TH1D* jpsi_mass_fine_pt10to15_;
+            TH1D* jpsi_mass_fine_pt15to20_;
+            TH1D* jpsi_mass_fine_pt20to25_;
+            TH1D* jpsi_mass_fine_pt25to30_;
+            TH1D* jpsi_mass_fine_ptAbove30_;
+
             TH1D* jpsi_rapidity_;
             TH1D* jpsi_pt_;
+            TH1D* jpsi_efficiency_;
+            TH1D* jpsi_scale_factor_;
+
             TH2D* jpsi_pt_vs_rap_;
             TH1D* jpsi_distance_;
             TH1D* jpsi_dist_err_;
@@ -89,7 +100,6 @@ namespace zf {
             TH1D* jpsi_tau_xy_very_fine_pt15to20_;
             TH1D* jpsi_tau_xy_very_fine_pt20to25_;
             TH1D* jpsi_tau_xy_very_fine_pt25to30_;
-            TH1D* jpsi_tau_xy_very_fine_ptAbove20_;
             TH1D* jpsi_tau_xy_very_fine_ptAbove30_;
 
             TH1D* jpsi_tau_xy_very_fine_rap0_0to0_3_;
@@ -109,6 +119,8 @@ namespace zf {
 
             TH1D* jpsi_tau_xy_very_fine_similar_pt_muons_;
 
+            TH1D* jpsi_tau_xy_dimuon_continuum_bg_;
+
             TH1D* jpsi_tau_z_;
             TH1D* jpsi_tau_z_fine_;
             TH1D* jpsi_tau_z_very_fine_;
@@ -125,6 +137,10 @@ namespace zf {
             TH1D* mu1_pt_;
             TH1D* mu0_eta_;
             TH1D* mu1_eta_;
+            TH1D* mu0_efficiency_;
+            TH1D* mu1_efficiency_;
+            TH1D* mu0_scale_factor_;
+            TH1D* mu1_scale_factor_;
             TH1D* mu0_phi_;
             TH1D* mu1_phi_;
             TH1D* mu0_charge_;
@@ -174,6 +190,8 @@ namespace zf {
             TH2D* jpsi_tau_xy_vs_tau_z_;
             TH2D* jpsi_tau_xy_vs_distance_z_;
             TH2D* jpsi_tau_z_vs_distance_z_;
+            TH2D* dimuon_mass_vs_dimuon_tau_xy_;
+            TH2D* dimuon_mass_vs_dimuon_tau_xy_fine_;
 
             TH1D* vtx_x_;
             TH1D* vtx_y_;

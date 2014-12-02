@@ -37,11 +37,13 @@ process.source = cms.Source("PoolSource",
     ##fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/ZPhysics/PromptJpsi/JpsiMM_8TeV_cfi_py_GEN_SIM_DIGI_L1_DIGI2RAW_HLT_RAW2DIGI_RECO.root')
     ##fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/ZPhysics/tmp/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball_00037C53-AAD1-E111-B1BE-003048D45F38.root')
     ##fileNames = cms.untracked.vstring( 'file:/hdfs/cms/user/turkewitz/tmp/jpsi_inclusive_mc_test_file.root')
+    ##fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/tmp/0012F37A-CE09-E211-ABDA-00261894396F.root')
     ###fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/ZPhysics/tmp/0012F37A-CE09-E211-ABDA-00261894396F.root')
     ##fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/MuonTriggerSkimTest2012B/MuonTriggerSkimTest2012B_200-pool.root')
     ##fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/ZPhysics/tmp/6642D763-9872-E211-BF3C-00259074AE5C.root')
     ##fileNames = cms.untracked.vstring( 'file:/home/user1/turkewitz/Work/CMSSW_5_3_13_ZJPsi/src/jpsiMuMu_Zee_Skim.root')
-    fileNames = cms.untracked.vstring( 'file:/home/user1/turkewitz/Work/CMSSW_5_3_13_ZJPsi/src/jpsiMuMu_Zmumu_Skim.root')
+    ##fileNames = cms.untracked.vstring( 'file:/home/user1/turkewitz/Work/CMSSW_5_3_13_ZJPsi/src/jpsiMuMu_Zmumu_Skim.root')
+    fileNames = cms.untracked.vstring( 'file:/home/user1/turkewitz/Work/CMSSW/CMSSW_5_3_7_patch6_ZbMCStudy/src/Jpsi_MM_step3_test.root')
     #fileNames = cms.untracked.vstring( 'file:/home/user1/turkewitz/Work/CMSSW_5_3_13_ZJPsi/src/jpsiSkimMuonsUpdated.root')
     ##fileNames = cms.untracked.vstring( 'root://xrootd.unl.edu//store/mc/Summer12_DR53X/JPsiToMuMu_2MuPtEtaFilter_tuneD6T_8TeV-pythia6-evtgen/AODSIM/PU_S10_START53_V7A-v2/00000/0012F37A-CE09-E211-ABDA-00261894396F.root')
     ## fileNames = cms.untracked.vstring( 'file:/hdfs/cms/user/turkewitz/ZPhysics/JPsiSkim/DoubleElectron/jpsiSkim/jpsiSkim_000-pool.root')
@@ -90,13 +92,10 @@ process.ZFinder = cms.EDAnalyzer('ZFinder',
         # General tags
         ecalElectronsInputTag  = cms.InputTag("gsfElectrons"),
         muonsInputTag          = cms.InputTag("muons"),
-        hfElectronsInputTag    = cms.InputTag("hfRecoEcalCandidate"),
-        hfClustersInputTag     = cms.InputTag("hfEMClusters"),
         conversionsInputTag    = cms.InputTag("allConversions"),
         beamSpotInputTag       = cms.InputTag("offlineBeamSpot"),
         rhoIsoInputTag         = cms.InputTag("kt6PFJetsForIsolation", "rho"),
         primaryVertexInputTag  = cms.InputTag("offlinePrimaryVertices"),
-        ntElectronsInputTag    = cms.InputTag("photons"),
         ak5PFJetsInputTag      = cms.InputTag("ak5PFJets"),
         isoValInputTags        = cms.VInputTag(
             cms.InputTag('elPFIsoValueCharged03PFIdPFIso'),
@@ -108,8 +107,8 @@ process.ZFinder = cms.EDAnalyzer('ZFinder',
         generatorInputTag = cms.InputTag("genParticles"),
         # ZDefinitions from ZFinder.ZFinder.ZDefinitions_cfi
         #ZDefinitions = zdefs,
-        ##pileup_era = cms.string("ABCD") # defaults to ABCD
-        pileup_era = cms.string("B") # defaults to ABCD
+        pileup_era = cms.string("ABCD") # defaults to ABCD
+        ##pileup_era = cms.string("B") # defaults to ABCD
         )
 
 # RUN

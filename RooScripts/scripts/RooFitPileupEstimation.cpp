@@ -68,13 +68,15 @@ int RooFitPileupEstimation(
   double distance_z_max = 20.0;
   // Set up the variables we're going to read in from the files
   RooRealVar distance_z("distance_z", "distance_z" , distance_z_min, distance_z_max, "cm");
+  //TODO clean up, use variable names
   distance_z.setRange("negative",-20.0,-3.0);
   distance_z.setRange("positive",3.0,20.0);
   // Define a range named "signal" in distance_z from -1,1
   distance_z.setRange("signal",-1.0,1.0) ;
   distance_z.setRange("test",-20.0,20.0) ;
 
-  std::string inclusive_jpsi_hist = "ZFinder/Jpsi/";
+  //std::string inclusive_jpsi_hist = "ZFinder/Jpsi/";
+  std::string inclusive_jpsi_hist = "ZFinder/Dimuon_Jpsi_Vertex_Compatible/";
   inclusive_jpsi_hist.append( "jpsi_vtx_z - z_vtx_z" );
   std::string jpsi_hist_name = "";
   jpsi_hist_name.append( "distance_z");

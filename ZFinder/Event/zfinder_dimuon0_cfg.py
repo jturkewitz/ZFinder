@@ -30,6 +30,15 @@ process.source = cms.Source("PoolSource",
 process.TFileService = cms.Service("TFileService",
         fileName = cms.string("trigger_dimuon0.root")
         )
+# Run only on lumis specified in the lumi file
+# Recipe from:
+# https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePythonTips#Use_a_JSON_file_of_good_lumi_sec
+from FWCore.ParameterSet.Types import untracked, VLuminosityBlockRange
+from FWCore.PythonUtilities.LumiList import LumiList
+##json_file for electrons
+json_file = "/home/user1/turkewitz/Work/CMSSW_5_3_13_ZJPsi/src/Metadata/lumi_json/Run2012ABCD.json" # File location
+run_2012abcd_lumis = LumiList(filename = json_file).getCMSSWString().split(',')
+process.source.lumisToProcess = untracked(VLuminosityBlockRange(run_2012abcd_lumis))
 
 #
 # rho value for isolation

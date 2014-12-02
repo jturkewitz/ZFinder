@@ -3,7 +3,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-#include <vector>  // std::vector
+#include <vector>
 
 // ROOT
 #include <TCanvas.h>
@@ -33,6 +33,10 @@
 #include "RooRealVar.h"
 #include "RooWorkspace.h"
 
+//Math
+#include <math.h>
+
+
 
 using namespace RooFit;
 
@@ -45,6 +49,7 @@ TCanvas* get_tcanvas(const int X_DIM, const int Y_DIM) {
 std::vector<double> RooFitLifetime(
     const std::string& DATA_FILE_1,
     const std::string& DATA_FILE_2,
+    const bool USE_Z_TO_EE,
     const std::string& OUT_DIR,
     const int PT_SLICE,
     const bool USE_PT_SLICES,
@@ -64,7 +69,7 @@ std::vector<double> RooFitLifetime(
     return zjpsi_info;
   }
   // Pass the open files to the main RooFitter
-  const std::vector<double> RET_CODE = RooFitLifetime(f_data_1, f_data_2, OUT_DIR, PT_SLICE, USE_PT_SLICES, RAP_SLICE, USE_RAP_SLICES);
+  const std::vector<double> RET_CODE = RooFitLifetime(f_data_1, f_data_2, USE_Z_TO_EE, OUT_DIR, PT_SLICE, USE_PT_SLICES, RAP_SLICE, USE_RAP_SLICES);
 
   // Clean up and return the exit code
   delete f_data_1;
@@ -76,6 +81,7 @@ std::vector<double> RooFitLifetime(
 std::vector<double> RooFitLifetime(
     TFile* const DATA_FILE_1,
     TFile* const DATA_FILE_2,
+    const bool USE_Z_TO_EE,
     const std::string& OUT_DIR,
     const int PT_SLICE,
     const bool USE_PT_SLICES,
@@ -97,24 +103,42 @@ std::vector<double> RooFitLifetime(
   //tau_xy.setRange("range_tau_xy", -0.3, 5.0);
   std::vector<double> zjpsi_info ;
 
-  RooRealVar zjpsi_tau_xy("zjpsi_tau_xy", "tau_xy" , tau_xy_min, tau_xy_max, "ps");
+  RooRealVar zjpsi_tau_xy("zjpsi_tau_xy", "zjpsi_tau_xy" , tau_xy_min, tau_xy_max, "ps");
   //zjpsi_tau_xy.setRange("zjpsi_range_tau_xy", -0.3, 5.0);
 
-  //TODO name this more script readable - maybe change ZFinder names
-  const std::string pt_slice_list[8] = {
+  const std::string pt_slice_list[7] = {
+    "jpsi_tau_xy_very_fine_all",
+    //"jpsi_tau_xy_dimuon_continuum_bg_",
+    "jpsi_tau_xy_very_fine_ptUnder10",
+    "jpsi_tau_xy_very_fine_pt_10_to_15",
+    "jpsi_tau_xy_very_fine_pt_15_to_20",
+    "jpsi_tau_xy_very_fine_pt_20_to_25",
+    "jpsi_tau_xy_very_fine_pt_25_to_30",
+    "jpsi_tau_xy_very_fine_ptAbove30"};
+
+  const std::string rap_slice_list[8] = {
+    //TODO
+    "jpsi_tau_xy_very_fine_all",
+    //"jpsi_tau_xy_dimuon_continuum_bg_",
+    "jpsi_tau_xy_very_fine_rap_0.0_to_0.3",
+    "jpsi_tau_xy_very_fine_rap_0.3_to_0.6",
+    "jpsi_tau_xy_very_fine_rap_0.6_to_0.9",
+    "jpsi_tau_xy_very_fine_rap_0.9_to_1.2",
+    "jpsi_tau_xy_very_fine_rap_1.2_to_1.5",
+    "jpsi_tau_xy_very_fine_rap_1.5_to_1.8",
+    "jpsi_tau_xy_very_fine_rap_1.8_to_2.1",
+    };
+  const std::string pt_slice_list_in[7] = {
     "jpsi_tau_xy_very_fine_all",
     "jpsi_tau_xy_very_fine_ptUnder10",
     "jpsi_tau_xy_very_fine_pt_10_to_15",
     "jpsi_tau_xy_very_fine_pt_15_to_20",
     "jpsi_tau_xy_very_fine_pt_20_to_25",
-    //TODO revert to normal
     "jpsi_tau_xy_very_fine_pt_25_to_30",
-    //"jpsi_tau_xy_very_fine_above_12_tracker_layers_",
-    "jpsi_tau_xy_very_fine_ptAbove20",
-    //"jpsi_tau_xy_very_fine_similar_pt_muons_",
     "jpsi_tau_xy_very_fine_ptAbove30"};
 
-  const std::string rap_slice_list[8] = {
+  const std::string rap_slice_list_in[8] = {
+    //TODO
     "jpsi_tau_xy_very_fine_all",
     "jpsi_tau_xy_very_fine_rap_0.0_to_0.3",
     "jpsi_tau_xy_very_fine_rap_0.3_to_0.6",
@@ -125,8 +149,8 @@ std::vector<double> RooFitLifetime(
     "jpsi_tau_xy_very_fine_rap_1.8_to_2.1",
     };
 
-  if(USE_PT_SLICES && ( PT_SLICE >= 8 || PT_SLICE < 0) ) {
-    std::cout << "PT_SLICE >=8 exiting" << std::endl;
+  if(USE_PT_SLICES && ( PT_SLICE >= 7 || PT_SLICE < 0) ) {
+    std::cout << "PT_SLICE >=7 exiting" << std::endl;
     return zjpsi_info;
   }
   if(USE_RAP_SLICES && ( RAP_SLICE >= 8 || RAP_SLICE < 0) ) {
@@ -134,29 +158,32 @@ std::vector<double> RooFitLifetime(
     return zjpsi_info;
   }
 
-//  std::string inclusive_jpsi_hist = "ZFinder/Jpsi/";
-//  std::string zjpsi_hist = "ZFinder/Jpsi_And_Z/";
-//  std::string inclusive_jpsi_hist = "ZFinder/Jpsi_Primary_Vertex/";
-//  std::string zjpsi_hist = "ZFinder/Jpsi_And_Z_Same_Vertex/";
-
-
-  //TODO make this an input option
   std::string inclusive_jpsi_hist = "ZFinder/Jpsi/";
-  //std::string zjpsi_hist = "ZFinder/Jpsi_And_Z_From_Muons/";
-  std::string zjpsi_hist = "ZFinder/Jpsi_And_Z/";
+  std::string zjpsi_hist = "";
+  if (USE_Z_TO_EE) {
+    zjpsi_hist += "ZFinder/Z_To_Electrons_And_Jpsi/";
+    //zjpsi_hist += "ZFinder/Z_To_Electrons_And_Good_Dimuon_Jpsi/";
+  }
+  else {
+    zjpsi_hist += "ZFinder/Z_To_Muons_And_Jpsi/";
+    //zjpsi_hist += "ZFinder/Z_To_Muons_And_Good_Dimuon_Jpsi/";
+  }
+
   std::string jpsi_hist_name = "";
   std::string zjpsi_hist_name = "z";
 
   if (USE_PT_SLICES) {
-    inclusive_jpsi_hist.append( pt_slice_list[PT_SLICE] );
+    //inclusive_jpsi_hist.append( pt_slice_list[PT_SLICE] );
+    inclusive_jpsi_hist.append( pt_slice_list_in[PT_SLICE] );
     zjpsi_hist.append( pt_slice_list[PT_SLICE] );
-    jpsi_hist_name.append(pt_slice_list[PT_SLICE]);
+    jpsi_hist_name.append(pt_slice_list_in[PT_SLICE]);
     zjpsi_hist_name.append(pt_slice_list[PT_SLICE]);
   }
   else if (USE_RAP_SLICES) {
-    inclusive_jpsi_hist.append( rap_slice_list[RAP_SLICE] );
+    //inclusive_jpsi_hist.append( rap_slice_list[RAP_SLICE] );
+    inclusive_jpsi_hist.append( rap_slice_list_in[RAP_SLICE] );
     zjpsi_hist.append( rap_slice_list[RAP_SLICE] );
-    jpsi_hist_name.append(rap_slice_list[RAP_SLICE]);
+    jpsi_hist_name.append(rap_slice_list_in[RAP_SLICE]);
     zjpsi_hist_name.append(rap_slice_list[RAP_SLICE]);
   }
   else {
@@ -236,29 +263,6 @@ std::vector<double> RooFitLifetime(
   RooRealVar zjpsi_prompt_fraction("zjpsi_prompt_fraction", "zjpsi_prompt_fraction" , 0.01 , 0.0, 1);
   RooAddPdf zjpsi_tau_xy_fitpdf("zjpsi_tau_xy_fitpdf", "zjpsi_tau_xy_fitpdf", RooArgList(zjpsi_tau_xy_gauss_sum_fitpdf, zjpsi_decay_exp), RooArgList(zjpsi_prompt_fraction));
 
-  //TODO TESTING allowing zjpsi parameters to float
-
-  //    RooRealVar zjpsi_gaussmean("zjpsi_gaussmean", "Mean of the smearing zjpsi Gaussian", zjpsi_gaussmean_value);
-  //    RooRealVar zjpsi_gausssigma("zjpsi_gausssigma", "Width of the smearing zjpsi Gaussian", zjpsi_gausssigma_value, 0, zjpsi_gausssigma_value*3);
-  //    RooGaussModel zjpsi_smear_gauss_model("zjpsi_smear_gauss", "Gaussian used to smear the zjpsi Exponential Decay", zjpsi_tau_xy, zjpsi_gaussmean, zjpsi_gausssigma);
-  //    RooRealVar zjpsi_decay_lifetime("zjpsi_decay_lifetime", "zjpsi_Tau", zjpsi_decay_lifetime_value, zjpsi_decay_lifetime_value*0.5, zjpsi_decay_lifetime_value*2.0 );
-  //    RooDecay zjpsi_decay_exp("zjpsi_decay_exp", "zjpsi_Exponential Decay", zjpsi_tau_xy, zjpsi_decay_lifetime, zjpsi_smear_gauss_model, RooDecay::SingleSided);
-  //
-  //    RooRealVar zjpsi_gauss_prompt_mean("zjpsi_gauss_prompt_mean", "Mean of the Prompt zjpsi_Gaussian", zjpsi_gauss_prompt_mean_value, -0.4, 0.4);
-  //    RooRealVar zjpsi_gauss_prompt_sigma("zjpsi_gauss_prompt_sigma", "Width of the Prompt zjpsi_Gaussian", zjpsi_gauss_prompt_sigma_value, zjpsi_gauss_prompt_sigma_value*0.5,
-  //       zjpsi_gauss_prompt_sigma_value*2.0 );
-  //    RooGaussian zjpsi_prompt_gauss("zjpsi_prompt_gauss", "Gaussian of the Prompt zjpsi_Peak", zjpsi_tau_xy, zjpsi_gauss_prompt_mean, zjpsi_gauss_prompt_sigma);
-  //
-  //    RooRealVar zjpsi_gauss_prompt_sigma_2("zjpsi_gauss_prompt_sigma_2", "Width of the Prompt zjpsi_Gaussian_2", zjpsi_gauss_prompt_sigma_2_value,zjpsi_gauss_prompt_sigma_2_value*0.5,zjpsi_gauss_prompt_sigma_2_value*2.0 );
-  //    RooGaussian zjpsi_prompt_gauss_2("zjpsi_prompt_gauss_2", "Gaussian_2 of the Prompt zjpsi_Peak", zjpsi_tau_xy, zjpsi_gauss_prompt_mean, zjpsi_gauss_prompt_sigma_2);
-  //
-  //    RooRealVar zjpsi_prompt_sharp_fraction("zjpsi_prompt_sharp_fraction", "zjpsi_prompt_sharp_fraction" , zjpsi_prompt_sharp_fraction_value, 0.0, zjpsi_prompt_sharp_fraction_value*2.0);
-  //    RooAddPdf zjpsi_tau_xy_gauss_sum_fitpdf("zjpsi_tau_xy_gauss_sum_fitpdf", "zjpsi_tau_xy_gauss_sum_fitpdf", RooArgList(zjpsi_prompt_gauss,zjpsi_prompt_gauss_2), RooArgList(zjpsi_prompt_sharp_fraction));
-  //
-  //    RooRealVar zjpsi_prompt_fraction("zjpsi_prompt_fraction", "zjpsi_prompt_fraction" , 0.01 , 0.0, 1);
-  //    RooAddPdf zjpsi_tau_xy_fitpdf("zjpsi_tau_xy_fitpdf", "zjpsi_tau_xy_fitpdf", RooArgList(zjpsi_tau_xy_gauss_sum_fitpdf, zjpsi_decay_exp), RooArgList(zjpsi_prompt_fraction));
-
-  //TCanvas* const canvas = get_tcanvas(1500, 750);
   TCanvas *canvas = new TCanvas("canvas", "canvas", 2000, 750);
 
   // Plot the left side
@@ -272,8 +276,9 @@ std::vector<double> RooFitLifetime(
   //tau_xy_fitframe->SetName(0); // Unset title
   tau_xy_data_hist.plotOn(tau_xy_fitframe);
   tau_xy_fitpdf.plotOn(tau_xy_fitframe, Components(decay_exp), LineColor(kGreen-2));
-  tau_xy_fitpdf.plotOn(tau_xy_fitframe, Components(prompt_gauss), LineColor(kBlue-2));
-  tau_xy_fitpdf.plotOn(tau_xy_fitframe, Components(prompt_gauss_2), LineColor(kOrange-2));
+  //tau_xy_fitpdf.plotOn(tau_xy_fitframe, Components(prompt_gauss), LineColor(kBlue-2));
+  //tau_xy_fitpdf.plotOn(tau_xy_fitframe, Components(prompt_gauss_2), LineColor(kOrange-2));
+  tau_xy_fitpdf.plotOn(tau_xy_fitframe, Components(tau_xy_gauss_sum_fitpdf), LineColor(kBlue-2));
   tau_xy_fitpdf.plotOn(tau_xy_fitframe, LineColor(kRed-2));
 
   tau_xy_fitframe->Draw();
@@ -309,6 +314,8 @@ std::vector<double> RooFitLifetime(
   std::cout << zjpsi_hist_name << std::endl;
   double zjpsi_prompt_events = 0.;
   double zjpsi_prompt_events_error = 0.;
+  double zjpsi_non_prompt_events = 0.;
+  double zjpsi_non_prompt_events_error = 0.;
   TAxis *axis = h_zjpsi_tau_xy_very_fine->GetXaxis();
   int bmin = axis->FindBin(tau_xy_min);
   int bmax = axis->FindBin(tau_xy_max);
@@ -316,10 +323,25 @@ std::vector<double> RooFitLifetime(
   integral -= h_zjpsi_tau_xy_very_fine->GetBinContent(bmin)*(tau_xy_min - axis->GetBinLowEdge(bmin)) / axis->GetBinWidth(bmin);
   integral -= h_zjpsi_tau_xy_very_fine->GetBinContent(bmax)*(axis->GetBinUpEdge(bmax) - tau_xy_max)  / axis->GetBinWidth(bmax); 
 
-  zjpsi_prompt_events = integral * zjpsi_prompt_fraction.getVal();
-  zjpsi_prompt_events_error = integral * zjpsi_prompt_fraction.getError();
+  double prompt_fraction_fit_value = zjpsi_prompt_fraction.getVal();
+  double prompt_fraction_fit_err = zjpsi_prompt_fraction.getError();
+  double integral_error = pow (integral, 0.5);
+  zjpsi_prompt_events = integral * prompt_fraction_fit_value;
+  // f = A*B, f = zjpsi_prompt events, A = prompt fraction, B = zjpsi_total_events
+  //sigma_f = sqrt (A^2 * sigma_b^2 + B^2 * sigma_a^2 + sigma_a^2 * sigma_b^2 )
+  zjpsi_prompt_events_error = pow(pow(prompt_fraction_fit_value * integral_error , 2.0) +
+                                  pow(integral * prompt_fraction_fit_err, 2.0 ) +
+                                  pow(integral_error * prompt_fraction_fit_err, 2.0) , 0.5);
+
+  zjpsi_non_prompt_events = integral * (1 - prompt_fraction_fit_value);
+  zjpsi_non_prompt_events_error = pow(pow((1.0 - prompt_fraction_fit_value) * integral_error , 2.0) +
+                                  pow(integral * prompt_fraction_fit_err, 2.0 ) +
+                                  pow(integral_error * prompt_fraction_fit_err, 2.0) , 0.5);
+
   std::cout << "zjpsi_prompt_events: " << zjpsi_prompt_events << std::endl;
   std::cout << "zjpsi_prompt_events_error: " << zjpsi_prompt_events_error << std::endl;
+  std::cout << "zjpsi_non_prompt_events: " << zjpsi_non_prompt_events << std::endl;
+  std::cout << "zjpsi_non_prompt_events_error: " << zjpsi_non_prompt_events_error << std::endl;
   //zjpsi_fitres->Print("v");
   zjpsi_fitres->Print();
 
@@ -327,6 +349,8 @@ std::vector<double> RooFitLifetime(
   zjpsi_info.push_back(zjpsi_prompt_events_error);
   zjpsi_info.push_back(zjpsi_gauss_prompt_sigma_value);
   zjpsi_info.push_back(zjpsi_gauss_prompt_sigma_error);
+  zjpsi_info.push_back(zjpsi_non_prompt_events);
+  zjpsi_info.push_back(zjpsi_non_prompt_events_error);
 
   TCanvas *zjpsi_canvas = new TCanvas("zjpsi_canvas", "zjpsi_canvas", 2000, 750);
   zjpsi_canvas->cd(1);
@@ -335,13 +359,24 @@ std::vector<double> RooFitLifetime(
   //gPad->SetLogy();
   //RooPlot* tau_xy_fitframe = tau_xy.frame(-0.3,5.0);
   //RooPlot* zjpsi_tau_xy_fitframe = zjpsi_tau_xy.frame( Title(zjpsi_hist_name.c_str()) );
-  RooPlot* zjpsi_tau_xy_fitframe = zjpsi_tau_xy.frame( Title("J/Psi Lifetime (Z->ee + J/Psi)") );
+  //RooPlot* zjpsi_tau_xy_fitframe = zjpsi_tau_xy.frame( Title("J/Psi Lifetime (Z->ee + J/Psi)") );
+  RooPlot* zjpsi_tau_xy_fitframe;
+  if (USE_Z_TO_EE) { 
+    zjpsi_tau_xy_fitframe = zjpsi_tau_xy.frame( Title("J/Psi Lifetime (Z->ee + J/Psi->mumu)") );
+    //zjpsi_tau_xy_fitframe = zjpsi_tau_xy.frame( Title("Background Dimuon Lifetime (Z->ee + bg dimuon [2.5,3.0] or [3.2,5.0] )") );
+  }
+  else {
+    zjpsi_tau_xy_fitframe = zjpsi_tau_xy.frame( Title("J/Psi Lifetime (Z->mumu + J/Psi->mumu)") );
+    //zjpsi_tau_xy_fitframe = zjpsi_tau_xy.frame( Title("Background Dimuon Lifetime (Z->mumu + bg dimuon [2.5,3.0] or [3.2,5.0] )") );
+  }
   //RooPlot* zjpsi_tau_xy_fitframe = zjpsi_tau_xy.frame( Title("J/Psi Lifetime (Z->mumu + J/Psi)") );
   //zjpsi_tau_xy_fitframe->SetName(0); // Unset title
   zjpsi_tau_xy_data_hist.plotOn(zjpsi_tau_xy_fitframe);
   zjpsi_tau_xy_fitpdf.plotOn(zjpsi_tau_xy_fitframe, Components(zjpsi_decay_exp), LineColor(kGreen-2) );
-  zjpsi_tau_xy_fitpdf.plotOn(zjpsi_tau_xy_fitframe, Components(zjpsi_prompt_gauss), LineColor(kBlue-2) );
-  zjpsi_tau_xy_fitpdf.plotOn(zjpsi_tau_xy_fitframe, Components(zjpsi_prompt_gauss_2), LineColor(kOrange-2));
+  //zjpsi_tau_xy_fitpdf.plotOn(zjpsi_tau_xy_fitframe, Components(zjpsi_prompt_gauss), LineColor(kBlue-2) );
+  //zjpsi_tau_xy_fitpdf.plotOn(zjpsi_tau_xy_fitframe, Components(zjpsi_prompt_gauss_2), LineColor(kOrange-2));
+  zjpsi_tau_xy_fitpdf.plotOn(zjpsi_tau_xy_fitframe, Components(zjpsi_tau_xy_gauss_sum_fitpdf), LineColor(kBlue-2));
+
   zjpsi_tau_xy_fitpdf.plotOn(zjpsi_tau_xy_fitframe, LineColor(kRed-2));
 
   zjpsi_tau_xy_fitframe->Draw();
@@ -357,7 +392,7 @@ std::vector<double> RooFitLifetime(
 }
 
 int main(int argc, char* argv[]) {
-  const int ARGC = 4;
+  const int ARGC = 5;
   if (argc < ARGC) {
     std::cout << "Not enough arguments.";
     return 1;
@@ -368,7 +403,14 @@ int main(int argc, char* argv[]) {
     /* Read in arguments */
     const std::string DATA_FILE_1(argv[1]);
     const std::string DATA_FILE_2(argv[2]);
-    const std::string OUT_DIR(argv[3]);
+    bool USE_Z_TO_EE = true;
+    std::istringstream ss(argv[3]);
+    if (!(ss >> USE_Z_TO_EE ) ) {
+      std::cout << "Invalid bool " << argv[3] << std::endl;
+      return 1;
+    }
+    //const bool USE_Z_TO_EE(argv[3]);
+    const std::string OUT_DIR(argv[4]);
 
     double zjpsi_prompt_events_pt_all = 0.0;
     double zjpsi_prompt_events_pt_all_error = 0.0;
@@ -379,25 +421,26 @@ int main(int argc, char* argv[]) {
     double zjpsi_prompt_events_rap_summed = 0.0;
     double zjpsi_prompt_events_rap_summed_sq_error = 0.0;
 
+    double zjpsi_non_prompt_events_pt_all = 0.0;
+    double zjpsi_non_prompt_events_pt_all_error = 0.0;
+
     std::vector <double> jpsi_prompt_sigma_pt;
     std::vector <double> jpsi_prompt_sigma_pt_error;
     std::vector <double> jpsi_prompt_sigma_rap;
     std::vector <double> jpsi_prompt_sigma_rap_error;
 
-    for (int i=0 ; i < 8 ; ++i) {
+    for (int i=0 ; i < 7 ; ++i) {
       //for now, if i==0, jpsi_all
-      std::vector <double> zjpsi_info = RooFitLifetime( DATA_FILE_1, DATA_FILE_2, OUT_DIR, i, true, 0, false );
-      if (zjpsi_info.size() == 4)
+      std::vector <double> zjpsi_info = RooFitLifetime( DATA_FILE_1, DATA_FILE_2, USE_Z_TO_EE, OUT_DIR, i, true, 0, false );
+      if (zjpsi_info.size() == 6)
       {
         jpsi_prompt_sigma_pt.push_back(zjpsi_info[2]);
         jpsi_prompt_sigma_pt_error.push_back(zjpsi_info[3]);
         if (i == 0 ) {
           zjpsi_prompt_events_pt_all = zjpsi_info[0] ;
           zjpsi_prompt_events_pt_all_error = zjpsi_info[1];
-        }
-        //above 20 pt skip as use above 30 pt bin instead
-        else if (i == 6 ) {
-          //do nothing ignore above 20 pt for now
+          zjpsi_non_prompt_events_pt_all = zjpsi_info[4] ;
+          zjpsi_non_prompt_events_pt_all_error = zjpsi_info[5];
         }
         else {
           zjpsi_prompt_events_pt_summed += zjpsi_info[0] ;
@@ -407,8 +450,8 @@ int main(int argc, char* argv[]) {
     }
     for (int i=0 ; i < 8 ; ++i) {
       //for now, if i==0, jpsi_all
-      std::vector <double> zjpsi_info = RooFitLifetime( DATA_FILE_1, DATA_FILE_2, OUT_DIR, 0, false, i, true );
-      if (zjpsi_info.size() == 4)
+      std::vector <double> zjpsi_info = RooFitLifetime( DATA_FILE_1, DATA_FILE_2, USE_Z_TO_EE, OUT_DIR, 0, false, i, true );
+      if (zjpsi_info.size() == 6)
       {
         jpsi_prompt_sigma_rap.push_back(zjpsi_info[2]);
         jpsi_prompt_sigma_rap_error.push_back(zjpsi_info[3]);
@@ -428,17 +471,16 @@ int main(int argc, char* argv[]) {
     std::cout << "3 --- 15-20" << std::endl;
     std::cout << "4 --- 20-25" << std::endl;
     std::cout << "5 --- 25-30" << std::endl;
-    std::cout << "6 --- > 20" << std::endl;
-    std::cout << "7 --- > 30" << std::endl;
+    std::cout << "6 --- > 30" << std::endl;
     double pt_bin[6];
     double pt_bin_error[6];
     double pt_prompt_sigma[6];
     double pt_prompt_sigma_error[6];
     for (unsigned int i=0 ; i < jpsi_prompt_sigma_pt.size() ; ++i) {
       std::cout << "pt bin: " << i << " prompt sigma " << jpsi_prompt_sigma_pt.at(i) << std::endl;
-      if (i == 0 || i==6) {
+      if (i == 0 ) {
         continue;
-        //first pt bin is all, 6th bin is above 20 GeV
+        //first pt bin is all,
       }
       if ( i == 1 ) {
         pt_bin[i-1] = 5 ; //first pt pin is under 10
@@ -446,7 +488,7 @@ int main(int argc, char* argv[]) {
         pt_prompt_sigma[i-1] = jpsi_prompt_sigma_pt.at(i);
         pt_prompt_sigma_error[i-1] = jpsi_prompt_sigma_pt_error.at(i);
       }
-      else if (i == 7 ) {
+      else if (i == 6 ) {
         pt_bin[5] = 45.;
         pt_bin_error[5] = 15.;
         pt_prompt_sigma[5] = jpsi_prompt_sigma_pt.at(i);
@@ -510,6 +552,8 @@ int main(int argc, char* argv[]) {
 
     std::cout << "zjpsi_prompt_events_pt_all: " << zjpsi_prompt_events_pt_all << std::endl;
     std::cout << "zjpsi_prompt_events_pt_all_error: " << zjpsi_prompt_events_pt_all_error << std::endl;
+    std::cout << "zjpsi_non_prompt_events_pt_all: " << zjpsi_non_prompt_events_pt_all << std::endl;
+    std::cout << "zjpsi_non_prompt_events_pt_all_error: " << zjpsi_non_prompt_events_pt_all_error << std::endl;
     std::cout << "zjpsi_prompt_events_pt_summed: " << zjpsi_prompt_events_pt_summed << std::endl;
     std::cout << "zjpsi_prompt_events_pt_summed_error: " << pow(zjpsi_prompt_events_pt_summed_sq_error , 0.5) << std::endl;
     std::cout << "zjpsi_prompt_events_rap_all: " << zjpsi_prompt_events_rap_all << std::endl;

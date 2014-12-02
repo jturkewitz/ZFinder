@@ -215,10 +215,46 @@ namespace zf {
       jpsi_mass_coarse_->GetYaxis()->SetTitle("Counts / 0.1 GeV");
 
       // jpsi_mass_fine_
-      const std::string jpsi_mass_fine_name = "jpsi Mass: Fine";
-      jpsi_mass_fine_ = tdir.make<TH1D>(jpsi_mass_fine_name.c_str(), jpsi_mass_fine_name.c_str(), 100, 2.5, 3.5);
+      const std::string jpsi_mass_fine_name = "jpsi_mass";
+      jpsi_mass_fine_ = tdir.make<TH1D>(jpsi_mass_fine_name.c_str(), jpsi_mass_fine_name.c_str(), 1500, 0.0, 15.0);
       jpsi_mass_fine_->GetXaxis()->SetTitle("m_{mumu} [GeV]");
       jpsi_mass_fine_->GetYaxis()->SetTitle("Counts / 0.01 GeV");
+
+      // jpsi_mass_fine_ptUnder10_
+      const std::string jpsi_mass_fine_ptUnder10_name = "jpsi_mass_ptUnder10";
+      jpsi_mass_fine_ptUnder10_ = tdir.make<TH1D>(jpsi_mass_fine_ptUnder10_name.c_str(), jpsi_mass_fine_ptUnder10_name.c_str(), 250, 2.5, 5.0);
+      jpsi_mass_fine_ptUnder10_->GetXaxis()->SetTitle("m_{mumu} [GeV]");
+      jpsi_mass_fine_ptUnder10_->GetYaxis()->SetTitle("Counts / 0.01 GeV");
+
+      // jpsi_mass_fine_pt10to15_
+      const std::string jpsi_mass_fine_pt10to15_name = "jpsi_mass_pt10to15";
+      jpsi_mass_fine_pt10to15_ = tdir.make<TH1D>(jpsi_mass_fine_pt10to15_name.c_str(), jpsi_mass_fine_pt10to15_name.c_str(), 250, 2.5, 5.0);
+      jpsi_mass_fine_pt10to15_->GetXaxis()->SetTitle("m_{mumu} [GeV]");
+      jpsi_mass_fine_pt10to15_->GetYaxis()->SetTitle("Counts / 0.01 GeV");
+
+      // jpsi_mass_fine_pt15to20_
+      const std::string jpsi_mass_fine_pt15to20_name = "jpsi_mass_pt15to20";
+      jpsi_mass_fine_pt15to20_ = tdir.make<TH1D>(jpsi_mass_fine_pt15to20_name.c_str(), jpsi_mass_fine_pt15to20_name.c_str(), 250, 2.5, 5.0);
+      jpsi_mass_fine_pt15to20_->GetXaxis()->SetTitle("m_{mumu} [GeV]");
+      jpsi_mass_fine_pt15to20_->GetYaxis()->SetTitle("Counts / 0.01 GeV");
+
+      // jpsi_mass_fine_pt20to25_
+      const std::string jpsi_mass_fine_pt20to25_name = "jpsi_mass_pt20to25";
+      jpsi_mass_fine_pt20to25_ = tdir.make<TH1D>(jpsi_mass_fine_pt20to25_name.c_str(), jpsi_mass_fine_pt20to25_name.c_str(), 250, 2.5, 5.0);
+      jpsi_mass_fine_pt20to25_->GetXaxis()->SetTitle("m_{mumu} [GeV]");
+      jpsi_mass_fine_pt20to25_->GetYaxis()->SetTitle("Counts / 0.01 GeV");
+
+      // jpsi_mass_fine_pt25to30_
+      const std::string jpsi_mass_fine_pt25to30_name = "jpsi_mass_pt25to30";
+      jpsi_mass_fine_pt25to30_ = tdir.make<TH1D>(jpsi_mass_fine_pt25to30_name.c_str(), jpsi_mass_fine_pt25to30_name.c_str(), 250, 2.5, 5.0);
+      jpsi_mass_fine_pt25to30_->GetXaxis()->SetTitle("m_{mumu} [GeV]");
+      jpsi_mass_fine_pt25to30_->GetYaxis()->SetTitle("Counts / 0.01 GeV");
+
+      // jpsi_mass_fine_ptAbove30_
+      const std::string jpsi_mass_fine_ptAbove30_name = "jpsi_mass_ptAbove30";
+      jpsi_mass_fine_ptAbove30_ = tdir.make<TH1D>(jpsi_mass_fine_ptAbove30_name.c_str(), jpsi_mass_fine_ptAbove30_name.c_str(), 250, 2.5, 5.0);
+      jpsi_mass_fine_ptAbove30_->GetXaxis()->SetTitle("m_{mumu} [GeV]");
+      jpsi_mass_fine_ptAbove30_->GetYaxis()->SetTitle("Counts / 0.01 GeV");
 
       // jpsi_rapidity_
       const std::string jpsi_rapidity_name = "jpsi Rapidity";
@@ -232,11 +268,24 @@ namespace zf {
       jpsi_pt_->GetXaxis()->SetTitle("p_{T,JPsi}");
       jpsi_pt_->GetYaxis()->SetTitle("Counts / GeV");
 
-      // jpsi_pt
+      // jpsi_efficiency
+      const std::string jpsi_efficiency_name = "jpsi efficiency";
+      jpsi_efficiency_ = tdir.make<TH1D>(jpsi_efficiency_name.c_str(), jpsi_efficiency_name.c_str(), 100, 0., 1.);
+      jpsi_efficiency_->GetXaxis()->SetTitle("Jpsi Efficiency");
+      jpsi_efficiency_->GetYaxis()->SetTitle("Counts / 0.01");
+
+      // jpsi_scale_factor
+      const std::string jpsi_scale_factor_name = "jpsi scale factor";
+      jpsi_scale_factor_ = tdir.make<TH1D>(jpsi_scale_factor_name.c_str(), jpsi_scale_factor_name.c_str(), 200, 0., 2.);
+      jpsi_scale_factor_->GetXaxis()->SetTitle("Jpsi Scale factor");
+      jpsi_scale_factor_->GetYaxis()->SetTitle("Counts / 0.01");
+
+      // jpsi_pt_vs_rap
       const std::string jpsi_pt_vs_rap_name = "jpsi_pt_vs_rap";
       jpsi_pt_vs_rap_ = tdir.make<TH2D>(jpsi_pt_vs_rap_name.c_str(), jpsi_pt_vs_rap_name.c_str(), 100, -5., 5., 200, 0., 200.);
       jpsi_pt_vs_rap_->GetXaxis()->SetTitle("jpsi Rapidity");
       jpsi_pt_vs_rap_->GetYaxis()->SetTitle("jpsi Pt");
+
 
       // jpsi_vtx_distance_z_vtx_x
       const std::string jpsi_vtx_distance_z_vtx_x_name = "jpsi_vtx_x - z_vtx_x";
@@ -346,12 +395,6 @@ namespace zf {
       jpsi_tau_xy_very_fine_pt25to30_->GetXaxis()->SetTitle("tau_xy_very_fine [ps]");
       jpsi_tau_xy_very_fine_pt25to30_->GetYaxis()->SetTitle("Counts / 0.01 ps ");
 
-      // jpsi_tau_xy_very_fine_ptAbove20
-      const std::string jpsi_tau_xy_very_fine_ptAbove20_name = "jpsi_tau_xy_very_fine_ptAbove20";
-      jpsi_tau_xy_very_fine_ptAbove20_ = tdir.make<TH1D>(jpsi_tau_xy_very_fine_ptAbove20_name.c_str(), jpsi_tau_xy_very_fine_ptAbove20_name.c_str(), 2000, -10., 10.);
-      jpsi_tau_xy_very_fine_ptAbove20_->GetXaxis()->SetTitle("tau_xy_very_fine [ps]");
-      jpsi_tau_xy_very_fine_ptAbove20_->GetYaxis()->SetTitle("Counts / 0.01 ps ");
-
       // jpsi_tau_xy_very_fine_ptAbove30
       const std::string jpsi_tau_xy_very_fine_ptAbove30_name = "jpsi_tau_xy_very_fine_ptAbove30";
       jpsi_tau_xy_very_fine_ptAbove30_ = tdir.make<TH1D>(jpsi_tau_xy_very_fine_ptAbove30_name.c_str(), jpsi_tau_xy_very_fine_ptAbove30_name.c_str(), 2000, -10., 10.);
@@ -436,6 +479,12 @@ namespace zf {
       jpsi_tau_xy_very_fine_similar_pt_muons_->GetXaxis()->SetTitle("tau_xy_very_fine [ps]");
       jpsi_tau_xy_very_fine_similar_pt_muons_->GetYaxis()->SetTitle("Counts / 0.01 ps ");
 
+      // jpsi_tau_xy_dimuon_continuum_bg_
+      const std::string jpsi_tau_xy_dimuon_continuum_bg_name = "jpsi_tau_xy_dimuon_continuum_bg_";
+      jpsi_tau_xy_dimuon_continuum_bg_ = tdir.make<TH1D>(jpsi_tau_xy_dimuon_continuum_bg_name.c_str(), jpsi_tau_xy_dimuon_continuum_bg_name.c_str(), 2000, -10., 10.);
+      jpsi_tau_xy_dimuon_continuum_bg_->GetXaxis()->SetTitle("tau_xy [ps]");
+      jpsi_tau_xy_dimuon_continuum_bg_->GetYaxis()->SetTitle("Counts / 0.01 ps ");
+
       // jpsi_tau_z
       const std::string jpsi_tau_z_name = "jpsi tau_z";
       jpsi_tau_z_ = tdir.make<TH1D>(jpsi_tau_z_name.c_str(), jpsi_tau_z_name.c_str(), 200, -100., 100.);
@@ -465,6 +514,18 @@ namespace zf {
       jpsi_tau_xy_vs_tau_z_ = tdir.make<TH2D>(jpsi_tau_xy_vs_tau_z_name.c_str(), jpsi_tau_xy_vs_tau_z_name.c_str(), 200, -10., 10., 200, -10., 10.);
       jpsi_tau_xy_vs_tau_z_->GetXaxis()->SetTitle("tau_xy [ps]");
       jpsi_tau_xy_vs_tau_z_->GetYaxis()->SetTitle("tau_z [ps]");
+
+      // dimuon_mass_vs_dimuon_tau_xy
+      const std::string dimuon_mass_vs_dimuon_tau_xy_name = "dimuon_mass_vs_dimuon_tau_xy";
+      dimuon_mass_vs_dimuon_tau_xy_ = tdir.make<TH2D>(dimuon_mass_vs_dimuon_tau_xy_name.c_str(), dimuon_mass_vs_dimuon_tau_xy_name.c_str(), 200, 2.0, 12.0, 200, -10., 10.);
+      dimuon_mass_vs_dimuon_tau_xy_->GetXaxis()->SetTitle("dimuon mass [GeV]");
+      dimuon_mass_vs_dimuon_tau_xy_->GetYaxis()->SetTitle("tau_xy [ps]");
+
+      // dimuon_mass_vs_dimuon_tau_xy_fine
+      const std::string dimuon_mass_vs_dimuon_tau_xy_fine_name = "dimuon_mass_vs_dimuon_tau_xy_fine";
+      dimuon_mass_vs_dimuon_tau_xy_fine_ = tdir.make<TH2D>(dimuon_mass_vs_dimuon_tau_xy_fine_name.c_str(), dimuon_mass_vs_dimuon_tau_xy_fine_name.c_str(), 50, 2.85, 3.35, 1000, -5., 5.);
+      dimuon_mass_vs_dimuon_tau_xy_fine_->GetXaxis()->SetTitle("dimuon mass [GeV]");
+      dimuon_mass_vs_dimuon_tau_xy_fine_->GetYaxis()->SetTitle("tau_xy [ps]");
 
       // jpsi_tau_xy_vs_distance_z
       const std::string jpsi_tau_xy_vs_distance_z_name = "jpsi tau_xy vs z vertex difference";
@@ -597,6 +658,30 @@ namespace zf {
       mu1_eta_ = tdir.make<TH1D>(mu1_eta_name.c_str(), mu1_eta_name.c_str(), 50, -5., 5.);
       mu1_eta_->GetXaxis()->SetTitle("#eta_{mu_{1}}");
       mu1_eta_->GetYaxis()->SetTitle("Counts / 0.2");
+
+      // mu0_efficiency_
+      const std::string mu0_efficiency_name = "Efficiency_{mu_{0}}";
+      mu0_efficiency_ = tdir.make<TH1D>(mu0_efficiency_name.c_str(), mu0_efficiency_name.c_str(), 100, 0.0, 1.0);
+      mu0_efficiency_->GetXaxis()->SetTitle("Efficiency_{mu_{0}}");
+      mu0_efficiency_->GetYaxis()->SetTitle("Counts / 0.2");
+
+      // mu1_efficiency_
+      const std::string mu1_efficiency_name = "Efficiency_{mu_{1}}";
+      mu1_efficiency_ = tdir.make<TH1D>(mu1_efficiency_name.c_str(), mu1_efficiency_name.c_str(), 100, 0.0, 1.0);
+      mu1_efficiency_->GetXaxis()->SetTitle("Efficiency_{mu_{1}}");
+      mu1_efficiency_->GetYaxis()->SetTitle("Counts / 0.01");
+
+      // mu0_scale_factor_
+      const std::string mu0_scale_factor_name = "scale_factor_{mu_{0}}";
+      mu0_scale_factor_ = tdir.make<TH1D>(mu0_scale_factor_name.c_str(), mu0_scale_factor_name.c_str(), 200, 0.0, 2.0);
+      mu0_scale_factor_->GetXaxis()->SetTitle("scale_factor_{mu_{0}}");
+      mu0_scale_factor_->GetYaxis()->SetTitle("Counts / 0.2");
+
+      // mu1_scale_factor_
+      const std::string mu1_scale_factor_name = "scale_factor_{mu_{1}}";
+      mu1_scale_factor_ = tdir.make<TH1D>(mu1_scale_factor_name.c_str(), mu1_scale_factor_name.c_str(), 200, 0.0, 2.0);
+      mu1_scale_factor_->GetXaxis()->SetTitle("scale_factor_{mu_{1}}");
+      mu1_scale_factor_->GetYaxis()->SetTitle("Counts / 0.01");
 
       // mu0_phi_
       const std::string mu0_phi_name = "#phi_{mu_{0}}";
@@ -903,57 +988,67 @@ namespace zf {
      * Given a zfe, fills all the histograms.
      */
     // Z Info
+    double event_weight = zfe.event_weight;
     if (!USE_MC_) {
-      z_mass_all_->Fill(zfe.reco_z.m, zfe.event_weight);
-      z_mass_coarse_->Fill(zfe.reco_z.m, zfe.event_weight);
-      z_mass_fine_->Fill(zfe.reco_z.m, zfe.event_weight);
-      z_rapidity_->Fill(zfe.reco_z.y, zfe.event_weight);
-      z_pt_->Fill(zfe.reco_z.pt, zfe.event_weight);
-      z_vtx_x_->Fill(zfe.reco_z.vtx_x, zfe.event_weight);
-      z_vtx_y_->Fill(zfe.reco_z.vtx_y, zfe.event_weight);
-      z_vtx_z_->Fill(zfe.reco_z.vtx_z, zfe.event_weight);
-      z_vtx_prob_->Fill(zfe.reco_z.vtx_prob, zfe.event_weight);
-      phistar_->Fill(zfe.reco_z.phistar, zfe.event_weight);
+      for (unsigned int i = 0; i < zfe.reco_jpsi.m.size() ; ++i ) {
+        if (!zfe.is_real_data && APPLY_SOFT_MUONS_ && zfe.reco_jpsi.has_soft_id_muons.at(i) &&
+            zfe.reco_jpsi.has_high_pt_muons.at(i) && zfe.reco_jpsi.has_muons_in_eta_window.at(i) ) {
+          event_weight = event_weight * zfe.reco_jpsi.jpsi_scale_factor.at(i);
+          //TODO decide how to handle multiple j/psi case!!
+          break;
+        }
+      }
+
+      z_mass_all_->Fill(zfe.reco_z.m, event_weight);
+      z_mass_coarse_->Fill(zfe.reco_z.m, event_weight);
+      z_mass_fine_->Fill(zfe.reco_z.m, event_weight);
+      z_rapidity_->Fill(zfe.reco_z.y, event_weight);
+      z_pt_->Fill(zfe.reco_z.pt, event_weight);
+      z_vtx_x_->Fill(zfe.reco_z.vtx_x, event_weight);
+      z_vtx_y_->Fill(zfe.reco_z.vtx_y, event_weight);
+      z_vtx_z_->Fill(zfe.reco_z.vtx_z, event_weight);
+      z_vtx_prob_->Fill(zfe.reco_z.vtx_prob, event_weight);
+      phistar_->Fill(zfe.reco_z.phistar, event_weight);
 
       // Fill the histograms with the information from the approriate electron
       if (zfe.e0 != NULL && zfe.e1 != NULL){
-        e0_pt_->Fill(zfe.e0->pt, zfe.event_weight);
-        e0_eta_->Fill(zfe.e0->eta, zfe.event_weight);
-        e0_phi_->Fill(zfe.e0->phi, zfe.event_weight);
-        e0_charge_->Fill(zfe.e0->charge, zfe.event_weight);
-        e1_pt_->Fill(zfe.e1->pt, zfe.event_weight);
-        e1_eta_->Fill(zfe.e1->eta, zfe.event_weight);
-        e1_phi_->Fill(zfe.e1->phi, zfe.event_weight);
-        e1_charge_->Fill(zfe.e1->charge, zfe.event_weight);
+        e0_pt_->Fill(zfe.e0->pt, event_weight);
+        e0_eta_->Fill(zfe.e0->eta, event_weight);
+        e0_phi_->Fill(zfe.e0->phi, event_weight);
+        e0_charge_->Fill(zfe.e0->charge, event_weight);
+        e1_pt_->Fill(zfe.e1->pt, event_weight);
+        e1_eta_->Fill(zfe.e1->eta, event_weight);
+        e1_phi_->Fill(zfe.e1->phi, event_weight);
+        e1_charge_->Fill(zfe.e1->charge, event_weight);
       }
 
       //Z To mumu
       //TODO change from to to? does that make more sense?
-      z_from_muons_mass_all_->Fill(zfe.reco_z_from_muons.m, zfe.event_weight);
-      z_from_muons_mass_coarse_->Fill(zfe.reco_z_from_muons.m, zfe.event_weight);
-      z_from_muons_mass_fine_->Fill(zfe.reco_z_from_muons.m, zfe.event_weight);
-      z_from_muons_rapidity_->Fill(zfe.reco_z_from_muons.y, zfe.event_weight);
-      z_from_muons_pt_->Fill(zfe.reco_z_from_muons.pt, zfe.event_weight);
-      z_from_muons_vtx_x_->Fill(zfe.reco_z_from_muons.vtx_x, zfe.event_weight);
-      z_from_muons_vtx_y_->Fill(zfe.reco_z_from_muons.vtx_y, zfe.event_weight);
-      z_from_muons_vtx_z_->Fill(zfe.reco_z_from_muons.vtx_z, zfe.event_weight);
-      z_from_muons_vtx_prob_->Fill(zfe.reco_z_from_muons.vtx_prob, zfe.event_weight);
-      z_from_muons_phistar_->Fill(zfe.reco_z_from_muons.phistar, zfe.event_weight);
+      z_from_muons_mass_all_->Fill(zfe.reco_z_from_muons.m, event_weight);
+      z_from_muons_mass_coarse_->Fill(zfe.reco_z_from_muons.m, event_weight);
+      z_from_muons_mass_fine_->Fill(zfe.reco_z_from_muons.m, event_weight);
+      z_from_muons_rapidity_->Fill(zfe.reco_z_from_muons.y, event_weight);
+      z_from_muons_pt_->Fill(zfe.reco_z_from_muons.pt, event_weight);
+      z_from_muons_vtx_x_->Fill(zfe.reco_z_from_muons.vtx_x, event_weight);
+      z_from_muons_vtx_y_->Fill(zfe.reco_z_from_muons.vtx_y, event_weight);
+      z_from_muons_vtx_z_->Fill(zfe.reco_z_from_muons.vtx_z, event_weight);
+      z_from_muons_vtx_prob_->Fill(zfe.reco_z_from_muons.vtx_prob, event_weight);
+      z_from_muons_phistar_->Fill(zfe.reco_z_from_muons.phistar, event_weight);
 
       if (zfe.reco_z_from_muons.m > -1) {
-        muon0_from_z_pt_->Fill(zfe.z_muon0.pt(), zfe.event_weight);
-        muon0_from_z_eta_->Fill(zfe.z_muon0.eta(), zfe.event_weight);
-        muon0_from_z_phi_->Fill(zfe.z_muon0.phi(), zfe.event_weight);
-        muon0_from_z_charge_->Fill(zfe.z_muon0.charge(), zfe.event_weight);
-        muon1_from_z_pt_->Fill(zfe.z_muon1.pt(), zfe.event_weight);
-        muon1_from_z_eta_->Fill(zfe.z_muon1.eta(), zfe.event_weight);
-        muon1_from_z_phi_->Fill(zfe.z_muon1.phi(), zfe.event_weight);
-        muon1_from_z_charge_->Fill(zfe.z_muon1.charge(), zfe.event_weight);
+        muon0_from_z_pt_->Fill(zfe.z_muon0.pt(), event_weight);
+        muon0_from_z_eta_->Fill(zfe.z_muon0.eta(), event_weight);
+        muon0_from_z_phi_->Fill(zfe.z_muon0.phi(), event_weight);
+        muon0_from_z_charge_->Fill(zfe.z_muon0.charge(), event_weight);
+        muon1_from_z_pt_->Fill(zfe.z_muon1.pt(), event_weight);
+        muon1_from_z_eta_->Fill(zfe.z_muon1.eta(), event_weight);
+        muon1_from_z_phi_->Fill(zfe.z_muon1.phi(), event_weight);
+        muon1_from_z_charge_->Fill(zfe.z_muon1.charge(), event_weight);
       }
 
-      primary_vtx_x_vs_z_vtx_x_->Fill(zfe.reco_z.vtx_x, zfe.reco_vert.primary_x, zfe.event_weight );
-      primary_vtx_y_vs_z_vtx_y_->Fill(zfe.reco_z.vtx_y, zfe.reco_vert.primary_y, zfe.event_weight );
-      primary_vtx_z_vs_z_vtx_z_->Fill(zfe.reco_z.vtx_z, zfe.reco_vert.primary_z, zfe.event_weight );
+      primary_vtx_x_vs_z_vtx_x_->Fill(zfe.reco_z.vtx_x, zfe.reco_vert.primary_x, event_weight );
+      primary_vtx_y_vs_z_vtx_y_->Fill(zfe.reco_z.vtx_y, zfe.reco_vert.primary_y, event_weight );
+      primary_vtx_z_vs_z_vtx_z_->Fill(zfe.reco_z.vtx_z, zfe.reco_vert.primary_z, event_weight );
 
       int n_jpsi = 0;
       for (unsigned int i = 0; i < zfe.reco_jpsi.m.size() ; ++i ) {
@@ -975,89 +1070,112 @@ namespace zf {
         }
         n_jpsi++;
 
-        jpsi_mass_all_->Fill(zfe.reco_jpsi.m.at(i), zfe.event_weight);
-        jpsi_mass_coarse_->Fill(zfe.reco_jpsi.m.at(i), zfe.event_weight);
-        jpsi_mass_fine_->Fill(zfe.reco_jpsi.m.at(i), zfe.event_weight);
-        jpsi_rapidity_->Fill(zfe.reco_jpsi.y.at(i), zfe.event_weight);
-        jpsi_pt_->Fill(zfe.reco_jpsi.pt.at(i), zfe.event_weight);
-        jpsi_pt_vs_rap_->Fill(zfe.reco_jpsi.y.at(i), zfe.reco_jpsi.pt.at(i) , zfe.event_weight);
-        jpsi_vtx_distance_z_vtx_x_->Fill( zfe.reco_jpsi.distance_x.at(i), zfe.event_weight);
-        jpsi_vtx_distance_z_vtx_y_->Fill( zfe.reco_jpsi.distance_y.at(i), zfe.event_weight);
-        jpsi_vtx_distance_z_vtx_z_->Fill( zfe.reco_jpsi.distance_z.at(i), zfe.event_weight);
-        jpsi_distance_->Fill(zfe.reco_jpsi.distance.at(i), zfe.event_weight);
-        jpsi_dist_err_->Fill(zfe.reco_jpsi.dist_err.at(i), zfe.event_weight);
-        jpsi_chi2_->Fill(zfe.reco_jpsi.chi2.at(i), zfe.event_weight);
-        jpsi_distance_xy_->Fill(zfe.reco_jpsi.distance_xy.at(i), zfe.event_weight);
-        jpsi_dist_err_xy_->Fill(zfe.reco_jpsi.dist_err_xy.at(i), zfe.event_weight);
-        jpsi_chi2_xy_->Fill(zfe.reco_jpsi.chi2_xy.at(i), zfe.event_weight);
-        jpsi_zpt_difference_->Fill( zfe.reco_z.pt - zfe.reco_jpsi.pt.at(i), zfe.event_weight);
-        jpsi_tau_xy_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, zfe.event_weight); // multiply by 1000 to go from ns to ps
-        jpsi_tau_xy_fine_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, zfe.event_weight); // multiply by 1000 to go from ns to ps
-        jpsi_tau_xy_very_fine_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, zfe.event_weight); // multiply by 1000 to go from ns to ps
+        jpsi_mass_all_->Fill(zfe.reco_jpsi.m.at(i), event_weight);
+        jpsi_mass_coarse_->Fill(zfe.reco_jpsi.m.at(i), event_weight);
+        jpsi_mass_fine_->Fill(zfe.reco_jpsi.m.at(i), event_weight);
+        jpsi_rapidity_->Fill(zfe.reco_jpsi.y.at(i), event_weight);
+        jpsi_pt_->Fill(zfe.reco_jpsi.pt.at(i), event_weight);
+        jpsi_efficiency_->Fill(zfe.reco_jpsi.jpsi_efficiency.at(i), event_weight);
+        jpsi_scale_factor_->Fill(zfe.reco_jpsi.jpsi_scale_factor.at(i), event_weight);
+        jpsi_pt_vs_rap_->Fill(zfe.reco_jpsi.y.at(i), zfe.reco_jpsi.pt.at(i) , event_weight);
+        jpsi_vtx_distance_z_vtx_x_->Fill( zfe.reco_jpsi.distance_x.at(i), event_weight);
+        jpsi_vtx_distance_z_vtx_y_->Fill( zfe.reco_jpsi.distance_y.at(i), event_weight);
+        jpsi_vtx_distance_z_vtx_z_->Fill( zfe.reco_jpsi.distance_z.at(i), event_weight);
+        jpsi_distance_->Fill(zfe.reco_jpsi.distance.at(i), event_weight);
+        jpsi_dist_err_->Fill(zfe.reco_jpsi.dist_err.at(i), event_weight);
+        jpsi_chi2_->Fill(zfe.reco_jpsi.chi2.at(i), event_weight);
+        jpsi_distance_xy_->Fill(zfe.reco_jpsi.distance_xy.at(i), event_weight);
+        jpsi_dist_err_xy_->Fill(zfe.reco_jpsi.dist_err_xy.at(i), event_weight);
+        jpsi_chi2_xy_->Fill(zfe.reco_jpsi.chi2_xy.at(i), event_weight);
+        jpsi_zpt_difference_->Fill( zfe.reco_z.pt - zfe.reco_jpsi.pt.at(i), event_weight);
+        jpsi_tau_xy_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight); // multiply by 1000 to go from ns to ps
+        jpsi_tau_xy_fine_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight); // multiply by 1000 to go from ns to ps
+        jpsi_tau_xy_very_fine_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight); // multiply by 1000 to go from ns to ps
 
         //pt
+        //TODO testing rapidity slice
         if ( zfe.reco_jpsi.pt.at(i) < 10.0 ) {
-          jpsi_tau_xy_very_fine_ptUnder10_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, zfe.event_weight); // multiply by 1000 to go from ns to ps
+          jpsi_tau_xy_very_fine_ptUnder10_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight); // multiply by 1000 to go from ns to ps
+          if ( fabs(zfe.reco_jpsi.y.at(i)) <= 0.3) {
+            jpsi_mass_fine_ptUnder10_->Fill(zfe.reco_jpsi.m.at(i), event_weight);
+          }
         }
         if ( zfe.reco_jpsi.pt.at(i) >= 10.0 && zfe.reco_jpsi.pt.at(i) < 15 ) {
-          jpsi_tau_xy_very_fine_pt10to15_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, zfe.event_weight); // multiply by 1000 to go from ns to ps
+          jpsi_tau_xy_very_fine_pt10to15_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight); // multiply by 1000 to go from ns to ps
+          if ( fabs(zfe.reco_jpsi.y.at(i)) <= 0.3) {
+            jpsi_mass_fine_pt10to15_->Fill(zfe.reco_jpsi.m.at(i), event_weight);
+          }
         }
         if ( zfe.reco_jpsi.pt.at(i) >= 15.0 && zfe.reco_jpsi.pt.at(i) < 20 ) {
-          jpsi_tau_xy_very_fine_pt15to20_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, zfe.event_weight); // multiply by 1000 to go from ns to ps
+          jpsi_tau_xy_very_fine_pt15to20_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight); // multiply by 1000 to go from ns to ps
+          if ( fabs(zfe.reco_jpsi.y.at(i)) <= 0.3) {
+            jpsi_mass_fine_pt15to20_->Fill(zfe.reco_jpsi.m.at(i), event_weight);
+          }
         }
         if ( zfe.reco_jpsi.pt.at(i) >= 20.0 && zfe.reco_jpsi.pt.at(i) < 25 ) {
-          jpsi_tau_xy_very_fine_pt20to25_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, zfe.event_weight); // multiply by 1000 to go from ns to ps
+          jpsi_tau_xy_very_fine_pt20to25_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight); // multiply by 1000 to go from ns to ps
+          if ( fabs(zfe.reco_jpsi.y.at(i)) <= 0.3) {
+            jpsi_mass_fine_pt20to25_->Fill(zfe.reco_jpsi.m.at(i), event_weight);
+          }
         }
         if ( zfe.reco_jpsi.pt.at(i) >= 25.0 && zfe.reco_jpsi.pt.at(i) < 30 ) {
-          jpsi_tau_xy_very_fine_pt25to30_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, zfe.event_weight); // multiply by 1000 to go from ns to ps
-        }
-        if ( zfe.reco_jpsi.pt.at(i) >= 20.0 ) {
-          jpsi_tau_xy_very_fine_ptAbove20_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, zfe.event_weight); // multiply by 1000 to go from ns to ps
+          jpsi_tau_xy_very_fine_pt25to30_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight); // multiply by 1000 to go from ns to ps
+          if ( fabs(zfe.reco_jpsi.y.at(i)) <= 0.3) {
+            jpsi_mass_fine_pt25to30_->Fill(zfe.reco_jpsi.m.at(i), event_weight);
+          }
         }
         if ( zfe.reco_jpsi.pt.at(i) >= 30.0 ) {
-          jpsi_tau_xy_very_fine_ptAbove30_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, zfe.event_weight); // multiply by 1000 to go from ns to ps
+          jpsi_tau_xy_very_fine_ptAbove30_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight); // multiply by 1000 to go from ns to ps
+          if ( fabs(zfe.reco_jpsi.y.at(i)) <= 0.3) {
+            jpsi_mass_fine_ptAbove30_->Fill(zfe.reco_jpsi.m.at(i), event_weight);
+          }
         }
 
         //rap
         if ( fabs(zfe.reco_jpsi.y.at(i)) >= 0.0 && fabs(zfe.reco_jpsi.y.at(i)) < 0.3 ) {
-          jpsi_tau_xy_very_fine_rap0_0to0_3_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, zfe.event_weight); // multiply by 1000 to go from ns to ps
+          jpsi_tau_xy_very_fine_rap0_0to0_3_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight); // multiply by 1000 to go from ns to ps
         }
         if ( fabs(zfe.reco_jpsi.y.at(i)) >= 0.3 && fabs(zfe.reco_jpsi.y.at(i)) < 0.6 ) {
-          jpsi_tau_xy_very_fine_rap0_3to0_6_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, zfe.event_weight); // multiply by 1000 to go from ns to ps
+          jpsi_tau_xy_very_fine_rap0_3to0_6_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight); // multiply by 1000 to go from ns to ps
         }
         if ( fabs(zfe.reco_jpsi.y.at(i)) >= 0.6 && fabs(zfe.reco_jpsi.y.at(i)) < 0.9 ) {
-          jpsi_tau_xy_very_fine_rap0_6to0_9_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, zfe.event_weight); // multiply by 1000 to go from ns to ps
+          jpsi_tau_xy_very_fine_rap0_6to0_9_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight); // multiply by 1000 to go from ns to ps
         }
         if ( fabs(zfe.reco_jpsi.y.at(i)) >= 0.9 && fabs(zfe.reco_jpsi.y.at(i)) < 1.2 ) {
-          jpsi_tau_xy_very_fine_rap0_9to1_2_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, zfe.event_weight); // multiply by 1000 to go from ns to ps
+          jpsi_tau_xy_very_fine_rap0_9to1_2_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight); // multiply by 1000 to go from ns to ps
         }
         if ( fabs(zfe.reco_jpsi.y.at(i)) >= 1.2 && fabs(zfe.reco_jpsi.y.at(i)) < 1.5 ) {
-          jpsi_tau_xy_very_fine_rap1_2to1_5_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, zfe.event_weight); // multiply by 1000 to go from ns to ps
+          jpsi_tau_xy_very_fine_rap1_2to1_5_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight); // multiply by 1000 to go from ns to ps
         }
         if ( fabs(zfe.reco_jpsi.y.at(i)) >= 1.5 && fabs(zfe.reco_jpsi.y.at(i)) < 1.8 ) {
-          jpsi_tau_xy_very_fine_rap1_5to1_8_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, zfe.event_weight); // multiply by 1000 to go from ns to ps
+          jpsi_tau_xy_very_fine_rap1_5to1_8_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight); // multiply by 1000 to go from ns to ps
         }
         if ( fabs(zfe.reco_jpsi.y.at(i)) >= 1.8 && fabs(zfe.reco_jpsi.y.at(i)) < 2.1 ) {
-          jpsi_tau_xy_very_fine_rap1_8to2_1_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, zfe.event_weight); // multiply by 1000 to go from ns to ps
+          jpsi_tau_xy_very_fine_rap1_8to2_1_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight); // multiply by 1000 to go from ns to ps
         }
         if ( fabs(zfe.reco_jpsi.y.at(i)) >= 2.1 && fabs(zfe.reco_jpsi.y.at(i)) < 2.4 ) {
-          jpsi_tau_xy_very_fine_rap2_1to2_4_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, zfe.event_weight); // multiply by 1000 to go from ns to ps
+          jpsi_tau_xy_very_fine_rap2_1to2_4_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight); // multiply by 1000 to go from ns to ps
         }
 
         //rap and pt
         if ( fabs(zfe.reco_jpsi.y.at(i)) >= 0.0 && fabs(zfe.reco_jpsi.y.at(i)) < 0.9 && (zfe.reco_jpsi.pt.at(i) >= 10.0 && zfe.reco_jpsi.pt.at(i) < 15 ) ) {
-          jpsi_tau_xy_very_fine_rap0_0to0_9pt10to15_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, zfe.event_weight); // multiply by 1000 to go from ns to ps
+          jpsi_tau_xy_very_fine_rap0_0to0_9pt10to15_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight); // multiply by 1000 to go from ns to ps
         }
         if ( fabs(zfe.reco_jpsi.y.at(i)) >= 0.9 && fabs(zfe.reco_jpsi.y.at(i)) < 1.2 && (zfe.reco_jpsi.pt.at(i) >= 10.0 && zfe.reco_jpsi.pt.at(i) < 15 ) ) {
-          jpsi_tau_xy_very_fine_rap0_9to1_2pt10to15_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, zfe.event_weight); // multiply by 1000 to go from ns to ps
+          jpsi_tau_xy_very_fine_rap0_9to1_2pt10to15_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight); // multiply by 1000 to go from ns to ps
         }
         if ( fabs(zfe.reco_jpsi.y.at(i)) >= 1.2 && fabs(zfe.reco_jpsi.y.at(i)) < 2.1 && (zfe.reco_jpsi.pt.at(i) >= 10.0 && zfe.reco_jpsi.pt.at(i) < 15 ) ) {
-          jpsi_tau_xy_very_fine_rap1_2to2_1pt10to15_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, zfe.event_weight); // multiply by 1000 to go from ns to ps
+          jpsi_tau_xy_very_fine_rap1_2to2_1pt10to15_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight); // multiply by 1000 to go from ns to ps
         }
 
         //similar pt muons
         if ( fabs( zfe.reco_jpsi.muon0.at(i).pt() - zfe.reco_jpsi.muon1.at(i).pt() ) < 2 ) {
-          jpsi_tau_xy_very_fine_similar_pt_muons_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, zfe.event_weight); // multiply by 1000 to go from ns to ps
+          jpsi_tau_xy_very_fine_similar_pt_muons_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight); // multiply by 1000 to go from ns to ps
+        }
+        //continuum bg
+        if ( (zfe.reco_jpsi.m.at(i) < MIN_JPSI_MASS && zfe.reco_jpsi.m.at(i) > 2.5) ||
+            (zfe.reco_jpsi.m.at(i) < 5.0 && zfe.reco_jpsi.m.at(i) > MAX_JPSI_MASS) ) {
+          jpsi_tau_xy_dimuon_continuum_bg_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight); // multiply by 1000 to go from ns to ps
         }
 
         //number of muon segments
@@ -1072,43 +1190,49 @@ namespace zf {
           mu1_layers = zfe.reco_jpsi.muon1.at(i).innerTrack()->hitPattern().trackerLayersWithMeasurement();
         }
         if ( mu0_layers > 12 && mu1_layers > 12 ) {
-          jpsi_tau_xy_very_fine_above_12_tracker_layers_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, zfe.event_weight); // multiply by 1000 to go from ns to ps
+          jpsi_tau_xy_very_fine_above_12_tracker_layers_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight); // multiply by 1000 to go from ns to ps
         }
 
-        jpsi_tau_z_->Fill(zfe.reco_jpsi.tau_z.at(i) * 1000, zfe.event_weight); // multiply by 1000 to go from ns to ps
-        jpsi_tau_z_fine_->Fill(zfe.reco_jpsi.tau_z.at(i) * 1000, zfe.event_weight); // multiply by 1000 to go from ns to ps
-        jpsi_tau_z_very_fine_->Fill(zfe.reco_jpsi.tau_z.at(i) * 1000, zfe.event_weight); // multiply by 1000 to go from ns to ps
-        jpsi_mass_vs_chi2_->Fill(zfe.reco_jpsi.m.at(i) , zfe.reco_jpsi.chi2.at(i), zfe.event_weight );
-        jpsi_tau_xy_vs_tau_z_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000 , zfe.reco_jpsi.tau_z.at(i) * 1000, zfe.event_weight );
-        jpsi_tau_xy_vs_distance_z_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000 , (zfe.reco_jpsi.vtx_z.at(i) - zfe.reco_z.vtx_z), zfe.event_weight );
-        jpsi_tau_z_vs_distance_z_->Fill(zfe.reco_jpsi.tau_z.at(i) * 1000 , (zfe.reco_jpsi.vtx_z.at(i) - zfe.reco_z.vtx_z), zfe.event_weight );
+        jpsi_tau_z_->Fill(zfe.reco_jpsi.tau_z.at(i) * 1000, event_weight); // multiply by 1000 to go from ns to ps
+        jpsi_tau_z_fine_->Fill(zfe.reco_jpsi.tau_z.at(i) * 1000, event_weight); // multiply by 1000 to go from ns to ps
+        jpsi_tau_z_very_fine_->Fill(zfe.reco_jpsi.tau_z.at(i) * 1000, event_weight); // multiply by 1000 to go from ns to ps
+        jpsi_mass_vs_chi2_->Fill(zfe.reco_jpsi.m.at(i) , zfe.reco_jpsi.chi2.at(i), event_weight );
+        dimuon_mass_vs_dimuon_tau_xy_->Fill(zfe.reco_jpsi.m.at(i) , zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight );
+        dimuon_mass_vs_dimuon_tau_xy_fine_->Fill(zfe.reco_jpsi.m.at(i) , zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight );
+        jpsi_tau_xy_vs_tau_z_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000 , zfe.reco_jpsi.tau_z.at(i) * 1000, event_weight );
+        jpsi_tau_xy_vs_distance_z_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000 , (zfe.reco_jpsi.vtx_z.at(i) - zfe.reco_z.vtx_z), event_weight );
+        jpsi_tau_z_vs_distance_z_->Fill(zfe.reco_jpsi.tau_z.at(i) * 1000 , (zfe.reco_jpsi.vtx_z.at(i) - zfe.reco_z.vtx_z), event_weight );
 
-        dimuon_vtx_x_->Fill(zfe.reco_jpsi.vtx_x.at(i), zfe.event_weight);
-        dimuon_vtx_y_->Fill(zfe.reco_jpsi.vtx_y.at(i), zfe.event_weight);
-        dimuon_vtx_z_->Fill(zfe.reco_jpsi.vtx_z.at(i), zfe.event_weight);
-        dimuon_vtx_prob_->Fill(zfe.reco_jpsi.vtx_prob.at(i), zfe.event_weight);
+        dimuon_vtx_x_->Fill(zfe.reco_jpsi.vtx_x.at(i), event_weight);
+        dimuon_vtx_y_->Fill(zfe.reco_jpsi.vtx_y.at(i), event_weight);
+        dimuon_vtx_z_->Fill(zfe.reco_jpsi.vtx_z.at(i), event_weight);
+        dimuon_vtx_prob_->Fill(zfe.reco_jpsi.vtx_prob.at(i), event_weight);
 
-        z_jpsi_delta_phi_->Fill(zfe.reco_jpsi.z_delta_phi.at(i), zfe.event_weight);
+        z_jpsi_delta_phi_->Fill(zfe.reco_jpsi.z_delta_phi.at(i), event_weight);
 
-        dimuon_delta_phi_->Fill(zfe.reco_jpsi.muons_delta_phi.at(i), zfe.event_weight);
-        dimuon_deltaR_->Fill(zfe.reco_jpsi.muons_deltaR.at(i), zfe.event_weight);
-        dimuon_delta_eta_->Fill(zfe.reco_jpsi.muons_delta_eta.at(i), zfe.event_weight);
+        dimuon_delta_phi_->Fill(zfe.reco_jpsi.muons_delta_phi.at(i), event_weight);
+        dimuon_deltaR_->Fill(zfe.reco_jpsi.muons_deltaR.at(i), event_weight);
+        dimuon_delta_eta_->Fill(zfe.reco_jpsi.muons_delta_eta.at(i), event_weight);
 
-        mu0_pt_->Fill(zfe.reco_jpsi.muon0.at(i).pt(), zfe.event_weight);
-        mu0_eta_->Fill(zfe.reco_jpsi.muon0.at(i).eta(), zfe.event_weight);
-        mu0_phi_->Fill(zfe.reco_jpsi.muon0.at(i).phi(), zfe.event_weight);
-        mu0_charge_->Fill(zfe.reco_jpsi.muon0.at(i).charge(), zfe.event_weight);
-        mu0_deltaR_z_muon_->Fill(zfe.reco_jpsi.muon0_deltaR_to_z_muons.at(i), zfe.event_weight);
-        mu0_deltaR_truth_->Fill(zfe.reco_jpsi.muon0_deltaR_to_truth_muons.at(i), zfe.event_weight);
-        mu0_tracker_layers_->Fill(mu0_layers, zfe.event_weight);
+        mu0_pt_->Fill(zfe.reco_jpsi.muon0.at(i).pt(), event_weight);
+        mu0_eta_->Fill(zfe.reco_jpsi.muon0.at(i).eta(), event_weight);
+        mu0_efficiency_->Fill(zfe.reco_jpsi.muon0_efficiency.at(i), event_weight);
+        mu0_scale_factor_->Fill(zfe.reco_jpsi.muon0_scale_factor.at(i), event_weight);
+        mu0_phi_->Fill(zfe.reco_jpsi.muon0.at(i).phi(), event_weight);
+        mu0_charge_->Fill(zfe.reco_jpsi.muon0.at(i).charge(), event_weight);
+        mu0_deltaR_z_muon_->Fill(zfe.reco_jpsi.muon0_deltaR_to_z_muons.at(i), event_weight);
+        mu0_deltaR_truth_->Fill(zfe.reco_jpsi.muon0_deltaR_to_truth_muons.at(i), event_weight);
+        mu0_tracker_layers_->Fill(mu0_layers, event_weight);
 
-        mu1_pt_->Fill(zfe.reco_jpsi.muon1.at(i).pt(), zfe.event_weight);
-        mu1_eta_->Fill(zfe.reco_jpsi.muon1.at(i).eta(), zfe.event_weight);
-        mu1_phi_->Fill(zfe.reco_jpsi.muon1.at(i).phi(), zfe.event_weight);
-        mu1_charge_->Fill(zfe.reco_jpsi.muon1.at(i).charge(), zfe.event_weight);
-        mu1_deltaR_z_muon_->Fill(zfe.reco_jpsi.muon1_deltaR_to_z_muons.at(i), zfe.event_weight);
-        mu1_deltaR_truth_->Fill(zfe.reco_jpsi.muon1_deltaR_to_truth_muons.at(i), zfe.event_weight);
-        mu1_tracker_layers_->Fill(mu1_layers, zfe.event_weight);
+        mu1_pt_->Fill(zfe.reco_jpsi.muon1.at(i).pt(), event_weight);
+        mu1_eta_->Fill(zfe.reco_jpsi.muon1.at(i).eta(), event_weight);
+        mu1_efficiency_->Fill(zfe.reco_jpsi.muon1_efficiency.at(i), event_weight);
+        mu1_scale_factor_->Fill(zfe.reco_jpsi.muon1_scale_factor.at(i), event_weight);
+        mu1_phi_->Fill(zfe.reco_jpsi.muon1.at(i).phi(), event_weight);
+        mu1_charge_->Fill(zfe.reco_jpsi.muon1.at(i).charge(), event_weight);
+        mu1_deltaR_z_muon_->Fill(zfe.reco_jpsi.muon1_deltaR_to_z_muons.at(i), event_weight);
+        mu1_deltaR_truth_->Fill(zfe.reco_jpsi.muon1_deltaR_to_truth_muons.at(i), event_weight);
+        mu1_tracker_layers_->Fill(mu1_layers, event_weight);
 
         int n_truth_matched_jpsi_muons = 0;
         if ( zfe.reco_jpsi.muon0_deltaR_to_truth_muons.at(i) <= MAX_DELTAR_TRUTH_MATCHED_JPSI_MUONS ) {
@@ -1117,32 +1241,32 @@ namespace zf {
         if ( zfe.reco_jpsi.muon1_deltaR_to_truth_muons.at(i) <= MAX_DELTAR_TRUTH_MATCHED_JPSI_MUONS ) {
           n_truth_matched_jpsi_muons++;
         }
-        n_truth_matched_jpsi_muons_->Fill (n_truth_matched_jpsi_muons, zfe.event_weight);
+        n_truth_matched_jpsi_muons_->Fill (n_truth_matched_jpsi_muons, event_weight);
 
-        jpsi_iso_mu0_->Fill(zfe.reco_jpsi.iso_mu0.at(i), zfe.event_weight ) ;
-        jpsi_iso_sum_charged_hadron_pt_mu0_->Fill(zfe.reco_jpsi.iso_sum_charged_hadron_pt_mu0.at(i), zfe.event_weight ) ;
-        jpsi_iso_sum_charged_particle_pt_mu0_->Fill(zfe.reco_jpsi.iso_sum_charged_particle_pt_mu0.at(i), zfe.event_weight ) ;
-        jpsi_iso_sum_neutral_hadron_et_mu0_->Fill(zfe.reco_jpsi.iso_sum_neutral_hadron_et_mu0.at(i), zfe.event_weight ) ;
-        jpsi_iso_sum_photon_et_mu0_->Fill(zfe.reco_jpsi.iso_sum_photon_et_mu0.at(i), zfe.event_weight ) ;
-        jpsi_iso_sum_pileup_pt_mu0_->Fill(zfe.reco_jpsi.iso_sum_pileup_pt_mu0.at(i), zfe.event_weight ) ;
+        jpsi_iso_mu0_->Fill(zfe.reco_jpsi.iso_mu0.at(i), event_weight ) ;
+        jpsi_iso_sum_charged_hadron_pt_mu0_->Fill(zfe.reco_jpsi.iso_sum_charged_hadron_pt_mu0.at(i), event_weight ) ;
+        jpsi_iso_sum_charged_particle_pt_mu0_->Fill(zfe.reco_jpsi.iso_sum_charged_particle_pt_mu0.at(i), event_weight ) ;
+        jpsi_iso_sum_neutral_hadron_et_mu0_->Fill(zfe.reco_jpsi.iso_sum_neutral_hadron_et_mu0.at(i), event_weight ) ;
+        jpsi_iso_sum_photon_et_mu0_->Fill(zfe.reco_jpsi.iso_sum_photon_et_mu0.at(i), event_weight ) ;
+        jpsi_iso_sum_pileup_pt_mu0_->Fill(zfe.reco_jpsi.iso_sum_pileup_pt_mu0.at(i), event_weight ) ;
 
-        jpsi_iso_mu1_->Fill(zfe.reco_jpsi.iso_mu1.at(i), zfe.event_weight ) ;
-        jpsi_iso_sum_charged_hadron_pt_mu1_->Fill(zfe.reco_jpsi.iso_sum_charged_hadron_pt_mu1.at(i), zfe.event_weight ) ;
-        jpsi_iso_sum_charged_particle_pt_mu1_->Fill(zfe.reco_jpsi.iso_sum_charged_particle_pt_mu1.at(i), zfe.event_weight ) ;
-        jpsi_iso_sum_neutral_hadron_et_mu1_->Fill(zfe.reco_jpsi.iso_sum_neutral_hadron_et_mu1.at(i), zfe.event_weight ) ;
-        jpsi_iso_sum_photon_et_mu1_->Fill(zfe.reco_jpsi.iso_sum_photon_et_mu1.at(i), zfe.event_weight ) ;
-        jpsi_iso_sum_pileup_pt_mu1_->Fill(zfe.reco_jpsi.iso_sum_pileup_pt_mu1.at(i), zfe.event_weight ) ;
+        jpsi_iso_mu1_->Fill(zfe.reco_jpsi.iso_mu1.at(i), event_weight ) ;
+        jpsi_iso_sum_charged_hadron_pt_mu1_->Fill(zfe.reco_jpsi.iso_sum_charged_hadron_pt_mu1.at(i), event_weight ) ;
+        jpsi_iso_sum_charged_particle_pt_mu1_->Fill(zfe.reco_jpsi.iso_sum_charged_particle_pt_mu1.at(i), event_weight ) ;
+        jpsi_iso_sum_neutral_hadron_et_mu1_->Fill(zfe.reco_jpsi.iso_sum_neutral_hadron_et_mu1.at(i), event_weight ) ;
+        jpsi_iso_sum_photon_et_mu1_->Fill(zfe.reco_jpsi.iso_sum_photon_et_mu1.at(i), event_weight ) ;
+        jpsi_iso_sum_pileup_pt_mu1_->Fill(zfe.reco_jpsi.iso_sum_pileup_pt_mu1.at(i), event_weight ) ;
       }
       for (unsigned int i = 0; i < zfe.reco_jets.pt.size() ; ++i ) {
-        jet_pt_->Fill(zfe.reco_jets.pt.at(i), zfe.event_weight);
-        jet_eta_->Fill(zfe.reco_jets.eta.at(i), zfe.event_weight);
-        jet_btag_discriminator_->Fill(zfe.reco_jets.btag_discriminator.at(i), zfe.event_weight);
+        jet_pt_->Fill(zfe.reco_jets.pt.at(i), event_weight);
+        jet_eta_->Fill(zfe.reco_jets.eta.at(i), event_weight);
+        jet_btag_discriminator_->Fill(zfe.reco_jets.btag_discriminator.at(i), event_weight);
       }
       for (unsigned int i = 0; i < zfe.reco_muon_jets.pt.size() ; ++i ) {
-        muon_jet_pt_->Fill(zfe.reco_muon_jets.pt.at(i), zfe.event_weight);
-        muon_jet_pt_diff_z_pt_->Fill(zfe.reco_z.pt - zfe.reco_muon_jets.pt.at(i), zfe.event_weight);
-        muon_jet_pt_z_pt_->Fill(zfe.reco_z.pt , zfe.reco_muon_jets.pt.at(i), zfe.event_weight);
-        muon_jet_phi_z_phi_->Fill(zfe.reco_z.phi , zfe.reco_muon_jets.phi.at(i), zfe.event_weight);
+        muon_jet_pt_->Fill(zfe.reco_muon_jets.pt.at(i), event_weight);
+        muon_jet_pt_diff_z_pt_->Fill(zfe.reco_z.pt - zfe.reco_muon_jets.pt.at(i), event_weight);
+        muon_jet_pt_z_pt_->Fill(zfe.reco_z.pt , zfe.reco_muon_jets.pt.at(i), event_weight);
+        muon_jet_phi_z_phi_->Fill(zfe.reco_z.phi , zfe.reco_muon_jets.phi.at(i), event_weight);
         //TODO is this extra for loop needed?
         for (unsigned int j = 0; j < zfe.reco_jpsi.m.size() ; ++j ) {
           if (APPLY_MUON_MIN_PT_ && !zfe.reco_jpsi.has_high_pt_muons.at(j) )  {
@@ -1160,50 +1284,50 @@ namespace zf {
           if (APPLY_JPSI_MASS_WINDOW_ && !zfe.reco_jpsi.is_within_jpsi_mass_window.at(j) ) {
             continue;
           }
-          muon_jet_pt_diff_dimuon_pt_->Fill(zfe.reco_jpsi.pt.at(j) - zfe.reco_muon_jets.pt.at(i), zfe.event_weight);
-          muon_jet_pt_dimuon_pt_->Fill(zfe.reco_jpsi.pt.at(j) , zfe.reco_muon_jets.pt.at(i), zfe.event_weight);
-          muon_jet_phi_dimuon_phi_->Fill(zfe.reco_jpsi.phi.at(j) , zfe.reco_muon_jets.phi.at(i), zfe.event_weight);
+          muon_jet_pt_diff_dimuon_pt_->Fill(zfe.reco_jpsi.pt.at(j) - zfe.reco_muon_jets.pt.at(i), event_weight);
+          muon_jet_pt_dimuon_pt_->Fill(zfe.reco_jpsi.pt.at(j) , zfe.reco_muon_jets.pt.at(i), event_weight);
+          muon_jet_phi_dimuon_phi_->Fill(zfe.reco_jpsi.phi.at(j) , zfe.reco_muon_jets.phi.at(i), event_weight);
         }
-        muon_jet_eta_->Fill(zfe.reco_muon_jets.eta.at(i), zfe.event_weight);
-        muon_jet_btag_discriminator_->Fill(zfe.reco_muon_jets.btag_discriminator.at(i), zfe.event_weight);
+        muon_jet_eta_->Fill(zfe.reco_muon_jets.eta.at(i), event_weight);
+        muon_jet_btag_discriminator_->Fill(zfe.reco_muon_jets.btag_discriminator.at(i), event_weight);
       }
       for (unsigned int i = 0; i < zfe.reco_vert.x.size() ; ++i ) {
-        vtx_x_->Fill(zfe.reco_vert.x.at(i), zfe.event_weight);
-        vtx_y_->Fill(zfe.reco_vert.y.at(i), zfe.event_weight);
-        vtx_z_->Fill(zfe.reco_vert.z.at(i), zfe.event_weight);
+        vtx_x_->Fill(zfe.reco_vert.x.at(i), event_weight);
+        vtx_y_->Fill(zfe.reco_vert.y.at(i), event_weight);
+        vtx_z_->Fill(zfe.reco_vert.z.at(i), event_weight);
       }
 
 
       // Event Info
-      primary_vtx_x_->Fill(zfe.reco_vert.primary_x, zfe.event_weight);
-      primary_vtx_y_->Fill(zfe.reco_vert.primary_y, zfe.event_weight);
-      primary_vtx_z_->Fill(zfe.reco_vert.primary_z, zfe.event_weight);
+      primary_vtx_x_->Fill(zfe.reco_vert.primary_x, event_weight);
+      primary_vtx_y_->Fill(zfe.reco_vert.primary_y, event_weight);
+      primary_vtx_z_->Fill(zfe.reco_vert.primary_z, event_weight);
 
-      baseweights_->Fill(zfe.event_weight); //Don't weight this histogram of event weights
+      baseweights_->Fill(event_weight); //Don't weight this histogram of event weights
 
-      pileup_->Fill(zfe.reco_vert.num, zfe.event_weight);
-      nelectrons_->Fill(zfe.n_reco_electrons, zfe.event_weight);
-      nmuons_->Fill(zfe.n_reco_muons, zfe.event_weight);
-      njets_->Fill(zfe.n_reco_jets, zfe.event_weight);
-      n_muonjets_->Fill(zfe.n_reco_muon_jets, zfe.event_weight);
-      njpsis_->Fill(n_jpsi, zfe.event_weight); 
+      pileup_->Fill(zfe.reco_vert.num, event_weight);
+      nelectrons_->Fill(zfe.n_reco_electrons, event_weight);
+      nmuons_->Fill(zfe.n_reco_muons, event_weight);
+      njets_->Fill(zfe.n_reco_jets, event_weight);
+      n_muonjets_->Fill(zfe.n_reco_muon_jets, event_weight);
+      njpsis_->Fill(n_jpsi, event_weight); 
     } 
     else if (USE_MC_ && !zfe.is_real_data) {
-      z_mass_all_->Fill(zfe.truth_z.m, zfe.event_weight);
-      z_mass_coarse_->Fill(zfe.truth_z.m, zfe.event_weight);
-      z_mass_fine_->Fill(zfe.truth_z.m, zfe.event_weight);
-      z_rapidity_->Fill(zfe.truth_z.y, zfe.event_weight);
-      z_pt_->Fill(zfe.truth_z.pt, zfe.event_weight);
-      phistar_->Fill(zfe.truth_z.phistar, zfe.event_weight);
+      z_mass_all_->Fill(zfe.truth_z.m, event_weight);
+      z_mass_coarse_->Fill(zfe.truth_z.m, event_weight);
+      z_mass_fine_->Fill(zfe.truth_z.m, event_weight);
+      z_rapidity_->Fill(zfe.truth_z.y, event_weight);
+      z_pt_->Fill(zfe.truth_z.pt, event_weight);
+      phistar_->Fill(zfe.truth_z.phistar, event_weight);
 
       // Fill the histograms with the information from the approriate electron
       if (zfe.e0_truth != NULL && zfe.e1_truth != NULL) {
-        e0_pt_->Fill(zfe.e0_truth->pt, zfe.event_weight);
-        e0_eta_->Fill(zfe.e0_truth->eta, zfe.event_weight);
-        e0_phi_->Fill(zfe.e0_truth->phi, zfe.event_weight);
-        e1_pt_->Fill(zfe.e1_truth->pt, zfe.event_weight);
-        e1_eta_->Fill(zfe.e1_truth->eta, zfe.event_weight);
-        e1_phi_->Fill(zfe.e1_truth->phi, zfe.event_weight);
+        e0_pt_->Fill(zfe.e0_truth->pt, event_weight);
+        e0_eta_->Fill(zfe.e0_truth->eta, event_weight);
+        e0_phi_->Fill(zfe.e0_truth->phi, event_weight);
+        e1_pt_->Fill(zfe.e1_truth->pt, event_weight);
+        e1_eta_->Fill(zfe.e1_truth->eta, event_weight);
+        e1_phi_->Fill(zfe.e1_truth->phi, event_weight);
       }
       //jpsi plots
       int n_truth_jpsi = 0;
@@ -1221,26 +1345,26 @@ namespace zf {
 
         n_truth_jpsi++;
 
-        jpsi_mass_all_->Fill(zfe.truth_jpsi.m.at(i), zfe.event_weight);
-        jpsi_mass_coarse_->Fill(zfe.truth_jpsi.m.at(i), zfe.event_weight);
-        jpsi_mass_fine_->Fill(zfe.truth_jpsi.m.at(i), zfe.event_weight);
-        jpsi_rapidity_->Fill(zfe.truth_jpsi.y.at(i), zfe.event_weight);
-        jpsi_pt_->Fill(zfe.truth_jpsi.pt.at(i), zfe.event_weight);
+        jpsi_mass_all_->Fill(zfe.truth_jpsi.m.at(i), event_weight);
+        jpsi_mass_coarse_->Fill(zfe.truth_jpsi.m.at(i), event_weight);
+        jpsi_mass_fine_->Fill(zfe.truth_jpsi.m.at(i), event_weight);
+        jpsi_rapidity_->Fill(zfe.truth_jpsi.y.at(i), event_weight);
+        jpsi_pt_->Fill(zfe.truth_jpsi.pt.at(i), event_weight);
 
-        mu0_pt_->Fill(zfe.jpsi_muon0.at(i)->pt(), zfe.event_weight);
-        mu0_eta_->Fill(zfe.jpsi_muon0.at(i)->eta(), zfe.event_weight);
-        mu0_phi_->Fill(zfe.jpsi_muon0.at(i)->phi(), zfe.event_weight);
-        mu0_charge_->Fill(zfe.jpsi_muon0.at(i)->charge(), zfe.event_weight);
-        mu1_pt_->Fill(zfe.jpsi_muon1.at(i)->pt(), zfe.event_weight);
-        mu1_eta_->Fill(zfe.jpsi_muon1.at(i)->eta(), zfe.event_weight);
-        mu1_phi_->Fill(zfe.jpsi_muon1.at(i)->phi(), zfe.event_weight);
-        mu1_charge_->Fill(zfe.jpsi_muon1.at(i)->charge(), zfe.event_weight);
+        mu0_pt_->Fill(zfe.jpsi_muon0.at(i)->pt(), event_weight);
+        mu0_eta_->Fill(zfe.jpsi_muon0.at(i)->eta(), event_weight);
+        mu0_phi_->Fill(zfe.jpsi_muon0.at(i)->phi(), event_weight);
+        mu0_charge_->Fill(zfe.jpsi_muon0.at(i)->charge(), event_weight);
+        mu1_pt_->Fill(zfe.jpsi_muon1.at(i)->pt(), event_weight);
+        mu1_eta_->Fill(zfe.jpsi_muon1.at(i)->eta(), event_weight);
+        mu1_phi_->Fill(zfe.jpsi_muon1.at(i)->phi(), event_weight);
+        mu1_charge_->Fill(zfe.jpsi_muon1.at(i)->charge(), event_weight);
       }
       // Event Info
-      baseweights_->Fill(zfe.event_weight); //Don't weight this histogram of event weights
-      pileup_->Fill(zfe.truth_vert.num, zfe.event_weight);
-      nelectrons_->Fill(2, zfe.event_weight);  // We only ever grab the two electrons from the Z
-      njpsis_->Fill(n_truth_jpsi, zfe.event_weight); 
+      baseweights_->Fill(event_weight); //Don't weight this histogram of event weights
+      pileup_->Fill(zfe.truth_vert.num, event_weight);
+      nelectrons_->Fill(2, event_weight);  // We only ever grab the two electrons from the Z
+      njpsis_->Fill(n_truth_jpsi, event_weight); 
     }
   }
 
