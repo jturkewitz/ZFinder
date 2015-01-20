@@ -141,6 +141,8 @@ namespace zf {
         std::vector<double> vtx_prob;
         std::vector<double> jpsi_efficiency;
         std::vector<double> jpsi_scale_factor;
+        std::vector<double> cos_jpsi_mu0;
+        std::vector<double> cos_jpsi_mu1;
         std::vector<double> muons_delta_phi;
         std::vector<double> muons_delta_eta;
         std::vector<double> muons_deltaR;
@@ -167,11 +169,14 @@ namespace zf {
         std::vector<double> iso_sum_neutral_hadron_et_mu1;
         std::vector<double> iso_sum_photon_et_mu1;
         std::vector<double> iso_sum_pileup_pt_mu1;
+        std::vector<double> trigger_object_mu0_pt;
+        std::vector<double> trigger_object_mu1_pt;
         std::vector<bool> has_muons_in_eta_window;
         std::vector<bool> has_high_pt_muons;
         std::vector<bool> has_soft_id_muons;
         std::vector<bool> has_muons_with_compatible_vertex;
         std::vector<bool> has_dimuon_vertex_compatible_with_primary_vertex;
+        std::vector<bool> is_high_pt;
         std::vector<bool> is_within_jpsi_mass_window;
       } reco_jpsi, truth_jpsi;
 

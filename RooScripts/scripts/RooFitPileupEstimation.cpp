@@ -155,7 +155,8 @@ int RooFitPileupEstimation(
   gPad->SetLogy();
   //RooPlot* distance_z_fitframe = distance_z.frame(-0.3,5.0);
   //RooPlot* distance_z_fitframe = distance_z.frame( Title(jpsi_hist_name.c_str()) , Range("negative, positive" ));
-  RooPlot* distance_z_fitframe = distance_z.frame( Title(jpsi_hist_name.c_str()) );
+  //RooPlot* distance_z_fitframe = distance_z.frame( Title(jpsi_hist_name.c_str()) );
+  RooPlot* distance_z_fitframe = distance_z.frame( Title("Difference in Z Position Between Primary Vertex and J/Psi Vertex") );
   //distance_z_fitframe->SetName(0); // Unset title
   distance_z_data_hist.plotOn(distance_z_fitframe);
   pileup_gauss_test.plotOn(distance_z_fitframe, LineColor(kGreen-2), NormRange("negative,positive"));

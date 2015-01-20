@@ -125,7 +125,7 @@ JPsiFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
    int n_positrons = 0;
    for(unsigned int i = 0; i < els_h->size(); ++i) {
      reco::GsfElectron electron = els_h->at(i);
-     if ( electron.pt() > 15 ) {
+     if ( electron.pt() > 18 ) {
        if ( electron.charge() == -1) {
            n_electrons++;
        }
@@ -142,7 +142,7 @@ JPsiFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
    int n_antimuons = 0;
    for(unsigned int i = 0; i < muons_h->size(); ++i) {
      reco::Muon muon = muons_h->at(i);
-     if ( muon.pt() > 2 ) {
+     if ( muon.pt() > 2.5 ) {
        if ( muon.charge() == -1) {
            n_muons++;
        }

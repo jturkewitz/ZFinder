@@ -83,6 +83,35 @@ namespace zf {
             TH1D* jpsi_pt_;
             TH1D* jpsi_efficiency_;
             TH1D* jpsi_scale_factor_;
+            TH2D* jpsi_reco_pt_vs_jpsi_truth_pt_;
+            TH1D* jpsi_truth_pt_minus_jpsi_reco_pt_;
+            TH1D* jpsi_trigger_obj_mu0_pt_;
+            TH1D* jpsi_trigger_obj_mu1_pt_;
+            TH1D* jpsi_trigger_obj_mu0_pt_minus_reco_mu0_pt_;
+            TH1D* jpsi_trigger_obj_mu1_pt_minus_reco_mu1_pt_;
+
+            TH1D* jpsi_cos_mu0_;
+            TH1D* jpsi_cos_mu1_;
+
+            TH1D* mu0_pt_;
+            TH1D* mu1_pt_;
+            TH1D* mu0_eta_;
+            TH1D* mu1_eta_;
+            TH1D* mu0_efficiency_;
+            TH1D* mu1_efficiency_;
+            TH1D* mu0_scale_factor_;
+            TH1D* mu1_scale_factor_;
+            TH1D* mu0_phi_;
+            TH1D* mu1_phi_;
+            TH1D* mu0_charge_;
+            TH1D* mu1_charge_;
+            TH1D* mu0_tracker_layers_;
+            TH1D* mu1_tracker_layers_;
+            TH1D* mu0_deltaR_truth_;
+            TH1D* mu1_deltaR_truth_;
+            TH1D* mu0_deltaR_z_muon_;
+            TH1D* mu1_deltaR_z_muon_;
+            TH1D* n_truth_matched_jpsi_muons_;
 
             TH2D* jpsi_pt_vs_rap_;
             TH1D* jpsi_distance_;
@@ -132,26 +161,6 @@ namespace zf {
             TH1D* dimuon_deltaR_;
 
             TH1D* z_jpsi_delta_phi_;
-
-            TH1D* mu0_pt_;
-            TH1D* mu1_pt_;
-            TH1D* mu0_eta_;
-            TH1D* mu1_eta_;
-            TH1D* mu0_efficiency_;
-            TH1D* mu1_efficiency_;
-            TH1D* mu0_scale_factor_;
-            TH1D* mu1_scale_factor_;
-            TH1D* mu0_phi_;
-            TH1D* mu1_phi_;
-            TH1D* mu0_charge_;
-            TH1D* mu1_charge_;
-            TH1D* mu0_tracker_layers_;
-            TH1D* mu1_tracker_layers_;
-            TH1D* mu0_deltaR_truth_;
-            TH1D* mu1_deltaR_truth_;
-            TH1D* mu0_deltaR_z_muon_;
-            TH1D* mu1_deltaR_z_muon_;
-            TH1D* n_truth_matched_jpsi_muons_;
 
             TH1D* jet_pt_;
             TH1D* jet_eta_;

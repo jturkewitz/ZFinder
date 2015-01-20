@@ -96,7 +96,9 @@ bool
 JPsiMuonFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
    using namespace edm;
-   bool found_four_muons = false;
+   bool found_four_jpsi_muons = false;
+   bool found_two_z_muons = false;
+   bool found_z_and_jpsi = false;
    //bool found_two_electrons = false;
 /*
 #ifdef THIS_IS_AN_EVENTSETUP_EXAMPLE
@@ -137,24 +139,45 @@ JPsiMuonFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
    //  found_two_electrons = true;
    //}
 
-   int n_muons = 0;
-   int n_antimuons = 0;
+   int n_jpsi_muons = 0;
+   int n_jpsi_antimuons = 0;
+   int n_z_muons = 0;
+   int n_z_antimuons = 0;
    for(unsigned int i = 0; i < muons_h->size(); ++i) {
      reco::Muon muon = muons_h->at(i);
-     if ( muon.pt() > 2 ) {
+     //check for muons forming a Z
+     if ( muon.pt() > 18 ) {
        if ( muon.charge() == -1) {
-           n_muons++;
+           n_z_muons++;
        }
        if ( muon.charge() == 1) {
-           n_antimuons++;
+           n_z_antimuons++;
        }
      }
+
+     //check for muons forming a J/Psi, note that we want a j/psi independent from the z,
+     //so crudely we require 4 "j/psi" muons as the j/psi pT requirement is looser
+     if ( muon.pt() > 2.5 ) {
+       if ( muon.charge() == -1) {
+           n_jpsi_muons++;
+       }
+       if ( muon.charge() == 1) {
+           n_jpsi_antimuons++;
+       }
+     }
+
    }
-   if ( n_muons >= 2 && n_antimuons >= 2 ) {
-     found_four_muons = true;
+   if ( n_jpsi_muons >= 2 && n_jpsi_antimuons >= 2 ) {
+     found_four_jpsi_muons = true;
+   }
+   if (n_z_muons >= 1 && n_z_antimuons >= 1 ) {
+     found_two_z_muons = true;
+   }
+   if (found_four_jpsi_muons && found_two_z_muons ) {
+     found_z_and_jpsi = true;
    }
 
-   return (found_four_muons);
+   return (found_z_and_jpsi);
 }
 
 // ------------ method called once each job just before starting event loop  ------------

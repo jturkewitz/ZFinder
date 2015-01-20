@@ -280,12 +280,59 @@ namespace zf {
       jpsi_scale_factor_->GetXaxis()->SetTitle("Jpsi Scale factor");
       jpsi_scale_factor_->GetYaxis()->SetTitle("Counts / 0.01");
 
+      // jpsi_reco_pt_vs_jpsi_truth_pt
+      const std::string jpsi_reco_pt_vs_jpsi_truth_pt_name = "jpsi_reco_pt_vs_jpsi_truth_pt";
+      jpsi_reco_pt_vs_jpsi_truth_pt_ = tdir.make<TH2D>(jpsi_reco_pt_vs_jpsi_truth_pt_name.c_str(), jpsi_reco_pt_vs_jpsi_truth_pt_name.c_str(), 100, 0., 100., 100, 0.0, 100);
+      jpsi_reco_pt_vs_jpsi_truth_pt_->GetXaxis()->SetTitle("truth pT [GeV]");
+      jpsi_reco_pt_vs_jpsi_truth_pt_->GetYaxis()->SetTitle("reco pT [GeV]");
+
+      // jpsi_truth_pt_minus_jpsi_reco_pt
+      const std::string jpsi_truth_pt_minus_jpsi_reco_pt_name = "jpsi_truth_pt_minus_jpsi_reco_pt";
+      jpsi_truth_pt_minus_jpsi_reco_pt_ = tdir.make<TH1D>(jpsi_truth_pt_minus_jpsi_reco_pt_name.c_str(), jpsi_truth_pt_minus_jpsi_reco_pt_name.c_str(), 200, -10., 10.);
+      jpsi_truth_pt_minus_jpsi_reco_pt_->GetXaxis()->SetTitle("truth pT - reco pT [GeV]");
+      jpsi_truth_pt_minus_jpsi_reco_pt_->GetYaxis()->SetTitle("Counts / 0.1 GeV");
+
+      // jpsi_trigger_obj_mu0_pt
+      const std::string jpsi_trigger_obj_mu0_pt_name = "jpsi_trigger_obj_mu0_pt";
+      jpsi_trigger_obj_mu0_pt_ = tdir.make<TH1D>(jpsi_trigger_obj_mu0_pt_name.c_str(), jpsi_trigger_obj_mu0_pt_name.c_str(), 1000, 0., 100.);
+      jpsi_trigger_obj_mu0_pt_->GetXaxis()->SetTitle("jpsi trigger object mu0 pT [GeV]");
+      jpsi_trigger_obj_mu0_pt_->GetYaxis()->SetTitle("Counts / 0.1 GeV");
+
+      // jpsi_trigger_obj_mu1_pt
+      const std::string jpsi_trigger_obj_mu1_pt_name = "jpsi_trigger_obj_mu1_pt";
+      jpsi_trigger_obj_mu1_pt_ = tdir.make<TH1D>(jpsi_trigger_obj_mu1_pt_name.c_str(), jpsi_trigger_obj_mu1_pt_name.c_str(), 1000, 0., 100.);
+      jpsi_trigger_obj_mu1_pt_->GetXaxis()->SetTitle("jpsi trigger object mu1 pT [GeV]");
+      jpsi_trigger_obj_mu1_pt_->GetYaxis()->SetTitle("Counts / 0.1 GeV");
+
+      // jpsi_trigger_obj_mu0_pt_minus_reco_mu0_pt
+      const std::string jpsi_trigger_obj_mu0_pt_minus_reco_mu0_pt_name = "jpsi_trigger_obj_mu0_pt_minus_reco_mu0_pt";
+      jpsi_trigger_obj_mu0_pt_minus_reco_mu0_pt_ = tdir.make<TH1D>(jpsi_trigger_obj_mu0_pt_minus_reco_mu0_pt_name.c_str(), jpsi_trigger_obj_mu0_pt_minus_reco_mu0_pt_name.c_str(), 1000, -10., 10.);
+      jpsi_trigger_obj_mu0_pt_minus_reco_mu0_pt_->GetXaxis()->SetTitle("trigger mu0 difference reco mu0 pT [GeV]");
+      jpsi_trigger_obj_mu0_pt_minus_reco_mu0_pt_->GetYaxis()->SetTitle("Counts / 0.1 GeV");
+
+      // jpsi_trigger_obj_mu1_pt_minus_reco_mu1_pt
+      const std::string jpsi_trigger_obj_mu1_pt_minus_reco_mu1_pt_name = "jpsi_trigger_obj_mu1_pt_minus_reco_mu1_pt";
+      jpsi_trigger_obj_mu1_pt_minus_reco_mu1_pt_ = tdir.make<TH1D>(jpsi_trigger_obj_mu1_pt_minus_reco_mu1_pt_name.c_str(), jpsi_trigger_obj_mu1_pt_minus_reco_mu1_pt_name.c_str(), 1000, -10., 10.);
+      jpsi_trigger_obj_mu1_pt_minus_reco_mu1_pt_->GetXaxis()->SetTitle("trigger mu1 difference reco mu1 pT [GeV]");
+      jpsi_trigger_obj_mu1_pt_minus_reco_mu1_pt_->GetYaxis()->SetTitle("Counts / 0.02 GeV");
+
+      // jpsi_cos_mu0
+      const std::string jpsi_cos_mu0_name = "jpsi_cos_mu0";
+      jpsi_cos_mu0_ = tdir.make<TH1D>(jpsi_cos_mu0_name.c_str(), jpsi_cos_mu0_name.c_str(), 400, -2., 2.);
+      jpsi_cos_mu0_->GetXaxis()->SetTitle("jpsi mu0 cos(theta)");
+      jpsi_cos_mu0_->GetYaxis()->SetTitle("Counts / 0.01 ");
+
+      // jpsi_cos_mu1
+      const std::string jpsi_cos_mu1_name = "jpsi_cos_mu1";
+      jpsi_cos_mu1_ = tdir.make<TH1D>(jpsi_cos_mu1_name.c_str(), jpsi_cos_mu1_name.c_str(), 400, -2., 2.);
+      jpsi_cos_mu1_->GetXaxis()->SetTitle("jpsi mu1 cos(theta)");
+      jpsi_cos_mu1_->GetYaxis()->SetTitle("Counts / 0.01 ");
+
       // jpsi_pt_vs_rap
       const std::string jpsi_pt_vs_rap_name = "jpsi_pt_vs_rap";
       jpsi_pt_vs_rap_ = tdir.make<TH2D>(jpsi_pt_vs_rap_name.c_str(), jpsi_pt_vs_rap_name.c_str(), 100, -5., 5., 200, 0., 200.);
       jpsi_pt_vs_rap_->GetXaxis()->SetTitle("jpsi Rapidity");
       jpsi_pt_vs_rap_->GetYaxis()->SetTitle("jpsi Pt");
-
 
       // jpsi_vtx_distance_z_vtx_x
       const std::string jpsi_vtx_distance_z_vtx_x_name = "jpsi_vtx_x - z_vtx_x";
@@ -644,7 +691,7 @@ namespace zf {
       // mu1_pt
       const std::string mu1_pt_name = "p_{T,mu_{1}}";
       mu1_pt_ = tdir.make<TH1D>(mu1_pt_name.c_str(), mu1_pt_name.c_str(), 400, 0., 200.);
-      mu1_pt_->GetXaxis()->SetTitle("p_{T,mu_{0}}");
+      mu1_pt_->GetXaxis()->SetTitle("p_{T,mu_{1}}");
       mu1_pt_->GetYaxis()->SetTitle("Counts / 0.5 GeV");
 
       // mu0_eta_
@@ -1052,7 +1099,10 @@ namespace zf {
 
       int n_jpsi = 0;
       for (unsigned int i = 0; i < zfe.reco_jpsi.m.size() ; ++i ) {
-        if (APPLY_MUON_MIN_PT_ && !zfe.reco_jpsi.has_high_pt_muons.at(i) )  {
+        //TODO should fold in eta window cut here??
+        //TODO should fold in jpsi pT window cut here??
+        if (APPLY_MUON_MIN_PT_ && (!zfe.reco_jpsi.has_high_pt_muons.at(i) || !zfe.reco_jpsi.has_muons_in_eta_window.at(i) || 
+            !zfe.reco_jpsi.is_high_pt.at(i) ) )  {
           continue;
         }
         if (APPLY_SOFT_MUONS_ && !zfe.reco_jpsi.has_soft_id_muons.at(i) ) {
@@ -1077,6 +1127,18 @@ namespace zf {
         jpsi_pt_->Fill(zfe.reco_jpsi.pt.at(i), event_weight);
         jpsi_efficiency_->Fill(zfe.reco_jpsi.jpsi_efficiency.at(i), event_weight);
         jpsi_scale_factor_->Fill(zfe.reco_jpsi.jpsi_scale_factor.at(i), event_weight);
+        jpsi_trigger_obj_mu0_pt_->Fill(zfe.reco_jpsi.trigger_object_mu0_pt.at(i), event_weight);
+        jpsi_trigger_obj_mu1_pt_->Fill(zfe.reco_jpsi.trigger_object_mu1_pt.at(i), event_weight);
+        jpsi_trigger_obj_mu0_pt_minus_reco_mu0_pt_->Fill(zfe.reco_jpsi.trigger_object_mu0_pt.at(i) - zfe.reco_jpsi.muon0.at(i).pt() , event_weight);
+        jpsi_trigger_obj_mu1_pt_minus_reco_mu1_pt_->Fill(zfe.reco_jpsi.trigger_object_mu1_pt.at(i) - zfe.reco_jpsi.muon1.at(i).pt() , event_weight);
+        jpsi_cos_mu0_->Fill(zfe.reco_jpsi.cos_jpsi_mu0.at(i), event_weight);
+        jpsi_cos_mu1_->Fill(zfe.reco_jpsi.cos_jpsi_mu1.at(i), event_weight);
+        if (!zfe.is_real_data) {
+          for (unsigned int j = 0; j < zfe.truth_jpsi.m.size() ; ++j ) {
+            jpsi_reco_pt_vs_jpsi_truth_pt_->Fill(zfe.truth_jpsi.pt.at(j), zfe.reco_jpsi.pt.at(i), event_weight); 
+            jpsi_truth_pt_minus_jpsi_reco_pt_->Fill(zfe.truth_jpsi.pt.at(j) - zfe.reco_jpsi.pt.at(i), event_weight);
+          }
+        }
         jpsi_pt_vs_rap_->Fill(zfe.reco_jpsi.y.at(i), zfe.reco_jpsi.pt.at(i) , event_weight);
         jpsi_vtx_distance_z_vtx_x_->Fill( zfe.reco_jpsi.distance_x.at(i), event_weight);
         jpsi_vtx_distance_z_vtx_y_->Fill( zfe.reco_jpsi.distance_y.at(i), event_weight);
@@ -1093,42 +1155,29 @@ namespace zf {
         jpsi_tau_xy_very_fine_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight); // multiply by 1000 to go from ns to ps
 
         //pt
-        //TODO testing rapidity slice
         if ( zfe.reco_jpsi.pt.at(i) < 10.0 ) {
           jpsi_tau_xy_very_fine_ptUnder10_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight); // multiply by 1000 to go from ns to ps
-          if ( fabs(zfe.reco_jpsi.y.at(i)) <= 0.3) {
-            jpsi_mass_fine_ptUnder10_->Fill(zfe.reco_jpsi.m.at(i), event_weight);
-          }
+          jpsi_mass_fine_ptUnder10_->Fill(zfe.reco_jpsi.m.at(i), event_weight);
         }
         if ( zfe.reco_jpsi.pt.at(i) >= 10.0 && zfe.reco_jpsi.pt.at(i) < 15 ) {
           jpsi_tau_xy_very_fine_pt10to15_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight); // multiply by 1000 to go from ns to ps
-          if ( fabs(zfe.reco_jpsi.y.at(i)) <= 0.3) {
-            jpsi_mass_fine_pt10to15_->Fill(zfe.reco_jpsi.m.at(i), event_weight);
-          }
+          jpsi_mass_fine_pt10to15_->Fill(zfe.reco_jpsi.m.at(i), event_weight);
         }
         if ( zfe.reco_jpsi.pt.at(i) >= 15.0 && zfe.reco_jpsi.pt.at(i) < 20 ) {
           jpsi_tau_xy_very_fine_pt15to20_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight); // multiply by 1000 to go from ns to ps
-          if ( fabs(zfe.reco_jpsi.y.at(i)) <= 0.3) {
-            jpsi_mass_fine_pt15to20_->Fill(zfe.reco_jpsi.m.at(i), event_weight);
-          }
+          jpsi_mass_fine_pt15to20_->Fill(zfe.reco_jpsi.m.at(i), event_weight);
         }
         if ( zfe.reco_jpsi.pt.at(i) >= 20.0 && zfe.reco_jpsi.pt.at(i) < 25 ) {
           jpsi_tau_xy_very_fine_pt20to25_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight); // multiply by 1000 to go from ns to ps
-          if ( fabs(zfe.reco_jpsi.y.at(i)) <= 0.3) {
-            jpsi_mass_fine_pt20to25_->Fill(zfe.reco_jpsi.m.at(i), event_weight);
-          }
+          jpsi_mass_fine_pt20to25_->Fill(zfe.reco_jpsi.m.at(i), event_weight);
         }
         if ( zfe.reco_jpsi.pt.at(i) >= 25.0 && zfe.reco_jpsi.pt.at(i) < 30 ) {
           jpsi_tau_xy_very_fine_pt25to30_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight); // multiply by 1000 to go from ns to ps
-          if ( fabs(zfe.reco_jpsi.y.at(i)) <= 0.3) {
-            jpsi_mass_fine_pt25to30_->Fill(zfe.reco_jpsi.m.at(i), event_weight);
-          }
+          jpsi_mass_fine_pt25to30_->Fill(zfe.reco_jpsi.m.at(i), event_weight);
         }
         if ( zfe.reco_jpsi.pt.at(i) >= 30.0 ) {
           jpsi_tau_xy_very_fine_ptAbove30_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight); // multiply by 1000 to go from ns to ps
-          if ( fabs(zfe.reco_jpsi.y.at(i)) <= 0.3) {
-            jpsi_mass_fine_ptAbove30_->Fill(zfe.reco_jpsi.m.at(i), event_weight);
-          }
+          jpsi_mass_fine_ptAbove30_->Fill(zfe.reco_jpsi.m.at(i), event_weight);
         }
 
         //rap
@@ -1269,7 +1318,9 @@ namespace zf {
         muon_jet_phi_z_phi_->Fill(zfe.reco_z.phi , zfe.reco_muon_jets.phi.at(i), event_weight);
         //TODO is this extra for loop needed?
         for (unsigned int j = 0; j < zfe.reco_jpsi.m.size() ; ++j ) {
-          if (APPLY_MUON_MIN_PT_ && !zfe.reco_jpsi.has_high_pt_muons.at(j) )  {
+          //TODO should fold in eta window cut here??
+          if (APPLY_MUON_MIN_PT_ && (!zfe.reco_jpsi.has_high_pt_muons.at(j) || !zfe.reco_jpsi.has_muons_in_eta_window.at(j) 
+                || !zfe.reco_jpsi.is_high_pt.at(j)) )  {
             continue;
           }
           if (APPLY_SOFT_MUONS_ && !zfe.reco_jpsi.has_soft_id_muons.at(j) ) {
@@ -1339,7 +1390,8 @@ namespace zf {
         //if (APPLY_VERTEX_Z_POS_WINDOW_ && fabs(zfe.truth_jpsi.distance_z.at(i)) > MAX_JPSI_VERTEX_Z_DISPLACEMENT ) {
         //  continue;
         //}
-        if (APPLY_MUON_MIN_PT_ && !zfe.truth_jpsi.has_high_pt_muons.at(i) ) {
+        //TODO eta cut needed here?? jpsi pT cut needed here?? || !zfe.truth_jpsi.is_high_pt.at(i) not really needed as included in ZFinderEvent for mc change this??
+        if (APPLY_MUON_MIN_PT_ && (!zfe.truth_jpsi.has_high_pt_muons.at(i) || !zfe.truth_jpsi.has_muons_in_eta_window.at(i) ) ) {
           continue;
         }
 

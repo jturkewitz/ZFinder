@@ -24,8 +24,8 @@ process.maxEvents = cms.untracked.PSet(
         )
 
 process.source = cms.Source("PoolSource",
-    ##fileNames = cms.untracked.vstring( 'file:/hdfs/cms/user/turkewitz/ZPhysics/JPsiSkim/MuOnia/Run2012B/jpsiTriggerSkim_198_1_U0I.root')
-    fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/MuOnia2012B_Dimuon0_Skim/MuOnia2012B_Dimuon0_Skim_000-pool.root')
+    fileNames = cms.untracked.vstring( 'file:/hdfs/cms/user/turkewitz/ZPhysics/JPsiSkim/MuOnia/Run2012B/jpsiTriggerSkim_198_1_U0I.root')
+    ##fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/MuOnia2012B_Dimuon0_Skim/MuOnia2012B_Dimuon0_Skim_000-pool.root')
 )
 
 process.TFileService = cms.Service("TFileService",
@@ -64,7 +64,8 @@ process.triggerSelection = cms.EDFilter( "TriggerResultsFilter",
     ##  'HLT_Dimuon8_Jpsi_v*',
     ##  'HLT_Dimuon10_Jpsi_v*'),
     triggerConditions = cms.vstring(
-      'HLT_Dimuon0_Jpsi_v*'), ##dimuon8 and dimuon10 have double-peaked jpsi lifetime distribution
+      ##'HLT_Dimuon0_Jpsi_v*'), ##dimuon8 and dimuon10 have double-peaked jpsi lifetime distribution
+      'HLT_Dimuon8_Jpsi_v*'), ##dimuon8 and dimuon10 have double-peaked jpsi lifetime distribution
     hltResults = cms.InputTag( "TriggerResults", "", "HLT" ),
     l1tResults = cms.InputTag( "" ),
     l1tIgnoreMask = cms.bool( False ),

@@ -25,6 +25,7 @@ Implementation:
 #include <map>  // std::map
 #include <string>  // std::string
 #include <utility>  // std::pair
+#include <iostream>  // std::cout, std::endl
 
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
@@ -47,6 +48,11 @@ Implementation:
 #include "ZFinder/Event/interface/ZFinderPlotter.h"  // ZFinderPlotter
 #include "ZFinder/Event/interface/ZFinderCuts.h"  // ZFinderCuts
 
+// HLT information
+#include "DataFormats/Common/interface/TriggerResults.h"
+#include "FWCore/Common/interface/TriggerNames.h"
+#include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
+
 //
 // class declaration
 //
@@ -58,6 +64,12 @@ class ZFinder : public edm::EDAnalyzer {
 
     static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
+    //TODO TESTING HLT PRESCALE
+    //std::string triggerName ;
+    //std::string hltMenuLabel_;
+    //HLTConfigProvider hltConfig_;
+    //std::pair<int,int> pair2;
+    //////////////////////////
 
   private:
     virtual void beginJob() ;
@@ -92,6 +104,13 @@ class ZFinder : public edm::EDAnalyzer {
 //
 ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
   //now do what ever initialization is needed
+
+  //TODO TESTING HLT PRESCALES ??////////////
+  //hltMenuLabel_ = iConfig.getParameter<std::string>("HLTMenuLabel");
+  //hltMenuLabel_ = iConfig.getParameter<std::string>("hltTriggerSummaryAOD");
+  //hltMenuLabel_ = iConfig.getParameter<std::string>("HLT");
+  //std::pair<int,int> prescaleValues(iEvent, iSetup, triggerName);
+  /////////////////////////////////////////////////////////
 
   // Setup plotters
   edm::Service<TFileService> fs;
@@ -139,7 +158,8 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
   zfp_dimuon_jpsi_soft = new zf::ZFinderPlotter(tdir_dimuon_jpsi_soft, !USE_MC, APPLY_MUON_MIN_PT, APPLY_SOFT_MUONS);
   zfp_dimuon_jpsi_vtx_compatible = new zf::ZFinderPlotter(tdir_dimuon_jpsi_vtx_compatible, !USE_MC, APPLY_MUON_MIN_PT, APPLY_SOFT_MUONS, APPLY_DIMUON_VTX_COMPATIBILITY);
   zfp_dimuon_jpsi_primary_vertex = new zf::ZFinderPlotter(tdir_dimuon_jpsi_primary_vertex, !USE_MC, APPLY_MUON_MIN_PT, APPLY_SOFT_MUONS, APPLY_DIMUON_VTX_COMPATIBILITY, !APPLY_JPSI_MASS_WINDOW, APPLY_VERTEX_Z_POS_WINDOW);
-  zfp_jpsi = new zf::ZFinderPlotter(tdir_jpsi, !USE_MC, APPLY_MUON_MIN_PT, APPLY_SOFT_MUONS, APPLY_DIMUON_VTX_COMPATIBILITY, APPLY_JPSI_MASS_WINDOW);
+  //TODO should I apply vertex z pos window here??
+  zfp_jpsi = new zf::ZFinderPlotter(tdir_jpsi, !USE_MC, APPLY_MUON_MIN_PT, APPLY_SOFT_MUONS, APPLY_DIMUON_VTX_COMPATIBILITY, APPLY_JPSI_MASS_WINDOW, APPLY_VERTEX_Z_POS_WINDOW);
 
   zfp_dielectron_z = new zf::ZFinderPlotter(tdir_dielectron_z);
   zfp_dielectron_z_good = new zf::ZFinderPlotter(tdir_dielectron_z_good);
@@ -176,6 +196,23 @@ ZFinder::~ZFinder() {
 void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
   using namespace edm;
   using namespace zf;
+
+
+  //TODO TESTING ability to print prescale //
+  //// Combined L1T (pair.first) and HLT (pair.second) prescales per HLT path
+  ////std::pair<int,int> prescaleValues(const edm::Event& iEvent, const edm::EventSetup& iSetup, const std::string& trigger) const;
+  ////hltConfig_.init(iRun,iSetup,processName_,changed)
+  ////triggerName = "HLT_Dimuon0_Jpsi_v18";
+  //triggerName = "HLT_Dimuon0_Jpsi_v15"; //this one worked! 1 200
+  ////pair = hltConfig_.prescaleValues(iEvent, iSetup, triggerName);
+  //std::cout << "testA" << std::endl;
+  //pair2 = hltConfig_.prescaleValues(iEvent, iSetup, triggerName);
+  //std::cout << "testB" << std::endl;
+  ////std::cout << "Trigger prescales: " << pair2 << std::endl;
+  //std::cout << "Trigger prescales: " << pair2.first << " and second " << pair2.second << std::endl;
+  ////pair = HLTConfigProvider::prescaleValues(iEvent, iSetup, triggerName);
+  //// any one negative => error in retrieving this (L1T or HLT) prescale
+  // ///////////////////////////////////////////////////////////////////
 
   zf::ZFinderEvent zfe(iEvent, iSetup, iConfig_);
 
@@ -259,7 +296,18 @@ void ZFinder::endJob() {
 }
 
 // ------------ method called when starting to processes a run  ------------
-void ZFinder::beginRun(edm::Run const&, edm::EventSetup const&) {
+//void ZFinder::beginRun(edm::Run const&, edm::EventSetup const&) {
+void ZFinder::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup) {
+  //TODO TESTING ??? ///
+  //bool changed = true;
+  ////string hltMenuLabel2_ = "test";
+  ////hltMenuLabel_ = "hltTriggerSummaryAOD";
+  //hltMenuLabel_ = "HLT";
+  ////if (hltConfig_.init(iRun, iSetup, hltMenuLabel_, changed) ) {
+  //if (hltConfig_.init(iRun, iSetup, hltMenuLabel_, changed) ) {
+  //
+  //}
+  /////////////////////////////////////////////////////////////////
 }
 
 // ------------ method called when ending the processing of a run  ------------

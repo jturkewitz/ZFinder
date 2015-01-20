@@ -10,6 +10,7 @@
 #include "TH1.h"
 #include "TH2.h"
 #include "TGraph.h"
+#include "TLegend.h"
 
 // RooFit
 #include "RooAddPdf.h"
@@ -312,12 +313,23 @@ int RooFitLifetimeAndMass(
   dimuon_mass_fitframe = dimuon_mass.frame( Title("Dimuon" ));
   //dimuon_mass_fitframe->SetName(0); // Unset title
   dimuon_mass_data_hist.plotOn(dimuon_mass_fitframe);
-  mass_tau_xy_fitpdf.plotOn(dimuon_mass_fitframe, LineColor(kRed-2));
-  mass_tau_xy_fitpdf.plotOn(dimuon_mass_fitframe, Components(m_sig_tau_sig), LineColor(kBlue-2));
-  mass_tau_xy_fitpdf.plotOn(dimuon_mass_fitframe, Components(m_sig_tau_bg), LineColor(kMagenta-2));
-  mass_tau_xy_fitpdf.plotOn(dimuon_mass_fitframe, Components(m_bg_tau_sig), LineColor(kCyan-2));
-  mass_tau_xy_fitpdf.plotOn(dimuon_mass_fitframe, Components(m_bg_tau_bg), LineColor(kGreen-2));
+  mass_tau_xy_fitpdf.plotOn(dimuon_mass_fitframe, LineColor(kRed-2), RooFit::Name("total"));
+  mass_tau_xy_fitpdf.plotOn(dimuon_mass_fitframe, Components(m_sig_tau_sig), LineColor(kBlue-2), RooFit::Name("prompt j/psi"));
+  mass_tau_xy_fitpdf.plotOn(dimuon_mass_fitframe, Components(m_sig_tau_bg), LineColor(kMagenta-2), RooFit::Name("non-prompt j/psi"));
+  mass_tau_xy_fitpdf.plotOn(dimuon_mass_fitframe, Components(m_bg_tau_sig), LineColor(kCyan-2), RooFit::Name("prompt continuum"));
+  mass_tau_xy_fitpdf.plotOn(dimuon_mass_fitframe, Components(m_bg_tau_bg), LineColor(kGreen-2), RooFit::Name("non-prompt continuum"));
+
+
   dimuon_mass_fitframe->Draw();
+  Double_t xl1=.58, yl1=0.55, xl2=xl1+.3, yl2=yl1+.325;
+  TLegend *leg = new TLegend(xl1,yl1,xl2,yl2);
+  leg->SetFillColor(kWhite);
+  leg->AddEntry(dimuon_mass_fitframe->findObject("total"),"total","l");
+  leg->AddEntry(dimuon_mass_fitframe->findObject("prompt j/psi"),"prompt j/psi","l");
+  leg->AddEntry(dimuon_mass_fitframe->findObject("non-prompt j/psi"),"non-prompt j/psi","l");
+  leg->AddEntry(dimuon_mass_fitframe->findObject("prompt continuum"),"prompt continuum","l");
+  leg->AddEntry(dimuon_mass_fitframe->findObject("non-prompt continuum"),"non-prompt continuum","l");
+  leg->Draw();
   std::string inclusive_jpsi_mass_image_name = OUT_DIR;
   inclusive_jpsi_mass_image_name.append("inclusive_jpsi_mass");
   inclusive_jpsi_mass_image_name.append(".png");
@@ -329,12 +341,22 @@ int RooFitLifetimeAndMass(
   //gPad->SetLogy();
   RooPlot* tau_xy_fitframe = tau_xy.frame( Title("J/Psi Lifetime") , Range(tau_xy_min, tau_xy_max ));
   dimuon_mass_data_hist.plotOn(tau_xy_fitframe);
-  mass_tau_xy_fitpdf.plotOn(tau_xy_fitframe, LineColor(kRed-2));
-  mass_tau_xy_fitpdf.plotOn(tau_xy_fitframe, Components(m_sig_tau_sig), LineColor(kBlue-2));
-  mass_tau_xy_fitpdf.plotOn(tau_xy_fitframe, Components(m_sig_tau_bg), LineColor(kMagenta-2));
-  mass_tau_xy_fitpdf.plotOn(tau_xy_fitframe, Components(m_bg_tau_sig), LineColor(kCyan-2));
-  mass_tau_xy_fitpdf.plotOn(tau_xy_fitframe, Components(m_bg_tau_bg), LineColor(kGreen-2));
+  mass_tau_xy_fitpdf.plotOn(tau_xy_fitframe, LineColor(kRed-2), RooFit::Name("total"));
+  mass_tau_xy_fitpdf.plotOn(tau_xy_fitframe, Components(m_sig_tau_sig), LineColor(kBlue-2), RooFit::Name("prompt j/psi"));
+  mass_tau_xy_fitpdf.plotOn(tau_xy_fitframe, Components(m_sig_tau_bg), LineColor(kMagenta-2), RooFit::Name("non-prompt j/psi"));
+  mass_tau_xy_fitpdf.plotOn(tau_xy_fitframe, Components(m_bg_tau_sig), LineColor(kCyan-2), RooFit::Name("prompt continuum"));
+  mass_tau_xy_fitpdf.plotOn(tau_xy_fitframe, Components(m_bg_tau_bg), LineColor(kGreen-2), RooFit::Name("non-prompt continuum"));
   tau_xy_fitframe->Draw();
+
+  TLegend *leg2 = new TLegend(xl1,yl1,xl2,yl2);
+  leg2->SetFillColor(kWhite);
+  leg2->AddEntry(dimuon_mass_fitframe->findObject("total"),"total","l");
+  leg2->AddEntry(dimuon_mass_fitframe->findObject("prompt j/psi"),"prompt j/psi","l");
+  leg2->AddEntry(dimuon_mass_fitframe->findObject("non-prompt j/psi"),"non-prompt j/psi","l");
+  leg2->AddEntry(dimuon_mass_fitframe->findObject("prompt continuum"),"prompt continuum","l");
+  leg2->AddEntry(dimuon_mass_fitframe->findObject("non-prompt continuum"),"non-prompt continuum","l");
+  leg2->Draw();
+
   std::string inclusive_jpsi_tau_xy_image_name = OUT_DIR;
   inclusive_jpsi_tau_xy_image_name.append("inclusive_jpsi_tau_xy");
   inclusive_jpsi_tau_xy_image_name.append(".png");
@@ -352,12 +374,22 @@ int RooFitLifetimeAndMass(
     zjpsi_tau_xy_fitframe = zjpsi_tau_xy.frame( Title("J/Psi Lifetime (Z->mumu + J/Psi->mumu)") );
   }
   zjpsi_dimuon_mass_data_hist.plotOn(zjpsi_tau_xy_fitframe);
-  zjpsi_mass_tau_xy_fitpdf.plotOn(zjpsi_tau_xy_fitframe, LineColor(kRed-2));
-  zjpsi_mass_tau_xy_fitpdf.plotOn(zjpsi_tau_xy_fitframe, Components(zjpsi_m_sig_tau_sig), LineColor(kBlue-2));
-  zjpsi_mass_tau_xy_fitpdf.plotOn(zjpsi_tau_xy_fitframe, Components(zjpsi_m_sig_tau_bg), LineColor(kMagenta-2));
-  zjpsi_mass_tau_xy_fitpdf.plotOn(zjpsi_tau_xy_fitframe, Components(zjpsi_m_bg_tau_sig), LineColor(kCyan-2));
-  zjpsi_mass_tau_xy_fitpdf.plotOn(zjpsi_tau_xy_fitframe, Components(zjpsi_m_bg_tau_bg), LineColor(kGreen-2));
+  zjpsi_mass_tau_xy_fitpdf.plotOn(zjpsi_tau_xy_fitframe, LineColor(kRed-2), RooFit::Name("total"));
+  zjpsi_mass_tau_xy_fitpdf.plotOn(zjpsi_tau_xy_fitframe, Components(zjpsi_m_sig_tau_sig), LineColor(kBlue-2), RooFit::Name("prompt j/psi"));
+  zjpsi_mass_tau_xy_fitpdf.plotOn(zjpsi_tau_xy_fitframe, Components(zjpsi_m_sig_tau_bg), LineColor(kMagenta-2), RooFit::Name("non-prompt j/psi"));
+  zjpsi_mass_tau_xy_fitpdf.plotOn(zjpsi_tau_xy_fitframe, Components(zjpsi_m_bg_tau_sig), LineColor(kCyan-2), RooFit::Name("prompt continuum"));
+  zjpsi_mass_tau_xy_fitpdf.plotOn(zjpsi_tau_xy_fitframe, Components(zjpsi_m_bg_tau_bg), LineColor(kGreen-2), RooFit::Name("non-prompt continuum"));
   zjpsi_tau_xy_fitframe->Draw();
+
+  TLegend *leg3 = new TLegend(xl1,yl1,xl2,yl2);
+  leg3->SetFillColor(kWhite);
+  leg3->AddEntry(dimuon_mass_fitframe->findObject("total"),"total","l");
+  leg3->AddEntry(dimuon_mass_fitframe->findObject("prompt j/psi"),"prompt j/psi","l");
+  leg3->AddEntry(dimuon_mass_fitframe->findObject("non-prompt j/psi"),"non-prompt j/psi","l");
+  leg3->AddEntry(dimuon_mass_fitframe->findObject("prompt continuum"),"prompt continuum","l");
+  leg3->AddEntry(dimuon_mass_fitframe->findObject("non-prompt continuum"),"non-prompt continuum","l");
+  leg3->Draw();
+
   std::string zjpsi_tau_xy_image_name = OUT_DIR;
   if (USE_Z_TO_EE) {
     zjpsi_tau_xy_image_name.append("ztoee_jpsi_tau_xy");
@@ -380,12 +412,22 @@ int RooFitLifetimeAndMass(
     zjpsi_dimuon_mass_fitframe = zjpsi_dimuon_mass.frame( Title("Dimuon Mass (Z->mumu + Dimuon)") );
   }
   zjpsi_dimuon_mass_data_hist.plotOn(zjpsi_dimuon_mass_fitframe);
-  zjpsi_mass_tau_xy_fitpdf.plotOn(zjpsi_dimuon_mass_fitframe, LineColor(kRed-2));
-  zjpsi_mass_tau_xy_fitpdf.plotOn(zjpsi_dimuon_mass_fitframe, Components(zjpsi_m_sig_tau_sig), LineColor(kBlue-2));
-  zjpsi_mass_tau_xy_fitpdf.plotOn(zjpsi_dimuon_mass_fitframe, Components(zjpsi_m_sig_tau_bg), LineColor(kMagenta-2));
-  zjpsi_mass_tau_xy_fitpdf.plotOn(zjpsi_dimuon_mass_fitframe, Components(zjpsi_m_bg_tau_sig), LineColor(kCyan-2));
-  zjpsi_mass_tau_xy_fitpdf.plotOn(zjpsi_dimuon_mass_fitframe, Components(zjpsi_m_bg_tau_bg), LineColor(kGreen-2));
+  zjpsi_mass_tau_xy_fitpdf.plotOn(zjpsi_dimuon_mass_fitframe, LineColor(kRed-2), RooFit::Name("total"));
+  zjpsi_mass_tau_xy_fitpdf.plotOn(zjpsi_dimuon_mass_fitframe, Components(zjpsi_m_sig_tau_sig), LineColor(kBlue-2), RooFit::Name("prompt j/psi"));
+  zjpsi_mass_tau_xy_fitpdf.plotOn(zjpsi_dimuon_mass_fitframe, Components(zjpsi_m_sig_tau_bg), LineColor(kMagenta-2), RooFit::Name("non-prompt j/psi"));
+  zjpsi_mass_tau_xy_fitpdf.plotOn(zjpsi_dimuon_mass_fitframe, Components(zjpsi_m_bg_tau_sig), LineColor(kCyan-2), RooFit::Name("prompt continuum"));
+  zjpsi_mass_tau_xy_fitpdf.plotOn(zjpsi_dimuon_mass_fitframe, Components(zjpsi_m_bg_tau_bg), LineColor(kGreen-2), RooFit::Name("non-prompt continuum"));
   zjpsi_dimuon_mass_fitframe->Draw();
+
+  TLegend *leg4 = new TLegend(xl1,yl1,xl2,yl2);
+  leg4->SetFillColor(kWhite);
+  leg4->AddEntry(dimuon_mass_fitframe->findObject("total"),"total","l");
+  leg4->AddEntry(dimuon_mass_fitframe->findObject("prompt j/psi"),"prompt j/psi","l");
+  leg4->AddEntry(dimuon_mass_fitframe->findObject("non-prompt j/psi"),"non-prompt j/psi","l");
+  leg4->AddEntry(dimuon_mass_fitframe->findObject("prompt continuum"),"prompt continuum","l");
+  leg4->AddEntry(dimuon_mass_fitframe->findObject("non-prompt continuum"),"non-prompt continuum","l");
+  leg4->Draw();
+
   std::string zjpsi_dimuon_mass_image_name = OUT_DIR;
   if (USE_Z_TO_EE) {
     zjpsi_dimuon_mass_image_name.append("ztoee_jpsi_dimuon_mass");

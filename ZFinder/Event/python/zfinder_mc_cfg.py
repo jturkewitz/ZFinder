@@ -33,12 +33,17 @@ process.source = cms.Source("PoolSource",
     ##fileNames = cms.untracked.vstring( 'file:/home/user1/turkewitz/Work/CMSSW/CMSSW_5_3_7_patch6_ZbMCStudy/src/Jpsi_MM_step3_test.root')
     ##fileNames = cms.untracked.vstring( 'file:/home/user1/turkewitz/Work/CMSSW/CMSSW_5_3_7_patch6_ZbMCStudy/src/Jpsi_MM_step3_test7.root')
     ##fileNames = cms.untracked.vstring( 'file:/home/user1/turkewitz/Work/CMSSW/CMSSW_5_3_7_patch6_ZbMCStudy/src/Jpsi_MM_step2_test10.root')
-    fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/tmp/Jpsi_MM_step3_test15_pileup.root')
+    ##fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/tmp/Jpsi_MM_step3_test15_pileup.root')
+    ##fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/tmp/Jpsi_MM_step3_test30.root')
+    ##fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/tmp/Jpsi_MM_step3_test31.root')
+    ##fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/tmp/Jpsi_MM_step3_test33.root')
+    fileNames = cms.untracked.vstring( 'file:/hdfs/cms/user/turkewitz/tmp/Jpsi_MM_step3_test34.root')
+    ##fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/tmp/Jpsi_MM_step3_test34.root')
     ##fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/tmp/Jpsi_MM_step3_test13_pileup.root')
 )
 
 process.TFileService = cms.Service("TFileService",
-        fileName = cms.string("zfinder_mc.root")
+        fileName = cms.string("zfinder_mc_test34_test2.root")
         )
 
 #
@@ -56,6 +61,27 @@ process.kt6PFJetsForIsolation.Rho_EtaMax = cms.double(2.5)
 from CommonTools.ParticleFlow.Tools.pfIsolation import setupPFElectronIso, setupPFMuonIso
 process.eleIsoSequence = setupPFElectronIso(process, 'gsfElectrons')
 process.pfiso = cms.Sequence(process.pfParticleSelectionSequence + process.eleIsoSequence)
+
+
+###testing TODO remove this when not needed!!
+##for jpsi MuOnia triggerign
+##process.triggerSelection = cms.EDFilter( "TriggerResultsFilter",
+##    ##triggerConditions = cms.vstring(
+##    ##  'HLT_Dimuon0_Jpsi_v*',
+##    ##  'HLT_Dimuon8_Jpsi_v*',
+##    ##  'HLT_Dimuon10_Jpsi_v*'),
+##    triggerConditions = cms.vstring(
+##      ##'HLT_Dimuon0_Jpsi_v*'), ##dimuon8 and dimuon10 have double-peaked jpsi lifetime distribution
+##      'HLT_Dimuon10_Jpsi_v*'), ##dimuon8 and dimuon10 have double-peaked jpsi lifetime distribution
+##    hltResults = cms.InputTag( "TriggerResults", "", "HLT" ),
+##    l1tResults = cms.InputTag( "" ),
+##    l1tIgnoreMask = cms.bool( False ),
+##    l1techIgnorePrescales = cms.bool( False ),
+##    daqPartitions = cms.uint32( 1 ),
+##    throw = cms.bool( False )
+##    ##throw = cms.bool( True )
+##)
+
 
 #
 # ZFinder
@@ -89,5 +115,6 @@ process.ZFinder = cms.EDAnalyzer('ZFinder',
         )
 
 # RUN
+##process.p = cms.Path(process.triggerSelection * process.kt6PFJetsForIsolation * process.pfiso * process.ZFinder)
 process.p = cms.Path(process.kt6PFJetsForIsolation * process.pfiso * process.ZFinder)
 process.schedule = cms.Schedule(process.p)

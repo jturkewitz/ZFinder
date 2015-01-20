@@ -19,6 +19,7 @@
 #include "DataFormats/Math/interface/deltaPhi.h"
 #include "DataFormats/Math/interface/deltaR.h"
 
+
 // for vertexing                                                                                                                                                                                        
 #include "FWCore/Framework/interface/ESHandle.h"
 #include "TrackingTools/TransientTrack/interface/TransientTrack.h"
@@ -279,6 +280,7 @@ namespace zf {
     found_dimuon_z_compatible_vertex = false;
     found_z_to_muons = false;
 
+    //TODO z rapidity
     if (reco_z_from_muons.m > -1 &&
         z_muon0.pt() >= MIN_Z_MUON_PT && z_muon1.pt() >= MIN_Z_MUON_PT ) {
       found_high_pt_muons_from_z = true;
@@ -334,6 +336,7 @@ namespace zf {
       for ( int i=0 ; i < (n_reco_muons - 1) ; ++i ) {
         const reco::Muon muon0 = muons_h->at(i);
         //Ensure that muons are not shared between JPsi and Z candidates
+        //TODO should we require tight muons here?? Other quality cuts to ensure there is actually a good Z necessary?
         if (found_z_to_muons && (i == leading_z_muon_list_position || i == sub_leading_z_muon_list_position)) {
           continue;
         }
@@ -389,7 +392,9 @@ namespace zf {
     for (unsigned int i = 0; i < reco_jpsi.m.size() ; ++i ) {
       if (reco_jpsi.has_muons_in_eta_window.at(i) ) {
         found_dimuon_jpsi_with_muons_in_eta_window = true;
-        if ( reco_jpsi.has_high_pt_muons.at(i) ) {
+        //TODO should each cut level have its own flag??
+        if ( reco_jpsi.has_high_pt_muons.at(i) && reco_jpsi.is_high_pt.at(i) ) {
+          //TODO rename this flag or use an additional flag for high pT j/psi
           found_dimuon_jpsi_with_high_pt_muons = true;
           if (reco_jpsi.has_soft_id_muons.at(i) ) {
             found_dimuon_jpsi_with_soft_id_and_high_pt_muons = true;
@@ -629,6 +634,15 @@ namespace zf {
     double py = jpsi_lv.py();
     double pz = jpsi_lv.pz();
     double pt = jpsi_lv.pt();
+
+    double mu0_px = mu0.px();
+    double mu0_py = mu0.py();
+    double mu0_pz = mu0.pz();
+
+    double mu1_px = mu1.px();
+    double mu1_py = mu1.py();
+    double mu1_pz = mu1.pz();
+
  
     if ( found_z_to_electrons ) {
       x = (pos_x - reco_z.vtx.position().x() );
@@ -704,6 +718,9 @@ namespace zf {
     if (reco_z.phi != -1000) {
       reco_jpsi.z_delta_phi.push_back ( fabs( deltaPhi( reco_z.phi , jpsi_lv.phi() ) ) );
     }
+    else if (reco_z_from_muons.phi != -1000) {
+      reco_jpsi.z_delta_phi.push_back ( fabs( deltaPhi( reco_z_from_muons.phi , jpsi_lv.phi() ) ) );
+    }
     else {
       reco_jpsi.z_delta_phi.push_back ( -1000 );
     }
@@ -724,6 +741,27 @@ namespace zf {
     //if ( mu1.pt() > 4 ) {
     //  std::cout << "eta1: " << mu1.eta() << " pT: " << mu1.pt() << " eff " << mu1_eff <<  std::endl; 
     //}
+
+
+    //TODO do this with a function, instead of by hand, cos(theta) = dot_product / (a.len() * b.len() )
+    double dot_product_mu0 = px * mu0_px + py * mu0_py + pz * mu0_pz;
+    double dot_product_mu1 = px * mu1_px + py * mu1_py + pz * mu1_pz;
+
+    double jpsi_p_mag = pow((px * px + py * py + pz * pz), 0.5);
+    double mu0_p_mag = pow((mu0_px * mu0_px + mu0_py * mu0_py + mu0_pz * mu0_pz), 0.5);
+    double mu1_p_mag = pow((mu1_px * mu1_px + mu1_py * mu1_py + mu1_pz * mu1_pz), 0.5);
+    double cos_jpsi_mu0 = dot_product_mu0 / (jpsi_p_mag * mu0_p_mag);
+    double cos_jpsi_mu1 = dot_product_mu1 / (jpsi_p_mag * mu1_p_mag);
+
+    //TODO clean this up
+    //std::cout << "px " << px << " py " << py << " pz " << pz << std::endl;
+    //std::cout << "mu0_px " << mu0_px << " mu0_py " << mu0_py << " mu0_pz " << mu0_pz << std::endl;
+    //std::cout << "mu0_p_mag " << mu0_p_mag << std::endl;
+    //std::cout << "jpsi_p_mag " << jpsi_p_mag << std::endl;
+    //std::cout << "cos_jpsi_mu0 " << cos_jpsi_mu0 << std::endl;
+
+    reco_jpsi.cos_jpsi_mu0.push_back(cos_jpsi_mu0);
+    reco_jpsi.cos_jpsi_mu1.push_back(cos_jpsi_mu1);
 
     
     if (mu0.pt() >= mu1.pt() ) {
@@ -799,7 +837,17 @@ namespace zf {
             mu1.pfIsolationR04().sumPhotonEtHighThreshold ) / mu1.pt());
     }
 
+
+
     //Cut results
+    
+    if ( jpsi_lv.pt() >= MIN_JPSI_PT ) {
+      reco_jpsi.is_high_pt.push_back(true);
+    }
+    else {
+      reco_jpsi.is_high_pt.push_back(false);
+    }
+
     if (mu0.pt() > mu1.pt() ) {
       if ( mu0.pt() >= MIN_JPSI_LEADING_MUON_PT && mu1.pt() >= MIN_JPSI_SUBLEADING_MUON_PT ) {
         reco_jpsi.has_high_pt_muons.push_back(true);
@@ -811,7 +859,7 @@ namespace zf {
     else {
       if ( mu1.pt() >= MIN_JPSI_LEADING_MUON_PT && mu0.pt() >= MIN_JPSI_SUBLEADING_MUON_PT ) {
         reco_jpsi.has_high_pt_muons.push_back(true);
-      } 
+      }
       else {
         reco_jpsi.has_high_pt_muons.push_back(false);
       }
@@ -1105,7 +1153,8 @@ namespace zf {
       truth_jpsi.y.push_back( 0.5 * log(JPSIEPP / JPSIEMP));
       truth_jpsi.eta.push_back( jpsi.at(i)->eta());
       if (jpsi_muon0.at(i)->pt() > jpsi_muon1.at(i)->pt() ) {
-        if (jpsi_muon0.at(i)->pt() >= MIN_JPSI_LEADING_MUON_PT && jpsi_muon1.at(i)->pt() >= MIN_JPSI_SUBLEADING_MUON_PT ) {
+        if (jpsi_muon0.at(i)->pt() >= MIN_JPSI_LEADING_MUON_PT && jpsi_muon1.at(i)->pt() >= MIN_JPSI_SUBLEADING_MUON_PT 
+            && jpsi.at(i)->pt() >= MIN_JPSI_PT) {
           truth_jpsi.has_high_pt_muons.push_back( true );
         }
         else {
@@ -1113,14 +1162,20 @@ namespace zf {
         }
       }
       else {
-        if (jpsi_muon1.at(i)->pt() >= MIN_JPSI_LEADING_MUON_PT && jpsi_muon0.at(i)->pt() >= MIN_JPSI_SUBLEADING_MUON_PT ) {
+        if (jpsi_muon1.at(i)->pt() >= MIN_JPSI_LEADING_MUON_PT && jpsi_muon0.at(i)->pt() >= MIN_JPSI_SUBLEADING_MUON_PT 
+            && jpsi.at(i)->pt() >= MIN_JPSI_PT) {
           truth_jpsi.has_high_pt_muons.push_back( true );
         }
         else {
           truth_jpsi.has_high_pt_muons.push_back( false );
         }
       }
-
+      if (fabs(jpsi_muon0.at(i)->eta() <= MAX_JPSI_MUON_ETA) && fabs(jpsi_muon1.at(i)->eta() <= MAX_JPSI_MUON_ETA) ) {
+        truth_jpsi.has_muons_in_eta_window.push_back( true );
+      }
+      else {
+        truth_jpsi.has_muons_in_eta_window.push_back( false );
+      }
 
       if (jpsi.at(i)->mass() <= MAX_JPSI_MASS && jpsi.at(i)->mass() >= MIN_JPSI_MASS ) {
         truth_jpsi.is_within_jpsi_mass_window.push_back( true );
@@ -1178,6 +1233,38 @@ namespace zf {
         set_e1_trig(tmp_e1);
       }
     }
+    //TODO look at muon trigger for Z
+
+    //TODO TESTING JPSI trigger
+    //for (unsigned int i = 0; i < reco_jpsi.m.size() ; ++i ) {
+    //  //const trigger::TriggerObject* trig_obj_jpsimuon0 = GetBestMatchedTriggerObject(iEvent, JPSI_TRIGGER, reco_jpsi.muon0.at(i).eta(), reco_jpsi.muon0.at(i).phi());
+    //  //const trigger::TriggerObject* trig_obj_jpsimuon1 = GetBestMatchedTriggerObject(iEvent, JPSI_TRIGGER, reco_jpsi.muon1.at(i).eta(), reco_jpsi.muon1.at(i).phi());
+    //  const trigger::TriggerObject* trig_obj_jpsimuon0 = GetBestMatchedTriggerObject(iEvent, JPSI_TRIGGER, reco_jpsi.muon0.at(i).eta(), reco_jpsi.muon0.at(i).phi());
+    //  const trigger::TriggerObject* trig_obj_jpsimuon1 = GetBestMatchedTriggerObject(iEvent, JPSI_TRIGGER, reco_jpsi.muon1.at(i).eta(), reco_jpsi.muon1.at(i).phi());
+    //  if (trig_obj_jpsimuon0 != NULL) {
+    //    std::cout << "jpsimuon0 trig_obj pt: " << trig_obj_jpsimuon0->pt() << std::endl;
+    //  }
+    //  if (trig_obj_jpsimuon1 != NULL) {
+    //    std::cout << "jpsimuon1 trig_obj pt: " << trig_obj_jpsimuon1->pt() << std::endl;
+    //  }
+    //}
+    for (unsigned int i = 0; i < reco_jpsi.m.size() ; ++i ) {
+      const trigger::TriggerObject* trig_obj_jpsimuon0 = GetBestMatchedTriggerObject(iEvent, JPSI_TRIGGER, reco_jpsi.muon0.at(i).eta(), reco_jpsi.muon0.at(i).phi());
+      const trigger::TriggerObject* trig_obj_jpsimuon1 = GetBestMatchedTriggerObject(iEvent, JPSI_TRIGGER, reco_jpsi.muon1.at(i).eta(), reco_jpsi.muon1.at(i).phi());
+      if (trig_obj_jpsimuon0 != NULL) {
+        reco_jpsi.trigger_object_mu0_pt.push_back(trig_obj_jpsimuon0->pt());
+      }
+      else {
+        reco_jpsi.trigger_object_mu0_pt.push_back( -9000.0);
+      }
+      if (trig_obj_jpsimuon1 != NULL) {
+        reco_jpsi.trigger_object_mu1_pt.push_back(trig_obj_jpsimuon1->pt());
+      }
+      else {
+        reco_jpsi.trigger_object_mu1_pt.push_back( -9000.0);
+      }
+    }
+      
   }
 
   ZFinderElectron* ZFinderEvent::AddRecoElectron(reco::GsfElectron electron) {

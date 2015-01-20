@@ -23,14 +23,15 @@ process.maxEvents = cms.untracked.PSet(
         )
 
 process.source = cms.Source("PoolSource",
-    #fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/ZPhysics/tmp/Run2012AMuOnia8401CB0B-D634-E211-8247-002618943919.root')
+    ##fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/ZPhysics/tmp/Run2012AMuOnia8401CB0B-D634-E211-8247-002618943919.root')
     fileNames = cms.untracked.vstring( 'file:/hdfs/cms/user/turkewitz/ZPhysics/JPsiSkim/DoubleElectron/2012B/jpsiSkimUpdated/jpsiSkimUpdated_999-pool.root')
 )
 process.triggerSelection = cms.EDFilter( "TriggerResultsFilter",
     triggerConditions = cms.vstring(
-      'HLT_Dimuon0_Jpsi_v*',
-      'HLT_Dimuon8_Jpsi_v*',
-      'HLT_Dimuon10_Jpsi_v*'),
+      'HLT_Dimuon0_Jpsi_v*'),
+      ##'HLT_Dimuon0_Jpsi_v*',
+      ##'HLT_Dimuon8_Jpsi_v*',
+      ##'HLT_Dimuon10_Jpsi_v*'),
     hltResults = cms.InputTag( "TriggerResults", "", "HLT" ),
     l1tResults = cms.InputTag( "" ),
     l1tIgnoreMask = cms.bool( False ),
@@ -43,6 +44,16 @@ process.triggerSelection = cms.EDFilter( "TriggerResultsFilter",
 ##process.TFileService = cms.Service("TFileService",
 ##        fileName = cms.string("skim.root")
 ##        )
+##
+### Run only on lumis specified in the lumi file
+### Recipe from:
+### https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePythonTips#Use_a_JSON_file_of_good_lumi_sec
+##from FWCore.ParameterSet.Types import untracked, VLuminosityBlockRange
+##from FWCore.PythonUtilities.LumiList import LumiList
+####json_file for electrons
+##json_file = "/home/user1/turkewitz/Work/CMSSW_5_3_13_ZJPsi/src/Metadata/lumi_json/Run2012ABCD.json" # File location
+##run_2012abcd_lumis = LumiList(filename = json_file).getCMSSWString().split(',')
+##process.source.lumisToProcess = untracked(VLuminosityBlockRange(run_2012abcd_lumis))
 
 ##process.jpsiFilter = cms.EDFilter("JPsiFilter")
 
