@@ -328,9 +328,12 @@ namespace zf {
       jpsi_cos_mu1_->GetXaxis()->SetTitle("jpsi mu1 cos(theta)");
       jpsi_cos_mu1_->GetYaxis()->SetTitle("Counts / 0.01 ");
 
+      //TODO variable bin size to use this histogram as an efficiency map
+      double bins[] = {8,8.5,9,9.5,10,12,15,100};
+      int bin_number = 7;
       // jpsi_pt_vs_rap
       const std::string jpsi_pt_vs_rap_name = "jpsi_pt_vs_rap";
-      jpsi_pt_vs_rap_ = tdir.make<TH2D>(jpsi_pt_vs_rap_name.c_str(), jpsi_pt_vs_rap_name.c_str(), 100, -5., 5., 200, 0., 200.);
+      jpsi_pt_vs_rap_ = tdir.make<TH2D>(jpsi_pt_vs_rap_name.c_str(), jpsi_pt_vs_rap_name.c_str(), 21, -2.1, 2.1, bin_number, bins);
       jpsi_pt_vs_rap_->GetXaxis()->SetTitle("jpsi Rapidity");
       jpsi_pt_vs_rap_->GetYaxis()->SetTitle("jpsi Pt");
 
@@ -1402,6 +1405,7 @@ namespace zf {
         jpsi_mass_fine_->Fill(zfe.truth_jpsi.m.at(i), event_weight);
         jpsi_rapidity_->Fill(zfe.truth_jpsi.y.at(i), event_weight);
         jpsi_pt_->Fill(zfe.truth_jpsi.pt.at(i), event_weight);
+        jpsi_pt_vs_rap_->Fill(zfe.truth_jpsi.y.at(i), zfe.truth_jpsi.pt.at(i) , event_weight);
 
         mu0_pt_->Fill(zfe.jpsi_muon0.at(i)->pt(), event_weight);
         mu0_eta_->Fill(zfe.jpsi_muon0.at(i)->eta(), event_weight);

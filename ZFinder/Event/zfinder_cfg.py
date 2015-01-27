@@ -5,7 +5,8 @@ process = cms.Process("Demo")
 # Set up message output and logging
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.load("TrackingTools/TransientTrack/TransientTrackBuilder_cfi")
-process.load("Configuration.Geometry.GeometryIdeal_cff")
+##process.load("Configuration.Geometry.GeometryIdeal_cff")
+process.load('Configuration.StandardSequences.GeometryDB_cff')
 process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
@@ -43,7 +44,8 @@ process.source = cms.Source("PoolSource",
     ##fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/ZPhysics/tmp/6642D763-9872-E211-BF3C-00259074AE5C.root')
     ##fileNames = cms.untracked.vstring( 'file:/home/user1/turkewitz/Work/CMSSW_5_3_13_ZJPsi/src/jpsiMuMu_Zee_Skim.root')
     ##fileNames = cms.untracked.vstring( 'file:/home/user1/turkewitz/Work/CMSSW_5_3_13_ZJPsi/src/jpsiMuMu_Zmumu_Skim.root')
-    fileNames = cms.untracked.vstring( 'file:/home/user1/turkewitz/Work/CMSSW_5_3_13_ZJPsi/src/jpsiMuMu_Zmumu_Skim.root')
+    ##fileNames = cms.untracked.vstring( 'file:/home/user1/turkewitz/Work/CMSSW_5_3_13_ZJPsi/src/jpsiMuMu_Zmumu_Skim.root')
+    fileNames = cms.untracked.vstring( 'file:/hdfs/cms/user/turkewitz/ZPhysics/JPsiSkim/DoubleElectronSkim/jpsiTest222_ZJpsiSkimDoubleMuon2012B/jpsiTest222_ZJpsiSkimDoubleMuon2012B_000.root')
     ##fileNames = cms.untracked.vstring( 'file:/home/user1/turkewitz/Work/CMSSW/CMSSW_5_3_7_patch6_ZbMCStudy/src/Jpsi_MM_step3_test.root')
     #fileNames = cms.untracked.vstring( 'file:/home/user1/turkewitz/Work/CMSSW_5_3_13_ZJPsi/src/jpsiSkimMuonsUpdated.root')
     ##fileNames = cms.untracked.vstring( 'root://xrootd.unl.edu//store/mc/Summer12_DR53X/JPsiToMuMu_2MuPtEtaFilter_tuneD6T_8TeV-pythia6-evtgen/AODSIM/PU_S10_START53_V7A-v2/00000/0012F37A-CE09-E211-ABDA-00261894396F.root')
@@ -67,6 +69,15 @@ run_2012abcd_lumis = LumiList(filename = json_file).getCMSSWString().split(',')
 process.source.lumisToProcess = untracked(VLuminosityBlockRange(run_2012abcd_lumis))
 
 #
+# electron regression
+#
+
+from ZFinder.Event.electron_regression_cfi import CalibratedElectrons, RandomNumberGeneratorService, ElectronEnergyRegressions
+process.RandomNumberGeneratorService = RandomNumberGeneratorService
+process.CalibratedElectrons = CalibratedElectrons
+process.eleRegressionEnergy = ElectronEnergyRegressions
+
+#
 # rho value for isolation
 #
 
@@ -79,7 +90,8 @@ process.kt6PFJetsForIsolation.Rho_EtaMax = cms.double(2.5)
 #
 
 from CommonTools.ParticleFlow.Tools.pfIsolation import setupPFElectronIso, setupPFMuonIso
-process.eleIsoSequence = setupPFElectronIso(process, 'gsfElectrons')
+##process.eleIsoSequence = setupPFElectronIso(process, 'gsfElectrons')
+process.eleIsoSequence = setupPFElectronIso(process, 'CalibratedElectrons:calibratedGsfElectrons')
 process.pfiso = cms.Sequence(process.pfParticleSelectionSequence + process.eleIsoSequence)
 
 #
@@ -91,7 +103,9 @@ process.pfiso = cms.Sequence(process.pfParticleSelectionSequence + process.eleIs
 
 process.ZFinder = cms.EDAnalyzer('ZFinder',
         # General tags
-        ecalElectronsInputTag  = cms.InputTag("gsfElectrons"),
+        # Use the calibrated electrons we make with process.CalibratedElectrons
+        ecalElectronsInputTag = cms.InputTag("CalibratedElectrons", "calibratedGsfElectrons"),
+        ##ecalElectronsInputTag  = cms.InputTag("gsfElectrons"),
         muonsInputTag          = cms.InputTag("muons"),
         conversionsInputTag    = cms.InputTag("allConversions"),
         beamSpotInputTag       = cms.InputTag("offlineBeamSpot"),
@@ -113,5 +127,6 @@ process.ZFinder = cms.EDAnalyzer('ZFinder',
         )
 
 # RUN
-process.p = cms.Path(process.kt6PFJetsForIsolation * process.pfiso * process.ZFinder)
+process.p = cms.Path(process.kt6PFJetsForIsolation * process.eleRegressionEnergy * process.CalibratedElectrons * process.pfiso * process.ZFinder)
+#process.p = cms.Path(process.kt6PFJetsForIsolation * process.eleRegressionEnergy * process.CalibratedElectrons * process.pfiso )
 process.schedule = cms.Schedule(process.p)

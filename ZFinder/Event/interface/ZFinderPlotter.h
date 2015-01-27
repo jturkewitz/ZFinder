@@ -81,6 +81,8 @@ namespace zf {
 
             TH1D* jpsi_rapidity_;
             TH1D* jpsi_pt_;
+            TH2D* jpsi_pt_vs_rap_;
+            //TH2D* jpsi_rap_vs_pt_;
             TH1D* jpsi_efficiency_;
             TH1D* jpsi_scale_factor_;
             TH2D* jpsi_reco_pt_vs_jpsi_truth_pt_;
@@ -113,7 +115,6 @@ namespace zf {
             TH1D* mu1_deltaR_z_muon_;
             TH1D* n_truth_matched_jpsi_muons_;
 
-            TH2D* jpsi_pt_vs_rap_;
             TH1D* jpsi_distance_;
             TH1D* jpsi_dist_err_;
             TH1D* jpsi_chi2_;

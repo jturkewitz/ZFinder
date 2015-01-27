@@ -43,7 +43,7 @@ process.source = cms.Source("PoolSource",
 )
 
 process.TFileService = cms.Service("TFileService",
-        fileName = cms.string("zfinder_mc_test34_test2.root")
+        fileName = cms.string("zfinder_mc_test34_test2_pileup_comparing.root")
         )
 
 #
@@ -55,13 +55,21 @@ process.kt6PFJetsForIsolation = kt4PFJets.clone( rParam = 0.6, doRhoFastjet = Tr
 process.kt6PFJetsForIsolation.Rho_EtaMax = cms.double(2.5)
 
 #
+# electron regression
+#
+from ZFinder.Event.electron_regression_cfi import CalibratedElectrons_MC, RandomNumberGeneratorService, ElectronEnergyRegressions_MC
+process.RandomNumberGeneratorService = RandomNumberGeneratorService
+process.CalibratedElectrons = CalibratedElectrons_MC
+process.eleRegressionEnergy = ElectronEnergyRegressions_MC
+
+#
 # particle flow isolation
 #
 
 from CommonTools.ParticleFlow.Tools.pfIsolation import setupPFElectronIso, setupPFMuonIso
-process.eleIsoSequence = setupPFElectronIso(process, 'gsfElectrons')
+##process.eleIsoSequence = setupPFElectronIso(process, 'gsfElectrons')
+process.eleIsoSequence = setupPFElectronIso(process, 'CalibratedElectrons:calibratedGsfElectrons')
 process.pfiso = cms.Sequence(process.pfParticleSelectionSequence + process.eleIsoSequence)
-
 
 ###testing TODO remove this when not needed!!
 ##for jpsi MuOnia triggerign
@@ -92,7 +100,9 @@ from ZFinder.Event.ZDefinitions_cfi import zdefs
 
 process.ZFinder = cms.EDAnalyzer('ZFinder',
         # General tags
-        ecalElectronsInputTag  = cms.InputTag("gsfElectrons"),
+        # Use the calibrated electrons we make with process.CalibratedElectrons
+        ecalElectronsInputTag = cms.InputTag("CalibratedElectrons", "calibratedGsfElectrons"),
+        ##ecalElectronsInputTag  = cms.InputTag("gsfElectrons"),
         muonsInputTag          = cms.InputTag("muons"),
         conversionsInputTag    = cms.InputTag("allConversions"),
         beamSpotInputTag       = cms.InputTag("offlineBeamSpot"),
@@ -113,8 +123,7 @@ process.ZFinder = cms.EDAnalyzer('ZFinder',
         pileup_era = cms.string("ABCD") # defaults to ABCD
         ##pileup_era = cms.string("B") # defaults to ABCD
         )
-
 # RUN
 ##process.p = cms.Path(process.triggerSelection * process.kt6PFJetsForIsolation * process.pfiso * process.ZFinder)
-process.p = cms.Path(process.kt6PFJetsForIsolation * process.pfiso * process.ZFinder)
+process.p = cms.Path(process.kt6PFJetsForIsolation * process.eleRegressionEnergy * process.CalibratedElectrons * process.pfiso * process.ZFinder)
 process.schedule = cms.Schedule(process.p)
