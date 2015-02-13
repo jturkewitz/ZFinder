@@ -84,8 +84,8 @@ int RooFitJpsiMass(
   //std::string inclusive_jpsi_hist = "ZFinder/Jpsi/";
   //std::string inclusive_jpsi_hist = "ZFinder/Dimuon/";
   std::string inclusive_jpsi_hist = "ZFinder/Dimuon_Jpsi_Primary_Vertex/";
-  //inclusive_jpsi_hist.append( "jpsi_mass" );
-  inclusive_jpsi_hist.append( "jpsi_mass_pt15to20" );
+  inclusive_jpsi_hist.append( "jpsi_mass" );
+  //inclusive_jpsi_hist.append( "jpsi_mass_pt15to20" );
   std::string jpsi_hist_name = "";
   jpsi_hist_name.append( "dimuon_mass");
 

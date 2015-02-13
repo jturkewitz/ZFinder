@@ -84,9 +84,11 @@ class ZFinder : public edm::EDAnalyzer {
     // ----------member data ---------------------------
     const edm::ParameterSet& iConfig_;
     zf::ZFinderPlotter *zfp_all;
-    zf::ZFinderPlotter *zfp_dimuon_jpsi, *zfp_dimuon_jpsi_soft, *zfp_dimuon_jpsi_vtx_compatible, *zfp_dimuon_jpsi_primary_vertex, *zfp_jpsi;
-    zf::ZFinderPlotter *zfp_dielectron_z, *zfp_dielectron_z_good, *zfp_dielectron_z_good_compatible_vertex, *zfp_z_to_electrons, *zfp_z_to_electrons_and_good_dimuon_jpsi, *zfp_z_to_electrons_and_jpsi;
-    zf::ZFinderPlotter *zfp_dimuon_z, *zfp_dimuon_z_good, *zfp_dimuon_z_good_compatible_vertex, *zfp_z_to_muons, *zfp_z_to_muons_and_good_dimuon_jpsi, *zfp_z_to_muons_and_jpsi;
+    zf::ZFinderPlotter *zfp_dimuon_jpsi, *zfp_dimuon_jpsi_soft, *zfp_dimuon_jpsi_vtx_compatible, *zfp_dimuon_jpsi_primary_vertex, *zfp_jpsi, *zfp_prompt_jpsi;
+    zf::ZFinderPlotter *zfp_dielectron_z, *zfp_dielectron_z_good, *zfp_dielectron_z_good_compatible_vertex, *zfp_z_to_electrons, 
+      *zfp_z_to_electrons_and_good_dimuon_jpsi, *zfp_z_to_electrons_and_jpsi, *zfp_z_to_electrons_and_prompt_jpsi;
+    zf::ZFinderPlotter *zfp_dimuon_z, *zfp_dimuon_z_good, *zfp_dimuon_z_good_compatible_vertex, *zfp_z_to_muons, 
+      *zfp_z_to_muons_and_good_dimuon_jpsi, *zfp_z_to_muons_and_jpsi, *zfp_z_to_muons_and_prompt_jpsi;
     zf::ZFinderPlotter *zfp_four_muons, *zfp_jpsi_and_two_muons;
     zf::ZFinderPlotter *zfp_all_mc, *zfp_jpsi_mc;
 };
@@ -122,6 +124,7 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
   TFileDirectory tdir_dimuon_jpsi_vtx_compatible(fs->mkdir("Dimuon_Jpsi_Vertex_Compatible"));
   TFileDirectory tdir_dimuon_jpsi_primary_vertex(fs->mkdir("Dimuon_Jpsi_Primary_Vertex"));
   TFileDirectory tdir_jpsi(fs->mkdir("Jpsi"));
+  TFileDirectory tdir_prompt_jpsi(fs->mkdir("Prompt_Jpsi"));
 
   TFileDirectory tdir_dielectron_z(fs->mkdir("Dielectron_Z"));
   TFileDirectory tdir_dielectron_z_good(fs->mkdir("Dielectron_Z_Good"));
@@ -129,6 +132,7 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
   TFileDirectory tdir_z_to_electrons(fs->mkdir("Z_To_Electrons"));
   TFileDirectory tdir_z_to_electrons_and_good_dimuon_jpsi(fs->mkdir("Z_To_Electrons_And_Good_Dimuon_Jpsi"));
   TFileDirectory tdir_z_to_electrons_and_jpsi(fs->mkdir("Z_To_Electrons_And_Jpsi"));
+  TFileDirectory tdir_z_to_electrons_and_prompt_jpsi(fs->mkdir("Z_To_Electrons_And_Prompt_Jpsi"));
 
   TFileDirectory tdir_dimuon_z(fs->mkdir("Dimuon_Z"));
   TFileDirectory tdir_dimuon_z_good(fs->mkdir("Dimuon_Z_Good"));
@@ -136,6 +140,7 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
   TFileDirectory tdir_z_to_muons(fs->mkdir("Z_To_Muons"));
   TFileDirectory tdir_z_to_muons_and_good_dimuon_jpsi(fs->mkdir("Z_To_Muons_And_Good_Dimuon_Jpsi"));
   TFileDirectory tdir_z_to_muons_and_jpsi(fs->mkdir("Z_To_Muons_And_Jpsi"));
+  TFileDirectory tdir_z_to_muons_and_prompt_jpsi(fs->mkdir("Z_To_Muons_And_Prompt_Jpsi"));
 
   TFileDirectory tdir_four_muons(fs->mkdir("Four_Muons"));
   TFileDirectory tdir_jpsi_and_two_muons(fs->mkdir("Jpsi_And_Two_Muons"));
@@ -149,6 +154,7 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
   const bool APPLY_DIMUON_VTX_COMPATIBILITY = true;
   const bool APPLY_JPSI_MASS_WINDOW = true;
   const bool APPLY_VERTEX_Z_POS_WINDOW = true;
+  const bool APPLY_PROMPT_JPSI_WINDOW = true;
 
   //dimuon => muon pt cut for now
   //TODO switch order of cuts? Other improvements?
@@ -160,6 +166,7 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
   zfp_dimuon_jpsi_primary_vertex = new zf::ZFinderPlotter(tdir_dimuon_jpsi_primary_vertex, !USE_MC, APPLY_MUON_MIN_PT, APPLY_SOFT_MUONS, APPLY_DIMUON_VTX_COMPATIBILITY, !APPLY_JPSI_MASS_WINDOW, APPLY_VERTEX_Z_POS_WINDOW);
   //TODO should I apply vertex z pos window here??
   zfp_jpsi = new zf::ZFinderPlotter(tdir_jpsi, !USE_MC, APPLY_MUON_MIN_PT, APPLY_SOFT_MUONS, APPLY_DIMUON_VTX_COMPATIBILITY, APPLY_JPSI_MASS_WINDOW, APPLY_VERTEX_Z_POS_WINDOW);
+  zfp_prompt_jpsi = new zf::ZFinderPlotter(tdir_prompt_jpsi, !USE_MC, APPLY_MUON_MIN_PT, APPLY_SOFT_MUONS, APPLY_DIMUON_VTX_COMPATIBILITY, APPLY_JPSI_MASS_WINDOW, APPLY_VERTEX_Z_POS_WINDOW, APPLY_PROMPT_JPSI_WINDOW);
 
   zfp_dielectron_z = new zf::ZFinderPlotter(tdir_dielectron_z);
   zfp_dielectron_z_good = new zf::ZFinderPlotter(tdir_dielectron_z_good);
@@ -167,6 +174,7 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
   zfp_z_to_electrons = new zf::ZFinderPlotter(tdir_z_to_electrons);
   zfp_z_to_electrons_and_good_dimuon_jpsi = new zf::ZFinderPlotter(tdir_z_to_electrons_and_good_dimuon_jpsi, !USE_MC, APPLY_MUON_MIN_PT, APPLY_SOFT_MUONS, APPLY_DIMUON_VTX_COMPATIBILITY, !APPLY_JPSI_MASS_WINDOW, APPLY_VERTEX_Z_POS_WINDOW);
   zfp_z_to_electrons_and_jpsi = new zf::ZFinderPlotter(tdir_z_to_electrons_and_jpsi, !USE_MC, APPLY_MUON_MIN_PT, APPLY_SOFT_MUONS, APPLY_DIMUON_VTX_COMPATIBILITY, APPLY_JPSI_MASS_WINDOW, APPLY_VERTEX_Z_POS_WINDOW);
+  zfp_z_to_electrons_and_prompt_jpsi = new zf::ZFinderPlotter(tdir_z_to_electrons_and_prompt_jpsi, !USE_MC, APPLY_MUON_MIN_PT, APPLY_SOFT_MUONS, APPLY_DIMUON_VTX_COMPATIBILITY, APPLY_JPSI_MASS_WINDOW, APPLY_VERTEX_Z_POS_WINDOW, APPLY_PROMPT_JPSI_WINDOW);
 
   zfp_dimuon_z = new zf::ZFinderPlotter(tdir_dimuon_z);
   zfp_dimuon_z_good = new zf::ZFinderPlotter(tdir_dimuon_z_good);
@@ -174,6 +182,7 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
   zfp_z_to_muons = new zf::ZFinderPlotter(tdir_z_to_muons);
   zfp_z_to_muons_and_good_dimuon_jpsi = new zf::ZFinderPlotter(tdir_z_to_muons_and_good_dimuon_jpsi, !USE_MC, APPLY_MUON_MIN_PT, APPLY_SOFT_MUONS, APPLY_DIMUON_VTX_COMPATIBILITY, !APPLY_JPSI_MASS_WINDOW, APPLY_VERTEX_Z_POS_WINDOW);
   zfp_z_to_muons_and_jpsi = new zf::ZFinderPlotter(tdir_z_to_muons_and_jpsi, !USE_MC, APPLY_MUON_MIN_PT, APPLY_SOFT_MUONS, APPLY_DIMUON_VTX_COMPATIBILITY, APPLY_JPSI_MASS_WINDOW, APPLY_VERTEX_Z_POS_WINDOW);
+  zfp_z_to_muons_and_prompt_jpsi = new zf::ZFinderPlotter(tdir_z_to_muons_and_prompt_jpsi, !USE_MC, APPLY_MUON_MIN_PT, APPLY_SOFT_MUONS, APPLY_DIMUON_VTX_COMPATIBILITY, APPLY_JPSI_MASS_WINDOW, APPLY_VERTEX_Z_POS_WINDOW, APPLY_PROMPT_JPSI_WINDOW);
 
 
   //TODO is this needed?
@@ -239,8 +248,11 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
           zfp_dimuon_jpsi_primary_vertex->Fill(zfe);
           if (zfe.found_jpsi) {
             zfp_jpsi->Fill(zfe);
-            if (zfe.found_four_muons) {
-              zfp_jpsi_and_two_muons->Fill(zfe);
+            if (zfe.found_prompt_jpsi) { 
+              zfp_prompt_jpsi->Fill(zfe);
+              if (zfe.found_four_muons) {
+                zfp_jpsi_and_two_muons->Fill(zfe);
+              }
             }
           }
         }
@@ -260,6 +272,9 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
             zfp_z_to_electrons_and_good_dimuon_jpsi->Fill(zfe);
             if ( zfe.found_jpsi ) {
               zfp_z_to_electrons_and_jpsi->Fill(zfe);
+              if (zfe.found_prompt_jpsi) {
+                zfp_z_to_electrons_and_prompt_jpsi->Fill(zfe);
+              }
             }
           }
         }
@@ -279,6 +294,9 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
             zfp_z_to_muons_and_good_dimuon_jpsi->Fill(zfe);
             if ( zfe.found_jpsi ) {
               zfp_z_to_muons_and_jpsi->Fill(zfe);
+              if (zfe.found_prompt_jpsi) {
+                zfp_z_to_muons_and_prompt_jpsi->Fill(zfe);
+              }
             }
           }
         }

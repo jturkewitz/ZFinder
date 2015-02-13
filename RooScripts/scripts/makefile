@@ -8,7 +8,7 @@ CC=g++ -g -O2
 CC11=${CC} -std=gnu++0x
 CCC=${CC} -c
 
-all: RooFitLifetime.exe RooFitPileupProb.exe RooFitPileupEstimation.exe RooFitJpsiMass.exe RooFitJpsiMassBackground.exe RooFitZMass.exe RooFitLifetimeAndMass.exe
+all: RooFitLifetime.exe RooFitPileupProb.exe RooFitPileupEstimation.exe RooFitJpsiMass.exe RooFitJpsiMassBackground.exe RooFitZMass.exe RooFitLifetimeAndMass.exe RooFitLifetimeAndMassCrystalBall.exe RooFitLifetimeAndMassSlices.exe
 
 RooFitLifetime.exe: RooFitLifetime.cpp
 	${CC} \
@@ -45,6 +45,16 @@ RooFitLifetimeAndMass.exe: RooFitLifetimeAndMass.cpp
 	${ROO_INCLUDES} \
 	-o RooFitLifetimeAndMass.exe \
 	RooFitLifetimeAndMass.cpp
+RooFitLifetimeAndMassCrystalBall.exe: RooFitLifetimeAndMassCrystalBall.cpp
+	${CC} \
+	${ROO_INCLUDES} \
+	-o RooFitLifetimeAndMassCrystalBall.exe \
+	RooFitLifetimeAndMassCrystalBall.cpp
+RooFitLifetimeAndMassSlices.exe: RooFitLifetimeAndMassSlices.cpp
+	${CC} \
+	${ROO_INCLUDES} \
+	-o RooFitLifetimeAndMassSlices.exe \
+	RooFitLifetimeAndMassSlices.cpp
 
 # All .o files rely on the .cpp files
 %.o:%.cpp
@@ -62,3 +72,5 @@ clean:
 	rm RooFitJpsiMassBackground_cpp.d RooFitJpsiMassBackground_cpp.so
 	rm RooFitZMass_cpp.d RooFitZMass_cpp.so
 	rm RooFitLifetimeAndMass_cpp.d RooFitLifetimeAndMass_cpp.so
+	rm RooFitLifetimeAndMassCrystalBall_cpp.d RooFitLifetimeAndMassCrystalBall_cpp.so
+	rm RooFitLifetimeAndMassSlices_cpp.d RooFitLifetimeAndMassSlices_cpp.so

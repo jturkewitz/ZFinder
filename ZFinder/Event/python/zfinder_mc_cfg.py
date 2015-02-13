@@ -38,12 +38,15 @@ process.source = cms.Source("PoolSource",
     ##fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/tmp/Jpsi_MM_step3_test31.root')
     ##fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/tmp/Jpsi_MM_step3_test33.root')
     fileNames = cms.untracked.vstring( 'file:/hdfs/cms/user/turkewitz/tmp/Jpsi_MM_step3_test34.root')
+    #/fileNames = cms.untracked.vstring( 'file:/data/whybee0a/user/turkewitz_2/test/turkewitz/jpsi_mc_Test41_step3/jpsi_mc_Test41_step3_000-pool.root',
+    #'file:/data/whybee0a/user/turkewitz_2/test/turkewitz/jpsi_mc_Test41_step3/jpsi_mc_Test41_step3_001-pool.root')
     ##fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/tmp/Jpsi_MM_step3_test34.root')
     ##fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/tmp/Jpsi_MM_step3_test13_pileup.root')
 )
 
 process.TFileService = cms.Service("TFileService",
-        fileName = cms.string("zfinder_mc_test34_test2_pileup_comparing.root")
+        ##fileName = cms.string("zfinder_mc_test34_test2_pileup_comparing.root")
+        fileName = cms.string("zfinder_mc_test34_JpsiMM.root")
         )
 
 #

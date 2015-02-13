@@ -21,7 +21,7 @@
 #include "RooDataHist.h"
 #include "RooDataSet.h"
 #include "RooFFTConvPdf.h"
-#include "RooFitLifetimeAndMass.h"
+#include "RooFitLifetimeAndMassCrystalBall.h"
 #include "RooFitResult.h"
 #include "RooFormulaVar.h"
 #include "RooGaussian.h"
@@ -41,7 +41,7 @@
 
 using namespace RooFit;
 
-int RooFitLifetimeAndMass(
+int RooFitLifetimeAndMassCrystalBall(
     const std::string& DATA_FILE_1,
     const std::string& DATA_FILE_2,
     const bool USE_Z_TO_EE,
@@ -59,7 +59,7 @@ int RooFitLifetimeAndMass(
     return 1;
   }
   // Pass the open files to the main RooFitter
-  const int RET_CODE = RooFitLifetimeAndMass(f_data_1, f_data_2, USE_Z_TO_EE, OUT_DIR);
+  const int RET_CODE = RooFitLifetimeAndMassCrystalBall(f_data_1, f_data_2, USE_Z_TO_EE, OUT_DIR);
 
   // Clean up and return the exit code
   delete f_data_1;
@@ -68,7 +68,7 @@ int RooFitLifetimeAndMass(
   return RET_CODE;
 }
 
-int RooFitLifetimeAndMass(
+int RooFitLifetimeAndMassCrystalBall(
     TFile* const DATA_FILE_1,
     TFile* const DATA_FILE_2,
     const bool USE_Z_TO_EE,
@@ -108,9 +108,6 @@ int RooFitLifetimeAndMass(
     
   std::string inclusive_jpsi_hist = "";
   inclusive_jpsi_hist.append("ZFinder/Dimuon_Jpsi_Primary_Vertex/");
-
-  //inclusive_jpsi_hist.append("dimuon_mass_vs_dimuon_tau_xy_fine");
-  //TODO testing
   inclusive_jpsi_hist.append("dimuon_mass_vs_dimuon_tau_xy_fine");
 
   std::string inclusive_jpsi_hist_name = "";
@@ -124,10 +121,8 @@ int RooFitLifetimeAndMass(
   else {
     zjpsi_hist.append("ZFinder/Z_To_Muons_And_Good_Dimuon_Jpsi/");
   }
-
+  //zjpsi_hist.append("dimuon_mass_vs_dimuon_tau_xy");
   zjpsi_hist.append("dimuon_mass_vs_dimuon_tau_xy_fine");
-  //TODO testing
-  //zjpsi_hist.append("dimuon_mass_vs_dimuon_tau_xy_fine_weighted");
   std::string zjpsi_hist_name = "";
   //zjpsi_hist_name.append( "z_and_dimuon_mass_vs_dimuon_tau_xy");
   zjpsi_hist_name.append( "z_and_dimuon_mass_vs_dimuon_tau_xy_fine");
@@ -164,12 +159,24 @@ int RooFitLifetimeAndMass(
   RooAddPdf tau_xy_gauss_sum_fitpdf("tau_xy_gauss_sum_fitpdf", "tau_xy_gauss_sum_fitpdf", RooArgList(prompt_gauss, prompt_gauss_2), RooArgList(frac_prompt_sharp));
 
 
-  RooRealVar dimuon_mean("dimuon_mean", "dimuon_mean", 3.1, 3.0, 3.2);
-  RooRealVar dimuon_sigma("dimuon_sigma", "dimuon_sigma", 0.02, 0.001, 0.1);
-  RooGaussian dimuon_gauss ("dimuon_gauss", "dimuon_gauss", dimuon_mass, dimuon_mean, dimuon_sigma);
+  //TODO testing c-ball function
+  //RooRealVar dimuon_mean("dimuon_mean", "dimuon_mean", 3.1, 3.0, 3.2);
+  //RooRealVar dimuon_sigma("dimuon_sigma", "dimuon_sigma", 0.02, 0.001, 0.1);
+  //RooGaussian dimuon_gauss ("dimuon_gauss", "dimuon_gauss", dimuon_mass, dimuon_mean, dimuon_sigma);
+
+  //RooRealVar dimuon_slope("dimuon_slope", "dimuon_slope", -0.1, -10., 10.);
+  //RooExponential dimuon_bg_exponential("dimuon_bg_exponential", "dimuon_bg_exponential", dimuon_mass, dimuon_slope);
+
+  RooRealVar mean("mean", "mean", 3.1, 3.00, 3.18);
+  RooRealVar sigma("sigma", "sigma", 0.05, 0.001, 0.1);
+  RooRealVar alpha("alpha", "alpha", 1.8, 1.0, 2.5);
+  RooRealVar n("n", "n", 2., 1.0, 100.);
+  //RooRealVar n("n", "n", 2.0);
+  RooCBShape crystal_ball ("crystal_ball", "crystal_ball", dimuon_mass, mean, sigma, alpha, n );
 
   RooRealVar dimuon_slope("dimuon_slope", "dimuon_slope", -0.1, -10., 10.);
   RooExponential dimuon_bg_exponential("dimuon_bg_exponential", "dimuon_bg_exponential", dimuon_mass, dimuon_slope);
+
 
 
   //RooRealVar mass_signal_tau_xy_signal_fraction("mass_signal_tau_xy_signal_fraction", "mass_signal_tau_xy_signal_fraction", 0.4, 0.0, 1.0);
@@ -181,8 +188,10 @@ int RooFitLifetimeAndMass(
   RooRealVar m_bg_tau_bg_frac("m_bg_tau_bg_frac", "m_bg_tau_bg_frac", 0.1, 0.0, 1.0);
   RooRealVar m_bg_tau_sig_frac("m_bg_tau_sig_frac", "m_bg_tau_sig_frac", 0.1, 0.0, 1.0);
 
-  RooProdPdf m_sig_tau_sig("m_sig_tau_sig", "m_sig_tau_sig", RooArgList(dimuon_gauss, tau_xy_gauss_sum_fitpdf ));
-  RooProdPdf m_sig_tau_bg("m_sig_tau_bg", "m_sig_tau_bg", RooArgList(dimuon_gauss, decay_exp ));
+  //RooProdPdf m_sig_tau_sig("m_sig_tau_sig", "m_sig_tau_sig", RooArgList(dimuon_gauss, tau_xy_gauss_sum_fitpdf ));
+  //RooProdPdf m_sig_tau_bg("m_sig_tau_bg", "m_sig_tau_bg", RooArgList(dimuon_gauss, decay_exp ));
+  RooProdPdf m_sig_tau_sig("m_sig_tau_sig", "m_sig_tau_sig", RooArgList(crystal_ball, tau_xy_gauss_sum_fitpdf ));
+  RooProdPdf m_sig_tau_bg("m_sig_tau_bg", "m_sig_tau_bg", RooArgList(crystal_ball, decay_exp ));
   RooProdPdf m_bg_tau_bg("m_bg_tau_bg", "m_bg_tau_bg", RooArgList(dimuon_bg_exponential, decay_exp ));
   RooProdPdf m_bg_tau_sig("m_bg_tau_sig", "m_bg_tau_sig", RooArgList(dimuon_bg_exponential, tau_xy_gauss_sum_fitpdf ));
 
@@ -225,40 +234,49 @@ int RooFitLifetimeAndMass(
   RooRealVar zjpsi_prompt_fraction("zjpsi_prompt_fraction", "zjpsi_prompt_fraction" , 0.01 , 0.0, 1);
   //RooAddPdf zjpsi_tau_xy_fitpdf("zjpsi_tau_xy_fitpdf", "zjpsi_tau_xy_fitpdf", RooArgList(zjpsi_tau_xy_gauss_sum_fitpdf, zjpsi_decay_exp), RooArgList(zjpsi_prompt_fraction));
 
-  double zjpsi_dimuon_mean_value = dimuon_mean.getVal();
-  double zjpsi_dimuon_sigma_value = dimuon_sigma.getVal();
-  double zjpsi_dimuon_gauss_value = dimuon_gauss.getVal();
+  //double zjpsi_dimuon_mean_value = dimuon_mean.getVal();
+  //double zjpsi_dimuon_sigma_value = dimuon_sigma.getVal();
+  //double zjpsi_dimuon_slope_value = dimuon_slope.getVal();
+
+  double zjpsi_mean_value = mean.getVal();
+  double zjpsi_sigma_value = sigma.getVal();
+  double zjpsi_alpha_value = alpha.getVal();
+  double zjpsi_n_value = n.getVal();
   double zjpsi_dimuon_slope_value = dimuon_slope.getVal();
 
-  RooRealVar zjpsi_dimuon_mean("zjpsi_dimuon_mean", "zjpsi_dimuon_mean", zjpsi_dimuon_mean_value);
-  RooRealVar zjpsi_dimuon_sigma("zjpsi_dimuon_sigma", "zjpsi_dimuon_sigma", zjpsi_dimuon_sigma_value);
-  RooGaussian zjpsi_dimuon_gauss ("zjpsi_dimuon_gauss", "zjpsi_dimuon_gauss", zjpsi_dimuon_mass, zjpsi_dimuon_mean, zjpsi_dimuon_sigma);
+  //RooRealVar zjpsi_dimuon_mean("zjpsi_dimuon_mean", "zjpsi_dimuon_mean", zjpsi_dimuon_mean_value);
+  //RooRealVar zjpsi_dimuon_sigma("zjpsi_dimuon_sigma", "zjpsi_dimuon_sigma", zjpsi_dimuon_sigma_value);
+  //RooGaussian zjpsi_dimuon_gauss ("zjpsi_dimuon_gauss", "zjpsi_dimuon_gauss", zjpsi_dimuon_mass, zjpsi_dimuon_mean, zjpsi_dimuon_sigma);
+
+  //RooRealVar zjpsi_dimuon_slope("zjpsi_dimuon_slope", "zjpsi_dimuon_slope", zjpsi_dimuon_slope_value);
+  //RooExponential zjpsi_dimuon_bg_exponential("zjpsi_dimuon_bg_exponential", "zjpsi_dimuon_bg_exponential", zjpsi_dimuon_mass, zjpsi_dimuon_slope);
+
+  RooRealVar zjpsi_mean("zjpsi_mean", "zjpsi_mean", zjpsi_mean_value);
+  RooRealVar zjpsi_sigma("zjpsi_sigma", "zjpsi_sigma", zjpsi_sigma_value);
+  RooRealVar zjpsi_alpha("zjpsi_alpha", "zjpsi_alpha", zjpsi_alpha_value);
+  RooRealVar zjpsi_n("zjpsi_n", "zjpsi_n", zjpsi_n_value);
+  RooCBShape zjpsi_crystal_ball ("zjpsi_crystal_ball", "zjpsi_crystal_ball", zjpsi_dimuon_mass, zjpsi_mean, zjpsi_sigma, zjpsi_alpha, zjpsi_n );
 
   RooRealVar zjpsi_dimuon_slope("zjpsi_dimuon_slope", "zjpsi_dimuon_slope", zjpsi_dimuon_slope_value);
   RooExponential zjpsi_dimuon_bg_exponential("zjpsi_dimuon_bg_exponential", "zjpsi_dimuon_bg_exponential", zjpsi_dimuon_mass, zjpsi_dimuon_slope);
 
-  //TODO testing
-  //RooRealVar zjpsi_m_sig_tau_sig_frac("zjpsi_m_sig_tau_sig_frac", "zjpsi_m_sig_tau_sig_frac", 0.4, 0.0, 1.0);
-  //RooRealVar zjpsi_m_sig_tau_bg_frac("zjpsi_m_sig_tau_bg_frac", "zjpsi_m_sig_tau_bg_frac", 0.4, 0.0, 1.0);
-  //RooRealVar zjpsi_m_bg_tau_bg_frac("zjpsi_m_bg_tau_bg_frac", "zjpsi_m_bg_tau_bg_frac", 0.1, 0.0, 1.0);
-  //RooRealVar zjpsi_m_bg_tau_sig_frac("zjpsi_m_bg_tau_sig_frac", "zjpsi_m_bg_tau_sig_frac", 0.1, 0.0, 1.0);
-
   RooRealVar zjpsi_m_sig_tau_sig_frac("zjpsi_m_sig_tau_sig_frac", "zjpsi_m_sig_tau_sig_frac", 0.4, 0.0, 1.0);
   RooRealVar zjpsi_m_sig_tau_bg_frac("zjpsi_m_sig_tau_bg_frac", "zjpsi_m_sig_tau_bg_frac", 0.4, 0.0, 1.0);
-  RooRealVar zjpsi_m_bg_tau_bg_frac("zjpsi_m_bg_tau_bg_frac", "zjpsi_m_bg_tau_bg_frac", 0.05, 0.0, 1.0);
-  RooRealVar zjpsi_m_bg_tau_sig_frac("zjpsi_m_bg_tau_sig_frac", "zjpsi_m_bg_tau_sig_frac", 0.15, 0.0, 1.0);
+  RooRealVar zjpsi_m_bg_tau_bg_frac("zjpsi_m_bg_tau_bg_frac", "zjpsi_m_bg_tau_bg_frac", 0.1, 0.0, 1.0);
+  RooRealVar zjpsi_m_bg_tau_sig_frac("zjpsi_m_bg_tau_sig_frac", "zjpsi_m_bg_tau_sig_frac", 0.1, 0.0, 1.0);
 
-  RooProdPdf zjpsi_m_sig_tau_sig("zjpsi_m_sig_tau_sig", "zjpsi_m_sig_tau_sig", RooArgList(zjpsi_dimuon_gauss, zjpsi_tau_xy_gauss_sum_fitpdf ));
-  RooProdPdf zjpsi_m_sig_tau_bg("zjpsi_m_sig_tau_bg", "zjpsi_m_sig_tau_bg", RooArgList(zjpsi_dimuon_gauss, zjpsi_decay_exp ));
+  //RooProdPdf zjpsi_m_sig_tau_sig("zjpsi_m_sig_tau_sig", "zjpsi_m_sig_tau_sig", RooArgList(zjpsi_dimuon_gauss, zjpsi_tau_xy_gauss_sum_fitpdf ));
+  //RooProdPdf zjpsi_m_sig_tau_bg("zjpsi_m_sig_tau_bg", "zjpsi_m_sig_tau_bg", RooArgList(zjpsi_dimuon_gauss, zjpsi_decay_exp ));
+  RooProdPdf zjpsi_m_sig_tau_sig("zjpsi_m_sig_tau_sig", "zjpsi_m_sig_tau_sig", RooArgList(zjpsi_crystal_ball, zjpsi_tau_xy_gauss_sum_fitpdf ));
+  RooProdPdf zjpsi_m_sig_tau_bg("zjpsi_m_sig_tau_bg", "zjpsi_m_sig_tau_bg", RooArgList(zjpsi_crystal_ball, zjpsi_decay_exp ));
   RooProdPdf zjpsi_m_bg_tau_bg("zjpsi_m_bg_tau_bg", "zjpsi_m_bg_tau_bg", RooArgList(zjpsi_dimuon_bg_exponential, zjpsi_decay_exp ));
   RooProdPdf zjpsi_m_bg_tau_sig("zjpsi_m_bg_tau_sig", "zjpsi_m_bg_tau_sig", RooArgList(zjpsi_dimuon_bg_exponential, zjpsi_tau_xy_gauss_sum_fitpdf ));
 
   RooAddPdf zjpsi_mass_tau_xy_fitpdf("zjpsi_mass_tau_xy_fitpdf","zjpsi_mass_tau_xy_fitpdf",RooArgSet(zjpsi_m_sig_tau_sig, zjpsi_m_sig_tau_bg, zjpsi_m_bg_tau_sig, zjpsi_m_bg_tau_bg ),
                                                                          RooArgList(zjpsi_m_sig_tau_sig_frac, zjpsi_m_sig_tau_bg_frac, zjpsi_m_bg_tau_sig_frac));
 
-  //TODO testing sumw2error
-  //RooFitResult *zjpsi_jpsi_fitres = zjpsi_mass_tau_xy_fitpdf.fitTo(zjpsi_dimuon_mass_data_hist, NumCPU(N_CPU), Verbose(false), PrintLevel(-1), SumW2Error(kFALSE), Save());
-  RooFitResult *zjpsi_jpsi_fitres = zjpsi_mass_tau_xy_fitpdf.fitTo(zjpsi_dimuon_mass_data_hist, NumCPU(N_CPU), Verbose(false), PrintLevel(-1), SumW2Error(kTRUE), Save());
+
+  RooFitResult *zjpsi_jpsi_fitres = zjpsi_mass_tau_xy_fitpdf.fitTo(zjpsi_dimuon_mass_data_hist, NumCPU(N_CPU), Verbose(false), PrintLevel(-1), SumW2Error(kFALSE), Save());
   zjpsi_jpsi_fitres->Print();
 
   std::cout << zjpsi_hist_name << std::endl;
@@ -473,7 +491,7 @@ int main(int argc, char* argv[]) {
       return 1;
     }
     const std::string OUT_DIR(argv[4]);
-    RooFitLifetimeAndMass(DATA_FILE_1, DATA_FILE_2, USE_Z_TO_EE, OUT_DIR);
+    RooFitLifetimeAndMassCrystalBall(DATA_FILE_1, DATA_FILE_2, USE_Z_TO_EE, OUT_DIR);
     return 0;
   }
 }

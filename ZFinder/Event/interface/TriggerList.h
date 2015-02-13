@@ -6,7 +6,7 @@
 
 namespace zf {
   static const std::vector<std::string> ET_ET_TIGHT = {
-    "hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsoFilter"  // ET-ET Tight Leg
+    "hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsoFilter"  // ET-ET (ET == ECAL TOTAL) Tight Leg
   };
   static const std::vector<std::string> ET_ET_DZ = {
     "hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsoDZ"  // ET-ET Vertex distance
@@ -47,12 +47,31 @@ namespace zf {
     "hltHFEMTightFilter",
     "hltEle27WP80TrackIsoFilter"
   };
+  static const std::vector<std::string> DOUBLE_MUON_TIGHT_LEG_TRIGGER = {
+    //"hltL3pfL1DoubleMu10MuOpenL1f0L2pf0L3PreFiltered8"
+    //"hltL3pfL1DoubleMu10MuOpenOR3p5L1f0L2pf0L3PreFiltered17"
+    //"hltL3fL1DoubleMu10MuOpenOR3p5L1f0L2f10L3Filtered17"
+    "hltL3fL1DoubleMu10MuOpenL1f0L2f10L3Filtered17",
+    "hltL3fL1DoubleMu10MuOpenOR3p5L1f0L2f10L3Filtered17"
+  };
+  //hltL3pfL1DoubleMu10MuOpenOR3p5L1f0L2pf0L3PreFiltered8
+  static const std::vector<std::string> DOUBLE_MUON_LOOSE_LEG_TRIGGER = {
+    //"hltL3pfL1DoubleMu10MuOpenL1f0L2f10L3Filtered17"
+    //"hltL3fL1DoubleMu10MuOpenOR3p5L1f0L2f10L3Filtered8"
+    //"hltL3fL1DoubleMu10MuOpenOR3p5L1f0L2f10L3Filtered13"
+    //"hltL3pfL1DoubleMu10MuOpenOR3p5L1f0L2pf0L3PreFiltered8"
+    "hltL3pfL1DoubleMu10MuOpenL1f0L2pf0L3PreFiltered8",
+    "hltL3pfL1DoubleMu10MuOpenOR3p5L1f0L2pf0L3PreFiltered8"
+  };
 
   //TODO testing Jpsi trigger
   static const std::vector<std::string> JPSI_TRIGGER = {
     "hltVertexmumuFilterJpsi" //HLT_DIMUON0_JPSI ???
   };
 
+  static const std::vector<std::string> DOUBLE_MUON_TRIGGER = {
+    "hltDiMuonGlb17Glb8DzFiltered0p2" //HLT_DIMUON0_JPSI ???
+  };
 
 }  // namespace zf
 #endif  // ZFINDER_TRIGGERLIST_H_

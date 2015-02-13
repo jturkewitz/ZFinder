@@ -19,7 +19,8 @@ namespace zf {
         public:
             // Constructor
             ZFinderPlotter(TFileDirectory& tdir, const bool USE_MC = false, const bool APPLY_MUON_MIN_PT = false, const bool APPLY_SOFT_MUONS = false,
-                const bool APPLY_DIMUON_VTX_COMPATIBILITY = false, const bool APPLY_JPSI_MASS_WINDOW = false, const bool APPLY_VERTEX_Z_POS_WINDOW = false);
+                const bool APPLY_DIMUON_VTX_COMPATIBILITY = false, const bool APPLY_JPSI_MASS_WINDOW = false, const bool APPLY_VERTEX_Z_POS_WINDOW = false,
+                const bool APPLY_PROMPT_JPSI_WINDOW = false);
 
             // Add events
             void Fill(
@@ -84,6 +85,7 @@ namespace zf {
             TH2D* jpsi_pt_vs_rap_;
             //TH2D* jpsi_rap_vs_pt_;
             TH1D* jpsi_efficiency_;
+            TH1D* jpsi_acc_eff_;
             TH1D* jpsi_scale_factor_;
             TH2D* jpsi_reco_pt_vs_jpsi_truth_pt_;
             TH1D* jpsi_truth_pt_minus_jpsi_reco_pt_;
@@ -92,8 +94,13 @@ namespace zf {
             TH1D* jpsi_trigger_obj_mu0_pt_minus_reco_mu0_pt_;
             TH1D* jpsi_trigger_obj_mu1_pt_minus_reco_mu1_pt_;
 
-            TH1D* jpsi_cos_mu0_;
-            TH1D* jpsi_cos_mu1_;
+            TH1D* jpsi_cos_mu_plus_;
+            TH1D* jpsi_cos_mu_plus_jpsi_pt_8to8p5_;
+            TH1D* jpsi_cos_mu_plus_jpsi_pt_8p5to9_;
+            TH1D* jpsi_cos_mu_plus_jpsi_pt_9to10_;
+            TH1D* jpsi_cos_mu_plus_jpsi_pt_10to15_;
+            TH1D* jpsi_cos_mu_plus_jpsi_pt_15to20_;
+            TH1D* jpsi_cos_mu_minus_;
 
             TH1D* mu0_pt_;
             TH1D* mu1_pt_;
@@ -203,6 +210,15 @@ namespace zf {
             TH2D* dimuon_mass_vs_dimuon_tau_xy_;
             TH2D* dimuon_mass_vs_dimuon_tau_xy_fine_;
 
+            TH2D* dimuon_mass_vs_dimuon_tau_xy_8p5to10p0_;
+            TH2D* dimuon_mass_vs_dimuon_tau_xy_10to14_;
+            TH2D* dimuon_mass_vs_dimuon_tau_xy_14to18_;
+            TH2D* dimuon_mass_vs_dimuon_tau_xy_18to30_;
+            TH2D* dimuon_mass_vs_dimuon_tau_xy_30to100_;
+
+
+            TH2D* dimuon_mass_vs_dimuon_tau_xy_fine_weighted_;
+
             TH1D* vtx_x_;
             TH1D* vtx_y_;
             TH1D* vtx_z_;
@@ -239,6 +255,7 @@ namespace zf {
             const bool APPLY_DIMUON_VTX_COMPATIBILITY_;
             const bool APPLY_JPSI_MASS_WINDOW_;
             const bool APPLY_VERTEX_Z_POS_WINDOW_;
+            const bool APPLY_PROMPT_JPSI_WINDOW_;
             // Plotting variables
             static const int X_SIZE = 1280;
             static const int Y_SIZE = 640;

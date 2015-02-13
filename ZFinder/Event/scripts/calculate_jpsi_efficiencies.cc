@@ -1,11 +1,14 @@
 #include <string.h>
-#include "TChain.h"
-#include "TFile.h"
-#include "TH1.h"
-#include "TH2.h"
-#include "TTree.h"
-#include "TKey.h"
-#include "Riostream.h"
+#include <TChain.h>
+#include <TFile.h>
+#include <TH1.h>
+#include <TH2.h>
+#include <TAxis.h>
+#include <TTree.h>
+#include <TGraphAsymmErrors.h>
+#include <TKey.h>
+#include <TEfficiency.h>
+#include <Riostream.h>
 void calculate_jpsi_efficiencies (string file_name )
 {
   
@@ -49,11 +52,76 @@ void calculate_jpsi_efficiencies (string file_name )
   jpsi_pt_vs_rap_jpsi->Rebin2D(3,1);
   jpsi_pt_vs_rap_mc->Sumw2();
   jpsi_pt_vs_rap_jpsi->Sumw2();
-  TH1D *acc_eff_map = jpsi_pt_vs_rap_mc->Clone();
+  TH2D *acc_eff_map = jpsi_pt_vs_rap_mc->Clone();
   acc_eff_map->Divide(jpsi_pt_vs_rap_jpsi, jpsi_pt_vs_rap_mc, 1.0, 1.0, "B");
+  //acc_eff_map->Divide(jpsi_pt_vs_rap_jpsi, jpsi_pt_vs_rap_mc, 1.0, 1.0);
+  //acc_eff_map->Divide(jpsi_pt_vs_rap_jpsi, jpsi_pt_vs_rap_mc, "cl=0.683 b(1,1) mode");
   acc_eff_map->Draw("colz");
+  
 
-  TFile output("acc_eff_map.root","new");
-  acc_eff_map->Write();
+  //TEfficiency * pEff = 0;
+  //if (TEfficiency::CheckConsistency(*jpsi_pt_vs_rap_jpsi, *jpsi_pt_vs_rap_mc, "w")) { 
+  //  pEff = new TEfficiency(*jpsi_pt_vs_rap_jpsi, *jpsi_pt_vs_rap_mc);
+  //}
+  //pEff->Draw("colz");
+
+  int nxbins = acc_eff_map->GetNbinsX();
+  int nybins = acc_eff_map->GetNbinsY();
+  for (int x=1;x<=nxbins;++x)
+  {
+    for (int y=1;y<=nybins;++y)
+    {
+      double acc_eff = acc_eff_map->GetBinContent(x,y);
+      double acc_error_low = acc_eff_map->GetBinError(x,y);
+      double acc_error_high = acc_eff_map->GetBinError(x,y);
+      //double acc_error_low = acc_eff_map->GetBinErrorLow(x,y);
+      //double acc_error_low = acc_eff_map->GetBinErrorLow(x,y);
+      //double acc_error_high = acc_eff_map->GetBinErrorHigh(x,y);
+      TAxis *xaxis = acc_eff_map->GetXaxis();  
+      double xlow = xaxis->GetBinLowEdge(x);
+      double xwidth = xaxis->GetBinWidth(x);
+      double xhigh = xlow + xwidth;
+      TAxis *yaxis = acc_eff_map->GetYaxis();  
+      double ylow = yaxis->GetBinLowEdge(y);
+      double ywidth = yaxis->GetBinWidth(y);
+      double yhigh = ylow + ywidth;
+      //std::cout << "xlow " << xlow  << " xhigh " << xhigh << " ylow " << ylow << " yhigh " << yhigh << " acc_eff " << acc_eff <<
+      //  " acc_error_low " << acc_error_low << " acc_error_high " << acc_error_high << std::endl;
+      std::cout << "{" << xlow << ",  " << xhigh << ",  " << ylow << ",  " << yhigh << ",  " <<
+        acc_eff << ",  " << acc_error_low << ",  " << acc_error_high << "   }," << std::endl;
+    }
+  }
+
+  //TODO verify just dividing seems to give similar/same results instead of using TEfficiency
+  //pEff->SetStatisticOption(1);
+  //int nxbins = jpsi_pt_vs_rap_mc->GetNbinsX();
+  //int nybins = jpsi_pt_vs_rap_mc->GetNbinsY();
+  //for (int x=1;x<=nxbins;++x)
+  //{
+  //  for (int y=1;y<=nybins;++y)
+  //  {
+  //    int bin = pEff->GetGlobalBin(x,y);
+  //    double acc_eff = pEff->GetEfficiency(bin);
+  //    double acc_error_low = pEff->GetEfficiencyErrorLow(bin);
+  //    double acc_error_high = pEff->GetEfficiencyErrorUp(bin);
+  //    TAxis *xaxis = jpsi_pt_vs_rap_mc->GetXaxis();  
+  //    double xlow = xaxis->GetBinLowEdge(x);
+  //    double xwidth = xaxis->GetBinWidth(x);
+  //    double xhigh = xlow + xwidth;
+  //    TAxis *yaxis = jpsi_pt_vs_rap_mc->GetYaxis();  
+  //    double ylow = yaxis->GetBinLowEdge(y);
+  //    double ywidth = yaxis->GetBinWidth(y);
+  //    double yhigh = ylow + ywidth;
+  //    //std::cout << "xlow " << xlow  << " xhigh " << xhigh << " ylow " << ylow << " yhigh " << yhigh << " acc_eff " << acc_eff <<
+  //    //  " acc_error_low " << acc_error_low << " acc_error_high " << acc_error_high << std::endl;
+  //    //eta low eta high pt_low pt_high acc_eff acc_eff_err_low acc_eff_err_high
+  //    std::cout << "{" << xlow << ",  " << xhigh << ",  " << ylow << ",  " << yhigh << ",  " <<
+  //      acc_eff << ",  " << acc_error_low << ",  " << acc_error_high << "   }," << std::endl;
+  //  }
+  //}
+
+  //TFile output("acc_eff_map.root","new");
+  //acc_eff_map->Write();
+
 
 }

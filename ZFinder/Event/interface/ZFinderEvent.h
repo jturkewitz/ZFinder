@@ -18,6 +18,8 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"  // edm::ParameterSet
 #include "FWCore/Utilities/interface/InputTag.h"  // edm::InputTag
 #include "DataFormats/HLTReco/interface/TriggerObject.h"  // trigger::TriggerObject
+#include "DataFormats/Common/interface/TriggerResults.h"  // trigger::TriggerResults
+#include "FWCore/Common/interface/TriggerNames.h"  // trigger::TriggerNames
 #include "RecoVertex/VertexTools/interface/VertexDistance3D.h"
 #include "PhysicsTools/Utilities/interface/LumiReWeighting.h" // edm::LumiReWeighting
 
@@ -141,14 +143,15 @@ namespace zf {
         std::vector<double> vtx_prob;
         std::vector<double> jpsi_efficiency;
         std::vector<double> jpsi_scale_factor;
-        std::vector<double> cos_jpsi_mu0;
-        std::vector<double> cos_jpsi_mu1;
+        std::vector<double> cos_jpsi_mu_plus;
+        std::vector<double> cos_jpsi_mu_minus;
         std::vector<double> muons_delta_phi;
         std::vector<double> muons_delta_eta;
         std::vector<double> muons_deltaR;
         std::vector<double> z_delta_phi;
         std::vector<reco::Muon> muon0;
         std::vector<reco::Muon> muon1;
+        std::vector<double> jpsi_acc_eff;
         std::vector<double> muon0_efficiency;
         std::vector<double> muon1_efficiency;
         std::vector<double> muon0_scale_factor;
@@ -178,6 +181,7 @@ namespace zf {
         std::vector<bool> has_dimuon_vertex_compatible_with_primary_vertex;
         std::vector<bool> is_high_pt;
         std::vector<bool> is_within_jpsi_mass_window;
+        std::vector<bool> is_prompt;
       } reco_jpsi, truth_jpsi;
 
       struct Jets{
@@ -259,6 +263,7 @@ namespace zf {
       bool found_dimuon_jpsi_with_good_muons_and_compatible_muon_vertex;
       bool found_good_dimuon_jpsi_compatible_with_primary_vertex;
       bool found_jpsi;
+      bool found_prompt_jpsi;
 
       bool found_truth_jpsi_with_high_pt_muons;
 

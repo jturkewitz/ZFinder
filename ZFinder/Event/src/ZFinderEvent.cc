@@ -48,6 +48,7 @@
 //Math
 #include <math.h>
 #include <TMath.h>
+#include <TLorentzVector.h>
 
 namespace zf {
   /*
@@ -96,6 +97,19 @@ namespace zf {
     // Truth
     inputtags_.pileup = iConfig.getParameter<edm::InputTag>("pileupInputTag");
     inputtags_.generator = iConfig.getParameter<edm::InputTag>("generatorInputTag");
+
+    //TODO testing
+    //edm::InputTag hltInputTag("TriggerResults","","HLT");
+    //edm::Handle<edm::TriggerResults> triggerResults;
+    //iEvent.getByLabel(hltInputTag, triggerResults);
+    //const edm::TriggerNames& names = iEvent.triggerNames(*triggerResults);
+    //for (int i = 0; i < (int) triggerResults->size(); ++i) { // you might have to do (int) triggerResults->size() - 1??
+    //  if (!(triggerResults->accept(i))) {
+    //    std::cout << "Trigger " << names.triggerName(i) << " did not pass" << std::endl;
+    //  } else {
+    //    std::cout << "Trigger " << names.triggerName(i) << " passed" << std::endl;
+    //  }
+    //}
 
     // Set up the lumi reweighting, but only if it is MC.
     if (!is_real_data && lumi_weights_ == NULL) {
@@ -288,7 +302,12 @@ namespace zf {
     if (reco_z_from_muons.m > -1 && 
         muon::isTightMuon(z_muon0, reco_vert.primary_vert ) &&
         muon::isTightMuon(z_muon1, reco_vert.primary_vert ) ) {
+        //muon::isTightMuon(z_muon1, reco_vert.primary_vert ) &&
+        //TriggerMatch(iEvent, DOUBLE_MUON_TIGHT_LEG_TRIGGER, z_muon0.eta(), z_muon0.phi(), TRIG_DR_) &&
+        //TriggerMatch(iEvent, DOUBLE_MUON_LOOSE_LEG_TRIGGER, z_muon1.eta(), z_muon1.phi(), TRIG_DR_) ) {
       found_good_muons_from_z = true;
+    }
+    else {
     }
     if (reco_z_from_muons.m > -1 && 
         reco_z_from_muons.vtx_prob >= MIN_VERTEX_PROB ) {
@@ -310,7 +329,9 @@ namespace zf {
       }
     }
     if (reco_z.m > -1 && e0 != NULL && e1 != NULL) {
+      //TODO testing eg_medium vs eg_tight
       if (e0->CutPassed("eg_medium") && e1->CutPassed("eg_medium") ) {
+      //if (e0->CutPassed("eg_tight") && e1->CutPassed("eg_tight") && (e0->CutPassed("trig(et_et_tight)") && e1->CutPassed("trig(et_et_loose)") ) ) {
         found_good_electrons_from_z = true;
       }
     }
@@ -389,6 +410,7 @@ namespace zf {
     found_dimuon_jpsi_with_good_muons_and_compatible_muon_vertex = false;
     found_good_dimuon_jpsi_compatible_with_primary_vertex = false;
     found_jpsi = false;
+    found_prompt_jpsi = false;
     for (unsigned int i = 0; i < reco_jpsi.m.size() ; ++i ) {
       if (reco_jpsi.has_muons_in_eta_window.at(i) ) {
         found_dimuon_jpsi_with_muons_in_eta_window = true;
@@ -404,6 +426,9 @@ namespace zf {
                 found_good_dimuon_jpsi_compatible_with_primary_vertex = true;
                 if (reco_jpsi.is_within_jpsi_mass_window.at(i) ) {
                   found_jpsi = true;
+                  if (reco_jpsi.is_prompt.at(i) ) {
+                    found_prompt_jpsi = true;
+                  }
                 }
               }
             }
@@ -500,6 +525,7 @@ namespace zf {
       const bool EEHF_LOOSE = TriggerMatch(iEvent, ET_HF_ET_LOOSE, zf_electron->eta, zf_electron->phi, TRIG_DR_);
       const bool SINGLE_E = TriggerMatch(iEvent, SINGLE_ELECTRON_TRIGGER, zf_electron->eta, zf_electron->phi, TRIG_DR_);
 
+      //et defined to mean total ecal here
       zf_electron->AddCutResult("trig(et_et_tight)", EE_TIGHT, WEIGHT);
       zf_electron->AddCutResult("trig(et_et_loose)", EE_LOOSE, WEIGHT);
       zf_electron->AddCutResult("trig(et_et_dz)", EE_DZ, WEIGHT);
@@ -605,7 +631,31 @@ namespace zf {
     math::PtEtaPhiMLorentzVector mu1lv(mu1.pt(), mu1.eta(), mu1.phi(), MUON_MASS);
     math::PtEtaPhiMLorentzVector jpsi_lv;
     jpsi_lv = mu0lv + mu1lv;
-  
+
+    //math::PtEtaPhiMLorentzVector mu0lv_boosted(mu0.pt(), mu0.eta(), mu0.phi(), MUON_MASS);
+    //mu0lv_boosted.boost(jpsi_lv.px() / jpsi_lv.energy(), jpsi_lv.py() / jpsi_lv.energy(), jpsi_lv.pz() / jpsi_lv.energy());
+    //math::BetaVector beta_vector;
+    ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >::BetaVector beta_vector;
+    beta_vector = jpsi_lv.BoostToCM();
+    //std::cout << "px " << jpsi_lv.px() << " bv_x  " << beta_vector.x() << std::endl;
+    //std::cout << "py " << jpsi_lv.py() << " bv_y  " << beta_vector.y() << std::endl;
+    //std::cout << "pz " << jpsi_lv.pz() << " bv_z  " << beta_vector.z() << std::endl;
+
+    TLorentzVector *mu0_lv2 = new TLorentzVector(mu0lv.px(), mu0lv.py(), mu0lv.pz(), mu0lv.energy());
+    mu0_lv2->Boost(beta_vector.x(), beta_vector.y(), beta_vector.z() );
+
+    TLorentzVector *mu1_lv2 = new TLorentzVector(mu1lv.px(), mu1lv.py(), mu1lv.pz(), mu1lv.energy());
+    mu1_lv2->Boost(beta_vector.x(), beta_vector.y(), beta_vector.z() );
+    //std::cout << "jpsi px " << jpsi_lv.px() << " mu0 px " << mu0lv.px() << " boosted px " << mu0_lv2->Px() << std::endl;
+
+    double mu0_px_boosted =  mu0_lv2->Px();
+    double mu0_py_boosted =  mu0_lv2->Py();
+    double mu0_pz_boosted =  mu0_lv2->Pz();
+
+    double mu1_px_boosted =  mu1_lv2->Px();
+    double mu1_py_boosted =  mu1_lv2->Py();
+    double mu1_pz_boosted =  mu1_lv2->Pz();
+
     double pos_x = -99999;
     double pos_y = -99999;
     double pos_z = -99999;
@@ -635,13 +685,13 @@ namespace zf {
     double pz = jpsi_lv.pz();
     double pt = jpsi_lv.pt();
 
-    double mu0_px = mu0.px();
-    double mu0_py = mu0.py();
-    double mu0_pz = mu0.pz();
+    //double mu0_px = mu0.px();
+    //double mu0_py = mu0.py();
+    //double mu0_pz = mu0.pz();
 
-    double mu1_px = mu1.px();
-    double mu1_py = mu1.py();
-    double mu1_pz = mu1.pz();
+    //double mu1_px = mu1.px();
+    //double mu1_py = mu1.py();
+    //double mu1_pz = mu1.pz();
 
  
     if ( found_z_to_electrons ) {
@@ -715,10 +765,10 @@ namespace zf {
       }
     }
 
-    if (reco_z.phi != -1000) {
+    if (reco_z.m >= MIN_Z_MASS && reco_z.m <= MAX_Z_MASS) {
       reco_jpsi.z_delta_phi.push_back ( fabs( deltaPhi( reco_z.phi , jpsi_lv.phi() ) ) );
     }
-    else if (reco_z_from_muons.phi != -1000) {
+    else if (reco_z_from_muons.m >= MIN_Z_MASS && reco_z_from_muons.m <= MAX_Z_MASS ) {
       reco_jpsi.z_delta_phi.push_back ( fabs( deltaPhi( reco_z_from_muons.phi , jpsi_lv.phi() ) ) );
     }
     else {
@@ -735,6 +785,9 @@ namespace zf {
     double mu1_eff = GetEfficiency (SOFT_MUON_DATA_EFF_TABLE, mu1.eta(), mu1.pt() ) ;
     double mu0_scale_factor = GetEfficiency (SOFT_MUON_SCALE_FACTOR_TABLE, mu0.eta(), mu0.pt());
     double mu1_scale_factor = GetEfficiency (SOFT_MUON_SCALE_FACTOR_TABLE, mu1.eta(), mu1.pt());
+
+    double jpsi_acc_eff = GetAccEff (SOFT_MUON_DATA_ACC_EFF_TABLE, jpsi_lv.Rapidity(), jpsi_lv.pt() );
+
     //if ( mu0.pt() > 4 ) {
     //  std::cout << "eta0: " << mu0.eta() << " pT: " << mu0.pt() << " eff " << mu0_eff <<  std::endl; 
     //}
@@ -744,14 +797,30 @@ namespace zf {
 
 
     //TODO do this with a function, instead of by hand, cos(theta) = dot_product / (a.len() * b.len() )
-    double dot_product_mu0 = px * mu0_px + py * mu0_py + pz * mu0_pz;
-    double dot_product_mu1 = px * mu1_px + py * mu1_py + pz * mu1_pz;
+    //double dot_product_mu0 = px * mu0_px + py * mu0_py + pz * mu0_pz;
+    //double dot_product_mu1 = px * mu1_px + py * mu1_py + pz * mu1_pz;
+
+    //double jpsi_p_mag = pow((px * px + py * py + pz * pz), 0.5);
+    //double mu0_p_mag = pow((mu0_px * mu0_px + mu0_py * mu0_py + mu0_pz * mu0_pz), 0.5);
+    //double mu1_p_mag = pow((mu1_px * mu1_px + mu1_py * mu1_py + mu1_pz * mu1_pz), 0.5);
+
+    double dot_product_mu0 = px * mu0_px_boosted + py * mu0_py_boosted + pz * mu0_pz_boosted;
+    double dot_product_mu1 = px * mu1_px_boosted + py * mu1_py_boosted + pz * mu1_pz_boosted;
 
     double jpsi_p_mag = pow((px * px + py * py + pz * pz), 0.5);
-    double mu0_p_mag = pow((mu0_px * mu0_px + mu0_py * mu0_py + mu0_pz * mu0_pz), 0.5);
-    double mu1_p_mag = pow((mu1_px * mu1_px + mu1_py * mu1_py + mu1_pz * mu1_pz), 0.5);
-    double cos_jpsi_mu0 = dot_product_mu0 / (jpsi_p_mag * mu0_p_mag);
-    double cos_jpsi_mu1 = dot_product_mu1 / (jpsi_p_mag * mu1_p_mag);
+    double mu0_p_mag = pow((mu0_px_boosted * mu0_px_boosted + mu0_py_boosted * mu0_py_boosted + mu0_pz_boosted * mu0_pz_boosted), 0.5);
+    double mu1_p_mag = pow((mu1_px_boosted * mu1_px_boosted + mu1_py_boosted * mu1_py_boosted + mu1_pz_boosted * mu1_pz_boosted), 0.5);
+    
+    double cos_jpsi_mu_plus = -1000;
+    double cos_jpsi_mu_minus = -1000;
+    if (mu0.charge() == 1 ) {
+      cos_jpsi_mu_plus = dot_product_mu0 / (jpsi_p_mag * mu0_p_mag);
+      cos_jpsi_mu_minus = dot_product_mu1 / (jpsi_p_mag * mu1_p_mag);
+    }
+    else {
+      cos_jpsi_mu_plus = dot_product_mu1 / (jpsi_p_mag * mu1_p_mag);
+      cos_jpsi_mu_minus = dot_product_mu0 / (jpsi_p_mag * mu0_p_mag);
+    }
 
     //TODO clean this up
     //std::cout << "px " << px << " py " << py << " pz " << pz << std::endl;
@@ -760,8 +829,8 @@ namespace zf {
     //std::cout << "jpsi_p_mag " << jpsi_p_mag << std::endl;
     //std::cout << "cos_jpsi_mu0 " << cos_jpsi_mu0 << std::endl;
 
-    reco_jpsi.cos_jpsi_mu0.push_back(cos_jpsi_mu0);
-    reco_jpsi.cos_jpsi_mu1.push_back(cos_jpsi_mu1);
+    reco_jpsi.cos_jpsi_mu_plus.push_back(cos_jpsi_mu_plus);
+    reco_jpsi.cos_jpsi_mu_minus.push_back(cos_jpsi_mu_minus);
 
     
     if (mu0.pt() >= mu1.pt() ) {
@@ -780,6 +849,8 @@ namespace zf {
       reco_jpsi.muon0_scale_factor.push_back ( mu1_scale_factor ); 
       reco_jpsi.muon1_scale_factor.push_back ( mu0_scale_factor ); 
     }
+
+    reco_jpsi.jpsi_acc_eff.push_back(jpsi_acc_eff);
 
     reco_jpsi.muon0_deltaR_to_z_muons.push_back(JpsiMuonZMuonMatch(mu0));
     reco_jpsi.muon1_deltaR_to_z_muons.push_back(JpsiMuonZMuonMatch(mu1));
@@ -812,6 +883,7 @@ namespace zf {
     reco_jpsi.eta.push_back (jpsi_lv.eta());
     reco_jpsi.phi.push_back (jpsi_lv.phi());
     reco_jpsi.jpsi_efficiency.push_back ( mu0_eff * mu1_eff);
+    reco_jpsi.jpsi_acc_eff.push_back ( jpsi_acc_eff);
     reco_jpsi.jpsi_scale_factor.push_back ( mu0_scale_factor * mu1_scale_factor);
 
     reco_jpsi.muons_delta_phi.push_back ( fabs( deltaPhi( mu0.phi() , mu1.phi() ) ) );
@@ -900,6 +972,13 @@ namespace zf {
     }
     else {
       reco_jpsi.is_within_jpsi_mass_window.push_back(false);
+    }
+
+    if (tau_xy >= MIN_PROMPT_JPSI_TIME && tau_xy <= MAX_PROMPT_JPSI_TIME) {
+      reco_jpsi.is_prompt.push_back(true);
+    }
+    else {
+      reco_jpsi.is_prompt.push_back(false);
     }
   }
   void ZFinderEvent::InitJets(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
@@ -1248,6 +1327,7 @@ namespace zf {
     //    std::cout << "jpsimuon1 trig_obj pt: " << trig_obj_jpsimuon1->pt() << std::endl;
     //  }
     //}
+
     for (unsigned int i = 0; i < reco_jpsi.m.size() ; ++i ) {
       const trigger::TriggerObject* trig_obj_jpsimuon0 = GetBestMatchedTriggerObject(iEvent, JPSI_TRIGGER, reco_jpsi.muon0.at(i).eta(), reco_jpsi.muon0.at(i).phi());
       const trigger::TriggerObject* trig_obj_jpsimuon1 = GetBestMatchedTriggerObject(iEvent, JPSI_TRIGGER, reco_jpsi.muon1.at(i).eta(), reco_jpsi.muon1.at(i).phi());

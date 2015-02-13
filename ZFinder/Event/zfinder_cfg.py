@@ -45,7 +45,9 @@ process.source = cms.Source("PoolSource",
     ##fileNames = cms.untracked.vstring( 'file:/home/user1/turkewitz/Work/CMSSW_5_3_13_ZJPsi/src/jpsiMuMu_Zee_Skim.root')
     ##fileNames = cms.untracked.vstring( 'file:/home/user1/turkewitz/Work/CMSSW_5_3_13_ZJPsi/src/jpsiMuMu_Zmumu_Skim.root')
     ##fileNames = cms.untracked.vstring( 'file:/home/user1/turkewitz/Work/CMSSW_5_3_13_ZJPsi/src/jpsiMuMu_Zmumu_Skim.root')
-    fileNames = cms.untracked.vstring( 'file:/hdfs/cms/user/turkewitz/ZPhysics/JPsiSkim/DoubleElectronSkim/jpsiTest222_ZJpsiSkimDoubleMuon2012B/jpsiTest222_ZJpsiSkimDoubleMuon2012B_000.root')
+    ##fileNames = cms.untracked.vstring( 'file:/hdfs/cms/user/turkewitz/ZPhysics/JPsiSkim/DoubleElectronSkim/jpsiTest222_ZJpsiSkimDoubleMuon2012B/jpsiTest222_ZJpsiSkimDoubleMuon2012B_000.root')
+    ##fileNames = cms.untracked.vstring( 'file:/hdfs/cms/user/turkewitz/ZPhysics/JPsiSkim/DoubleMuonSkim/jpsiTest222_ZJpsiSkimDoubleMuon2012B/jpsiTest222_ZJpsiSkimDoubleMuon2012B_000.root')
+    fileNames = cms.untracked.vstring( 'file:/hdfs/cms/user/turkewitz/ZPhysics/JPsiSkim/DoubleMuonSkim/jpsiTest222_ZJpsiSkimDoubleMuon2012D/jpsiTest222_ZJpsiSkimDoubleMuon2012D_000.root')
     ##fileNames = cms.untracked.vstring( 'file:/home/user1/turkewitz/Work/CMSSW/CMSSW_5_3_7_patch6_ZbMCStudy/src/Jpsi_MM_step3_test.root')
     #fileNames = cms.untracked.vstring( 'file:/home/user1/turkewitz/Work/CMSSW_5_3_13_ZJPsi/src/jpsiSkimMuonsUpdated.root')
     ##fileNames = cms.untracked.vstring( 'root://xrootd.unl.edu//store/mc/Summer12_DR53X/JPsiToMuMu_2MuPtEtaFilter_tuneD6T_8TeV-pythia6-evtgen/AODSIM/PU_S10_START53_V7A-v2/00000/0012F37A-CE09-E211-ABDA-00261894396F.root')
@@ -55,7 +57,7 @@ process.source = cms.Source("PoolSource",
 )
 
 process.TFileService = cms.Service("TFileService",
-        fileName = cms.string("test9e2c.root")
+        fileName = cms.string("test9e2b.root")
         )
 
 # Run only on lumis specified in the lumi file
@@ -93,6 +95,10 @@ from CommonTools.ParticleFlow.Tools.pfIsolation import setupPFElectronIso, setup
 ##process.eleIsoSequence = setupPFElectronIso(process, 'gsfElectrons')
 process.eleIsoSequence = setupPFElectronIso(process, 'CalibratedElectrons:calibratedGsfElectrons')
 process.pfiso = cms.Sequence(process.pfParticleSelectionSequence + process.eleIsoSequence)
+
+##TESTING muon pfIso
+##process.muonIsoSequence = setupPFMuonIso(process, 'muons')
+##process.pfiso = cms.Sequence(process.pfParticleSelectionSequence + process.eleIsoSequence + process.muonIsoSequence)
 
 #
 # ZFinder
