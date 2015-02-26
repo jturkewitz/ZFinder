@@ -69,8 +69,8 @@ int RooFitJpsiMass(
 
   //double dimuon_mass_min = 2.8;
   //double dimuon_mass_max = 3.4;
-  double dimuon_mass_min = 3.0;
-  double dimuon_mass_max = 3.2;
+  double dimuon_mass_min = 2.85;
+  double dimuon_mass_max = 3.35;
   //double dimuon_mass_max = 3.2;
   // Set up the variables we're going to read in from the files
   RooRealVar dimuon_mass("dimuon_mass", "dimuon_mass" , dimuon_mass_min, dimuon_mass_max, "GeV");
@@ -102,17 +102,34 @@ int RooFitJpsiMass(
   ////RooRealVar n("n", "n", 2.0);
   //RooCBShape crystal_ball ("crystal_ball", "crystal_ball", dimuon_mass, mean, sigma, alpha, n );
 
-  RooRealVar mean("mean", "mean", 3.1, 3.0, 3.2);
-  RooRealVar sigma("sigma", "sigma", 0.1, 0.0001, 10.0);
-  RooGaussian gauss ("gauss", "gauss", dimuon_mass, mean, sigma);
+  //RooRealVar mean("mean", "mean", 3.1, 3.0, 3.2);
+  //RooRealVar sigma("sigma", "sigma", 0.1, 0.0001, 10.0);
+  //RooGaussian gauss ("gauss", "gauss", dimuon_mass, mean, sigma);
 
-  RooRealVar slope("slope", "slope", -0.1, -100., 100.);
-  RooExponential bg_exponential("bg_exponential", "bg_exponential", dimuon_mass, slope);
+  //RooRealVar slope("slope", "slope", -0.1, -100., 100.);
+  //RooExponential bg_exponential("bg_exponential", "bg_exponential", dimuon_mass, slope);
+
+  RooRealVar dimuon_mean("dimuon_mean", "dimuon_mean", 3.1, 3.0, 3.2);
+  RooRealVar sigma("sigma", "sigma", 0.05, 0.001, 0.1);
+  RooRealVar alpha("alpha", "alpha", 1.8, 1.0, 2.5);
+  RooRealVar n("n", "n", 2., 1.0, 80.);
+  //RooCBShape crystal_ball ("crystal_ball", "crystal_ball", dimuon_mass, mean, sigma, alpha, n );
+  RooCBShape crystal_ball ("crystal_ball", "crystal_ball", dimuon_mass, dimuon_mean, sigma, alpha, n );
+
+  RooRealVar dimuon_sigma("dimuon_sigma", "dimuon_sigma", 0.02, 0.001, 0.1);
+  RooGaussian dimuon_gauss ("dimuon_gauss", "dimuon_gauss", dimuon_mass, dimuon_mean, dimuon_sigma);
+
+  RooRealVar frac_cball("frac_cball", "frac_cball" , 0.5 , 0.0, 1.);
+  RooAddPdf mass_signal("mass_signal", "mass_signal", RooArgList(crystal_ball, dimuon_gauss), RooArgList(frac_cball));
+
+  RooRealVar dimuon_slope("dimuon_slope", "dimuon_slope", -0.1, -10., 10.);
+  RooExponential dimuon_bg_exponential("dimuon_bg_exponential", "dimuon_bg_exponential", dimuon_mass, dimuon_slope);
 
   RooRealVar signal_fraction("signal_fraction", "signal_fraction" , 0.9 , 0.0, 1.);
   //RooRealVar signal_fraction("signal_fraction", "signal_fraction" , 1.);
   //RooAddPdf dimuon_mass_fitpdf("dimuon_mass_fitpdf", "dimuon_mass_fitpdf", RooArgList(crystal_ball, bg_exponential), RooArgList(signal_fraction));
-  RooAddPdf dimuon_mass_fitpdf("dimuon_mass_fitpdf", "dimuon_mass_fitpdf", RooArgList(gauss, bg_exponential), RooArgList(signal_fraction));
+  //RooAddPdf dimuon_mass_fitpdf("dimuon_mass_fitpdf", "dimuon_mass_fitpdf", RooArgList(gauss, bg_exponential), RooArgList(signal_fraction));
+  RooAddPdf dimuon_mass_fitpdf("dimuon_mass_fitpdf", "dimuon_mass_fitpdf", RooArgList(mass_signal, dimuon_bg_exponential), RooArgList(signal_fraction));
 
   RooFitResult *jpsi_fitres = dimuon_mass_fitpdf.fitTo(dimuon_mass_data_hist, Range(dimuon_mass_min, dimuon_mass_max), NumCPU(N_CPU), Verbose(false), PrintLevel(-1), SumW2Error(kFALSE), Save());
 
@@ -122,17 +139,17 @@ int RooFitJpsiMass(
 
   // Plot the left side
   canvas->cd(1);
-  gPad->SetLogy();
+  //gPad->SetLogy();
   //RooPlot* dimuon_mass_fitframe = dimuon_mass.frame( Title(jpsi_hist_name.c_str()) );
-  RooPlot* dimuon_mass_fitframe = dimuon_mass.frame( Title("Inclusive J/Psi Trigger" ));
+  RooPlot* dimuon_mass_fitframe = dimuon_mass.frame( Title("Inclusive Dimuon8 JPsi Trigger" ));
   //dimuon_mass_fitframe->SetName(0); // Unset title
   dimuon_mass_data_hist.plotOn(dimuon_mass_fitframe);
   //dimuon_mass_fitpdf.plotOn(dimuon_mass_fitframe, Components(voigtian), LineColor(kGreen-2));
   //dimuon_mass_fitpdf.plotOn(dimuon_mass_fitframe, Components(crystal_ball), LineColor(kGreen-2));
-  dimuon_mass_fitpdf.plotOn(dimuon_mass_fitframe, Components(gauss), LineColor(kGreen-2));
-  dimuon_mass_fitpdf.plotOn(dimuon_mass_fitframe, Components(bg_exponential), LineColor(kBlue-2));
+  dimuon_mass_fitpdf.plotOn(dimuon_mass_fitframe, Components(mass_signal), LineColor(kBlue-2));
+  dimuon_mass_fitpdf.plotOn(dimuon_mass_fitframe, Components(dimuon_bg_exponential), LineColor(kGreen-2));
   dimuon_mass_fitpdf.plotOn(dimuon_mass_fitframe, LineColor(kRed-2));
-  dimuon_mass_fitframe->SetMinimum(0.5);
+  //dimuon_mass_fitframe->SetMinimum(0.5);
   //dimuon_mass_fitframe->SetMaximum(5e4);
 
   dimuon_mass_fitframe->Draw();

@@ -89,7 +89,6 @@ class ZFinder : public edm::EDAnalyzer {
       *zfp_z_to_electrons_and_good_dimuon_jpsi, *zfp_z_to_electrons_and_jpsi, *zfp_z_to_electrons_and_prompt_jpsi;
     zf::ZFinderPlotter *zfp_dimuon_z, *zfp_dimuon_z_good, *zfp_dimuon_z_good_compatible_vertex, *zfp_z_to_muons, 
       *zfp_z_to_muons_and_good_dimuon_jpsi, *zfp_z_to_muons_and_jpsi, *zfp_z_to_muons_and_prompt_jpsi;
-    zf::ZFinderPlotter *zfp_four_muons, *zfp_jpsi_and_two_muons;
     zf::ZFinderPlotter *zfp_all_mc, *zfp_jpsi_mc;
 };
 
@@ -142,9 +141,6 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
   TFileDirectory tdir_z_to_muons_and_jpsi(fs->mkdir("Z_To_Muons_And_Jpsi"));
   TFileDirectory tdir_z_to_muons_and_prompt_jpsi(fs->mkdir("Z_To_Muons_And_Prompt_Jpsi"));
 
-  TFileDirectory tdir_four_muons(fs->mkdir("Four_Muons"));
-  TFileDirectory tdir_jpsi_and_two_muons(fs->mkdir("Jpsi_And_Two_Muons"));
-
   TFileDirectory tdir_all_mc(fs->mkdir("MC_All"));
   TFileDirectory tdir_jpsi_mc(fs->mkdir("MC_Jpsi"));
 
@@ -186,8 +182,6 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
 
 
   //TODO is this needed?
-  zfp_four_muons = new zf::ZFinderPlotter(tdir_four_muons, !USE_MC);
-  zfp_jpsi_and_two_muons = new zf::ZFinderPlotter(tdir_jpsi_and_two_muons, !USE_MC, APPLY_MUON_MIN_PT, APPLY_SOFT_MUONS, APPLY_DIMUON_VTX_COMPATIBILITY, APPLY_JPSI_MASS_WINDOW);
 
   zfp_all_mc = new zf::ZFinderPlotter(tdir_all_mc, USE_MC);
   zfp_jpsi_mc = new zf::ZFinderPlotter(tdir_jpsi_mc, USE_MC, APPLY_MUON_MIN_PT, !APPLY_SOFT_MUONS, APPLY_JPSI_MASS_WINDOW);
@@ -233,10 +227,6 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
     zfp_jpsi_mc->Fill(zfe);
   }
 
-  if (zfe.found_four_muons) {
-    zfp_four_muons->Fill(zfe);
-  }
-
   //TODO nested if might not be necessary here
   if ( zfe.found_dimuon_jpsi_with_high_pt_muons && zfe.found_dimuon_jpsi_with_muons_in_eta_window ) {
     zfp_dimuon_jpsi->Fill(zfe);
@@ -250,9 +240,6 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
             zfp_jpsi->Fill(zfe);
             if (zfe.found_prompt_jpsi) { 
               zfp_prompt_jpsi->Fill(zfe);
-              if (zfe.found_four_muons) {
-                zfp_jpsi_and_two_muons->Fill(zfe);
-              }
             }
           }
         }

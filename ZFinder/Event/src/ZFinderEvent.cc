@@ -274,7 +274,7 @@ namespace zf {
     }
 
     if (n_reco_electrons >= 1 && n_reco_anti_electrons >=1 ) {
-      //TODO parity between how electrons and how muons are selected
+      //TODO coding parity between how electrons and how muons are selected
       // Set our internal electrons
       //highest pT electron, and highest pT antielectron
       if (reco_electrons_[0]->pt >= reco_anti_electrons_[0]->pt) {
@@ -329,9 +329,8 @@ namespace zf {
       }
     }
     if (reco_z.m > -1 && e0 != NULL && e1 != NULL) {
-      //TODO testing eg_medium vs eg_tight
+      //somewhat arbitrary decision between eg_medium vs eg_tight, eg_medium should have a greater acceptance
       if (e0->CutPassed("eg_medium") && e1->CutPassed("eg_medium") ) {
-      //if (e0->CutPassed("eg_tight") && e1->CutPassed("eg_tight") && (e0->CutPassed("trig(et_et_tight)") && e1->CutPassed("trig(et_et_loose)") ) ) {
         found_good_electrons_from_z = true;
       }
     }
@@ -357,7 +356,6 @@ namespace zf {
       for ( int i=0 ; i < (n_reco_muons - 1) ; ++i ) {
         const reco::Muon muon0 = muons_h->at(i);
         //Ensure that muons are not shared between JPsi and Z candidates
-        //TODO should we require tight muons here?? Other quality cuts to ensure there is actually a good Z necessary?
         if (found_z_to_muons && (i == leading_z_muon_list_position || i == sub_leading_z_muon_list_position)) {
           continue;
         }
@@ -412,7 +410,7 @@ namespace zf {
     found_jpsi = false;
     found_prompt_jpsi = false;
     for (unsigned int i = 0; i < reco_jpsi.m.size() ; ++i ) {
-      if (reco_jpsi.has_muons_in_eta_window.at(i) ) {
+      if (reco_jpsi.has_muons_in_eta_window.at(i) && reco_jpsi.is_in_rap_window.at(i) ) {
         found_dimuon_jpsi_with_muons_in_eta_window = true;
         //TODO should each cut level have its own flag??
         if ( reco_jpsi.has_high_pt_muons.at(i) && reco_jpsi.is_high_pt.at(i) ) {
@@ -708,7 +706,6 @@ namespace zf {
         VertexDistance3D vertTool;
         distance = vertTool.distance(reco_z.vtx, dimuon_vertex).value();
         dist_err = vertTool.distance(reco_z.vtx, dimuon_vertex).error();
-        //TODO figure out why this causes errors occassionally
         //chi2 = vertTool.compatibility(reco_z.vtx, dimuon_vertex);
 
         VertexDistanceXY vertTool_xy;
@@ -731,7 +728,6 @@ namespace zf {
         VertexDistance3D vertTool;
         distance = vertTool.distance(reco_z_from_muons.vtx, dimuon_vertex).value();
         dist_err = vertTool.distance(reco_z_from_muons.vtx, dimuon_vertex).error();
-        //TODO figure out why this causes errors occassionally
         //chi2 = vertTool.compatibility(reco_z_from_muons.vtx, dimuon_vertex);
 
         VertexDistanceXY vertTool_xy;
@@ -756,7 +752,6 @@ namespace zf {
         distance = vertTool.distance(reco_vert.primary_vert, dimuon_vertex).value();
         dist_err = vertTool.distance(reco_vert.primary_vert, dimuon_vertex).error();
         //chi2 = vertTool.compatibility(reco_vert.primary_vert, dimuon_vertex);
-        //TODO figure out why this causes an error occsionally
 
         VertexDistanceXY vertTool_xy;
         distance_xy = vertTool_xy.distance(reco_vert.primary_vert, dimuon_vertex).value();
@@ -779,8 +774,6 @@ namespace zf {
       vertex_probability = TMath::Prob(dimuon_vertex.totalChiSquared(), int(dimuon_vertex.degreesOfFreedom()));
     }
 
-    //ensure muon0 is the higher pT muon
-    //Is this needed??
     double mu0_eff = GetEfficiency (SOFT_MUON_DATA_EFF_TABLE, mu0.eta(), mu0.pt() ) ;
     double mu1_eff = GetEfficiency (SOFT_MUON_DATA_EFF_TABLE, mu1.eta(), mu1.pt() ) ;
     double mu0_scale_factor = GetEfficiency (SOFT_MUON_SCALE_FACTOR_TABLE, mu0.eta(), mu0.pt());
@@ -788,21 +781,7 @@ namespace zf {
 
     double jpsi_acc_eff = GetAccEff (SOFT_MUON_DATA_ACC_EFF_TABLE, jpsi_lv.Rapidity(), jpsi_lv.pt() );
 
-    //if ( mu0.pt() > 4 ) {
-    //  std::cout << "eta0: " << mu0.eta() << " pT: " << mu0.pt() << " eff " << mu0_eff <<  std::endl; 
-    //}
-    //if ( mu1.pt() > 4 ) {
-    //  std::cout << "eta1: " << mu1.eta() << " pT: " << mu1.pt() << " eff " << mu1_eff <<  std::endl; 
-    //}
-
-
     //TODO do this with a function, instead of by hand, cos(theta) = dot_product / (a.len() * b.len() )
-    //double dot_product_mu0 = px * mu0_px + py * mu0_py + pz * mu0_pz;
-    //double dot_product_mu1 = px * mu1_px + py * mu1_py + pz * mu1_pz;
-
-    //double jpsi_p_mag = pow((px * px + py * py + pz * pz), 0.5);
-    //double mu0_p_mag = pow((mu0_px * mu0_px + mu0_py * mu0_py + mu0_pz * mu0_pz), 0.5);
-    //double mu1_p_mag = pow((mu1_px * mu1_px + mu1_py * mu1_py + mu1_pz * mu1_pz), 0.5);
 
     double dot_product_mu0 = px * mu0_px_boosted + py * mu0_py_boosted + pz * mu0_pz_boosted;
     double dot_product_mu1 = px * mu1_px_boosted + py * mu1_py_boosted + pz * mu1_pz_boosted;
@@ -822,16 +801,8 @@ namespace zf {
       cos_jpsi_mu_minus = dot_product_mu0 / (jpsi_p_mag * mu0_p_mag);
     }
 
-    //TODO clean this up
-    //std::cout << "px " << px << " py " << py << " pz " << pz << std::endl;
-    //std::cout << "mu0_px " << mu0_px << " mu0_py " << mu0_py << " mu0_pz " << mu0_pz << std::endl;
-    //std::cout << "mu0_p_mag " << mu0_p_mag << std::endl;
-    //std::cout << "jpsi_p_mag " << jpsi_p_mag << std::endl;
-    //std::cout << "cos_jpsi_mu0 " << cos_jpsi_mu0 << std::endl;
-
     reco_jpsi.cos_jpsi_mu_plus.push_back(cos_jpsi_mu_plus);
     reco_jpsi.cos_jpsi_mu_minus.push_back(cos_jpsi_mu_minus);
-
     
     if (mu0.pt() >= mu1.pt() ) {
       reco_jpsi.muon0.push_back (mu0);
@@ -942,6 +913,13 @@ namespace zf {
     }
     else {
       reco_jpsi.has_muons_in_eta_window.push_back(false);
+    }
+
+    if (fabs(jpsi_lv.Rapidity()) < MAX_JPSI_RAP) {
+      reco_jpsi.is_in_rap_window.push_back(true);
+    }
+    else {
+      reco_jpsi.is_in_rap_window.push_back(false);
     }
 
     if ( muon::isSoftMuon(mu0, reco_vert.primary_vert )
@@ -1191,7 +1169,7 @@ namespace zf {
           }
         }
       }
-      //selecting jpsi that go to a muon
+      //selecting jpsi that go to at least one muon
       if ( gen_particle->pdgId() == JPSI ) {
         for (size_t j = 0; j < gen_particle->numberOfDaughters(); ++j) {
           if (gen_particle->daughter(j)->pdgId() == MUON) {
@@ -1231,6 +1209,66 @@ namespace zf {
       const double JPSIEMP = jpsi.at(i)->energy() - jpsi.at(i)->pz();
       truth_jpsi.y.push_back( 0.5 * log(JPSIEPP / JPSIEMP));
       truth_jpsi.eta.push_back( jpsi.at(i)->eta());
+
+
+      ////////////////////////////////////////////////////////////////////////////////////
+      //TODO figure out if there is a better way to do this, maybe in a function as right now 
+      //I do same process for reco_jpsi and truth_jpsi
+
+      const double MUON_MASS = 0.1056583715;
+      math::PtEtaPhiMLorentzVector mu0lv(jpsi_muon0.at(i)->pt(), jpsi_muon0.at(i)->eta(), jpsi_muon0.at(i)->phi() , MUON_MASS);
+      math::PtEtaPhiMLorentzVector mu1lv(jpsi_muon1.at(i)->pt(), jpsi_muon1.at(i)->eta(), jpsi_muon1.at(i)->phi() , MUON_MASS);
+      math::PtEtaPhiMLorentzVector jpsi_lv;
+      jpsi_lv = mu0lv + mu1lv;
+
+      ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >::BetaVector beta_vector;
+      beta_vector = jpsi_lv.BoostToCM();
+
+      TLorentzVector *mu0_lv2 = new TLorentzVector(mu0lv.px(), mu0lv.py(), mu0lv.pz(), mu0lv.energy());
+      mu0_lv2->Boost(beta_vector.x(), beta_vector.y(), beta_vector.z() );
+
+      TLorentzVector *mu1_lv2 = new TLorentzVector(mu1lv.px(), mu1lv.py(), mu1lv.pz(), mu1lv.energy());
+      mu1_lv2->Boost(beta_vector.x(), beta_vector.y(), beta_vector.z() );
+
+      double px = jpsi_lv.px();
+      double py = jpsi_lv.py();
+      double pz = jpsi_lv.pz();
+
+      double mu0_px_boosted =  mu0_lv2->Px();
+      double mu0_py_boosted =  mu0_lv2->Py();
+      double mu0_pz_boosted =  mu0_lv2->Pz();
+
+      double mu1_px_boosted =  mu1_lv2->Px();
+      double mu1_py_boosted =  mu1_lv2->Py();
+      double mu1_pz_boosted =  mu1_lv2->Pz();
+
+      //TODO do this with a function, instead of by hand, cos(theta) = dot_product / (a.len() * b.len() )
+
+      double dot_product_mu0 = px * mu0_px_boosted + py * mu0_py_boosted + pz * mu0_pz_boosted;
+      double dot_product_mu1 = px * mu1_px_boosted + py * mu1_py_boosted + pz * mu1_pz_boosted;
+
+      double jpsi_p_mag = pow((px * px + py * py + pz * pz), 0.5);
+      double mu0_p_mag = pow((mu0_px_boosted * mu0_px_boosted + mu0_py_boosted * mu0_py_boosted + mu0_pz_boosted * mu0_pz_boosted), 0.5);
+      double mu1_p_mag = pow((mu1_px_boosted * mu1_px_boosted + mu1_py_boosted * mu1_py_boosted + mu1_pz_boosted * mu1_pz_boosted), 0.5);
+
+      double cos_jpsi_mu_plus = -1000;
+      double cos_jpsi_mu_minus = -1000;
+      if (jpsi_muon0.at(i)->charge() == 1 ) {
+        cos_jpsi_mu_plus = dot_product_mu0 / (jpsi_p_mag * mu0_p_mag);
+        cos_jpsi_mu_minus = dot_product_mu1 / (jpsi_p_mag * mu1_p_mag);
+      }
+      else {
+        cos_jpsi_mu_plus = dot_product_mu1 / (jpsi_p_mag * mu1_p_mag);
+        cos_jpsi_mu_minus = dot_product_mu0 / (jpsi_p_mag * mu0_p_mag);
+      }
+
+      truth_jpsi.cos_jpsi_mu_plus.push_back(cos_jpsi_mu_plus);
+      truth_jpsi.cos_jpsi_mu_minus.push_back(cos_jpsi_mu_minus);
+
+      ////////////////////////////////////////////////////////////////////////////////////
+
+
+
       if (jpsi_muon0.at(i)->pt() > jpsi_muon1.at(i)->pt() ) {
         if (jpsi_muon0.at(i)->pt() >= MIN_JPSI_LEADING_MUON_PT && jpsi_muon1.at(i)->pt() >= MIN_JPSI_SUBLEADING_MUON_PT 
             && jpsi.at(i)->pt() >= MIN_JPSI_PT) {
@@ -1312,9 +1350,7 @@ namespace zf {
         set_e1_trig(tmp_e1);
       }
     }
-    //TODO look at muon trigger for Z
-
-    //TODO TESTING JPSI trigger
+    //TESTING JPSI trigger
     //for (unsigned int i = 0; i < reco_jpsi.m.size() ; ++i ) {
     //  //const trigger::TriggerObject* trig_obj_jpsimuon0 = GetBestMatchedTriggerObject(iEvent, JPSI_TRIGGER, reco_jpsi.muon0.at(i).eta(), reco_jpsi.muon0.at(i).phi());
     //  //const trigger::TriggerObject* trig_obj_jpsimuon1 = GetBestMatchedTriggerObject(iEvent, JPSI_TRIGGER, reco_jpsi.muon1.at(i).eta(), reco_jpsi.muon1.at(i).phi());

@@ -10,13 +10,10 @@ process.load('Configuration.StandardSequences.GeometryDB_cff')
 process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
-##TODO make this an option, maybe make a different file for data/mc to avoid forgetting
-##about to switch out the glbal tag
 process.GlobalTag.globaltag = 'FT53_V21A_AN6::All' ##data
 #process.GlobalTag.globaltag = 'START53_V29B::All' ##mc
 
-#process.MessageLogger.cerr.FwkReport.reportEvery = 100  # Report status ever 100 events
-process.MessageLogger.cerr.FwkReport.reportEvery = 1000  # Report status ever 100 events
+process.MessageLogger.cerr.FwkReport.reportEvery = 1000  # Report status ever 1000 events
 
 # Number of events from each file to process. It should be -1 (all) when
 # running for an analysis
@@ -32,28 +29,9 @@ process.options = cms.untracked.PSet(
 )
 
 process.source = cms.Source("PoolSource",
-    ##fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/ZPhysics/JpsiSkim/jpsiSkimUpdated.root')
-    ##fileNames = cms.untracked.vstring( 'file:/hdfs/cms/user/turkewitz/ZPhysics/JPsiSkim/DoubleElectron/2012B/jpsiSkimUpdated/jpsiSkimUpdated_999-pool.root')
-    ##fileNames = cms.untracked.vstring( 'file:/hdfs/cms/user/turkewitz/ZPhysics/JPsiSkim/MuOnia/Run2012B/jpsiTriggerSkim_198_1_U0I.root')
-    ##fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/ZPhysics/PromptJpsi/JpsiMM_8TeV_cfi_py_GEN_SIM_DIGI_L1_DIGI2RAW_HLT_RAW2DIGI_RECO.root')
-    ##fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/ZPhysics/tmp/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball_00037C53-AAD1-E111-B1BE-003048D45F38.root')
-    ##fileNames = cms.untracked.vstring( 'file:/hdfs/cms/user/turkewitz/tmp/jpsi_inclusive_mc_test_file.root')
-    ##fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/tmp/0012F37A-CE09-E211-ABDA-00261894396F.root')
-    ###fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/ZPhysics/tmp/0012F37A-CE09-E211-ABDA-00261894396F.root')
-    ##fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/MuonTriggerSkimTest2012B/MuonTriggerSkimTest2012B_200-pool.root')
-    ##fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/ZPhysics/tmp/6642D763-9872-E211-BF3C-00259074AE5C.root')
-    ##fileNames = cms.untracked.vstring( 'file:/home/user1/turkewitz/Work/CMSSW_5_3_13_ZJPsi/src/jpsiMuMu_Zee_Skim.root')
-    ##fileNames = cms.untracked.vstring( 'file:/home/user1/turkewitz/Work/CMSSW_5_3_13_ZJPsi/src/jpsiMuMu_Zmumu_Skim.root')
-    ##fileNames = cms.untracked.vstring( 'file:/home/user1/turkewitz/Work/CMSSW_5_3_13_ZJPsi/src/jpsiMuMu_Zmumu_Skim.root')
     ##fileNames = cms.untracked.vstring( 'file:/hdfs/cms/user/turkewitz/ZPhysics/JPsiSkim/DoubleElectronSkim/jpsiTest222_ZJpsiSkimDoubleMuon2012B/jpsiTest222_ZJpsiSkimDoubleMuon2012B_000.root')
     ##fileNames = cms.untracked.vstring( 'file:/hdfs/cms/user/turkewitz/ZPhysics/JPsiSkim/DoubleMuonSkim/jpsiTest222_ZJpsiSkimDoubleMuon2012B/jpsiTest222_ZJpsiSkimDoubleMuon2012B_000.root')
     fileNames = cms.untracked.vstring( 'file:/hdfs/cms/user/turkewitz/ZPhysics/JPsiSkim/DoubleMuonSkim/jpsiTest222_ZJpsiSkimDoubleMuon2012D/jpsiTest222_ZJpsiSkimDoubleMuon2012D_000.root')
-    ##fileNames = cms.untracked.vstring( 'file:/home/user1/turkewitz/Work/CMSSW/CMSSW_5_3_7_patch6_ZbMCStudy/src/Jpsi_MM_step3_test.root')
-    #fileNames = cms.untracked.vstring( 'file:/home/user1/turkewitz/Work/CMSSW_5_3_13_ZJPsi/src/jpsiSkimMuonsUpdated.root')
-    ##fileNames = cms.untracked.vstring( 'root://xrootd.unl.edu//store/mc/Summer12_DR53X/JPsiToMuMu_2MuPtEtaFilter_tuneD6T_8TeV-pythia6-evtgen/AODSIM/PU_S10_START53_V7A-v2/00000/0012F37A-CE09-E211-ABDA-00261894396F.root')
-    ## fileNames = cms.untracked.vstring( 'file:/hdfs/cms/user/turkewitz/ZPhysics/JPsiSkim/DoubleElectron/jpsiSkim/jpsiSkim_000-pool.root')
-    ##fileNames = cms.untracked.vstring( 'file:/home/user1/turkewitz/Work/CMSSW_5_3_13_ZJPsi/src/JPsiFilter/jpsiSkim.root')
-    ##fileNames = cms.untracked.vstring( 'file:/local/cms/phedex/store/data/Run2012A/DoubleElectron/AOD/22Jan2013-v1/20000/003EC246-5E67-E211-B103-00259059642E.root')
 )
 
 process.TFileService = cms.Service("TFileService",
@@ -134,5 +112,4 @@ process.ZFinder = cms.EDAnalyzer('ZFinder',
 
 # RUN
 process.p = cms.Path(process.kt6PFJetsForIsolation * process.eleRegressionEnergy * process.CalibratedElectrons * process.pfiso * process.ZFinder)
-#process.p = cms.Path(process.kt6PFJetsForIsolation * process.eleRegressionEnergy * process.CalibratedElectrons * process.pfiso )
 process.schedule = cms.Schedule(process.p)

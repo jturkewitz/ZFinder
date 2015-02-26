@@ -365,13 +365,25 @@ namespace zf {
       jpsi_cos_mu_minus_->GetYaxis()->SetTitle("Counts / 0.01 ");
 
       //TODO variable bin size to use this histogram as an efficiency map
-      double bins[] = {8,8.5,9,9.5,10,12,15,100};
-      int bin_number = 7;
+      //double bins[] = {8,8.5,9,9.5,10,12,15,100};
+      double bins[] = {8.5,10,14,18,30,100};
+      //int bin_number = 7;
+      int bin_number = 5;
       // jpsi_pt_vs_rap
       const std::string jpsi_pt_vs_rap_name = "jpsi_pt_vs_rap";
       jpsi_pt_vs_rap_ = tdir.make<TH2D>(jpsi_pt_vs_rap_name.c_str(), jpsi_pt_vs_rap_name.c_str(), 21, -2.1, 2.1, bin_number, bins);
       jpsi_pt_vs_rap_->GetXaxis()->SetTitle("jpsi Rapidity");
       jpsi_pt_vs_rap_->GetYaxis()->SetTitle("jpsi Pt");
+
+      const std::string jpsi_pt_vs_rap_polarization_longname = "jpsi_pt_vs_rap_polarization_long";
+      jpsi_pt_vs_rap_polarization_long = tdir.make<TH2D>(jpsi_pt_vs_rap_polarization_longname.c_str(), jpsi_pt_vs_rap_polarization_longname.c_str(), 21, -2.1, 2.1, bin_number, bins);
+      jpsi_pt_vs_rap_polarization_long->GetXaxis()->SetTitle("jpsi Rapidity");
+      jpsi_pt_vs_rap_polarization_long->GetYaxis()->SetTitle("jpsi Pt");
+
+      const std::string jpsi_pt_vs_rap_polarization_TPlusZeroname = "jpsi_pt_vs_rap_polarization_TPlusZero";
+      jpsi_pt_vs_rap_polarization_TPlusZero = tdir.make<TH2D>(jpsi_pt_vs_rap_polarization_TPlusZeroname.c_str(), jpsi_pt_vs_rap_polarization_TPlusZeroname.c_str(), 21, -2.1, 2.1, bin_number, bins);
+      jpsi_pt_vs_rap_polarization_TPlusZero->GetXaxis()->SetTitle("jpsi Rapidity");
+      jpsi_pt_vs_rap_polarization_TPlusZero->GetYaxis()->SetTitle("jpsi Pt");
 
       // jpsi_vtx_distance_z_vtx_x
       const std::string jpsi_vtx_distance_z_vtx_x_name = "jpsi_vtx_x - z_vtx_x";
@@ -1145,7 +1157,6 @@ namespace zf {
       }
 
       //Z To mumu
-      //TODO change from to to? does that make more sense?
       z_from_muons_mass_all_->Fill(zfe.reco_z_from_muons.m, event_weight);
       z_from_muons_mass_coarse_->Fill(zfe.reco_z_from_muons.m, event_weight);
       z_from_muons_mass_fine_->Fill(zfe.reco_z_from_muons.m, event_weight);
@@ -1233,6 +1244,10 @@ namespace zf {
           }
         }
         jpsi_pt_vs_rap_->Fill(zfe.reco_jpsi.y.at(i), zfe.reco_jpsi.pt.at(i) , event_weight);
+        jpsi_pt_vs_rap_polarization_long->Fill(zfe.reco_jpsi.y.at(i), zfe.reco_jpsi.pt.at(i) , 
+            event_weight * (1.0 - pow(zfe.reco_jpsi.cos_jpsi_mu_plus.at(i), 2.0) ));
+        jpsi_pt_vs_rap_polarization_TPlusZero->Fill(zfe.reco_jpsi.y.at(i), zfe.reco_jpsi.pt.at(i) , 
+            event_weight * (1.0 + pow(zfe.reco_jpsi.cos_jpsi_mu_plus.at(i), 2.0) ));
         jpsi_vtx_distance_z_vtx_x_->Fill( zfe.reco_jpsi.distance_x.at(i), event_weight);
         jpsi_vtx_distance_z_vtx_y_->Fill( zfe.reco_jpsi.distance_y.at(i), event_weight);
         jpsi_vtx_distance_z_vtx_z_->Fill( zfe.reco_jpsi.distance_z.at(i), event_weight);
@@ -1517,6 +1532,13 @@ namespace zf {
         jpsi_rapidity_->Fill(zfe.truth_jpsi.y.at(i), event_weight);
         jpsi_pt_->Fill(zfe.truth_jpsi.pt.at(i), event_weight);
         jpsi_pt_vs_rap_->Fill(zfe.truth_jpsi.y.at(i), zfe.truth_jpsi.pt.at(i) , event_weight);
+        jpsi_cos_mu_plus_->Fill(zfe.truth_jpsi.cos_jpsi_mu_plus.at(i), event_weight);
+        jpsi_cos_mu_minus_->Fill(zfe.truth_jpsi.cos_jpsi_mu_minus.at(i), event_weight);
+
+        jpsi_pt_vs_rap_polarization_long->Fill(zfe.truth_jpsi.y.at(i), zfe.truth_jpsi.pt.at(i) , 
+            event_weight * (1.0 - pow(zfe.truth_jpsi.cos_jpsi_mu_plus.at(i), 2.0) ));
+        jpsi_pt_vs_rap_polarization_TPlusZero->Fill(zfe.truth_jpsi.y.at(i), zfe.truth_jpsi.pt.at(i) , 
+            event_weight * (1.0 + pow(zfe.truth_jpsi.cos_jpsi_mu_plus.at(i), 2.0) ));
 
         mu0_pt_->Fill(zfe.jpsi_muon0.at(i)->pt(), event_weight);
         mu0_eta_->Fill(zfe.jpsi_muon0.at(i)->eta(), event_weight);

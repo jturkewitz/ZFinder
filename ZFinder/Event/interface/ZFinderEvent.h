@@ -180,6 +180,7 @@ namespace zf {
         std::vector<bool> has_muons_with_compatible_vertex;
         std::vector<bool> has_dimuon_vertex_compatible_with_primary_vertex;
         std::vector<bool> is_high_pt;
+        std::vector<bool> is_in_rap_window;
         std::vector<bool> is_within_jpsi_mass_window;
         std::vector<bool> is_prompt;
       } reco_jpsi, truth_jpsi;

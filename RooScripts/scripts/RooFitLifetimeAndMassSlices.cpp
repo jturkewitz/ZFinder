@@ -194,11 +194,6 @@ std::vector<double> RooFitLifetimeAndMassSlices(
   RooRealVar dimuon_slope("dimuon_slope", "dimuon_slope", -0.1, -10., 10.);
   RooExponential dimuon_bg_exponential("dimuon_bg_exponential", "dimuon_bg_exponential", dimuon_mass, dimuon_slope);
 
-
-  //RooRealVar mass_signal_tau_xy_signal_fraction("mass_signal_tau_xy_signal_fraction", "mass_signal_tau_xy_signal_fraction", 0.4, 0.0, 1.0);
-  //RooRealVar mass_signal_tau_xy_bg_fraction("mass_signal_tau_xy_bg_fraction", "mass_signal_tau_xy_bg_fraction", 0.4, 0.0, 1.0);
-  //RooRealVar mass_bg_tau_xy_bg_fraction("mass_bg_tau_xy_bg_fraction", "mass_bg_tau_xy_bg_fraction", 0.1, 0.0, 1.0);
-  //RooRealVar mass_bg_tau_xy_signal_fraction("mass_bg_tau_xy_signal_fraction", "mass_bg_tau_xy_signal_fraction", 0.1, 0.0, 1.0);
   RooRealVar m_sig_tau_sig_frac("m_sig_tau_sig_frac", "m_sig_tau_sig_frac", 0.4, 0.0, 1.0);
   RooRealVar m_sig_tau_bg_frac("m_sig_tau_bg_frac", "m_sig_tau_bg_frac", 0.4, 0.0, 1.0);
   RooRealVar m_bg_tau_bg_frac("m_bg_tau_bg_frac", "m_bg_tau_bg_frac", 0.1, 0.0, 1.0);
@@ -268,9 +263,14 @@ std::vector<double> RooFitLifetimeAndMassSlices(
 
   //RooRealVar zjpsi_m_sig_tau_sig_frac("zjpsi_m_sig_tau_sig_frac", "zjpsi_m_sig_tau_sig_frac", 0.4, 0.0, 1.0);
   //RooRealVar zjpsi_m_sig_tau_bg_frac("zjpsi_m_sig_tau_bg_frac", "zjpsi_m_sig_tau_bg_frac", 0.4, 0.0, 1.0);
+
+  //RooRealVar zjpsi_m_sig_tau_sig_frac("zjpsi_m_sig_tau_sig_frac", "zjpsi_m_sig_tau_sig_frac", 0.2, 0.0, 1.0);
+  //RooRealVar zjpsi_m_sig_tau_bg_frac("zjpsi_m_sig_tau_bg_frac", "zjpsi_m_sig_tau_bg_frac", 0.6, 0.0, 1.0);
+  ////RooRealVar zjpsi_m_bg_tau_bg_frac("zjpsi_m_bg_tau_bg_frac", "zjpsi_m_bg_tau_bg_frac", 0.05, 0.0, 1.0);
+  //RooRealVar zjpsi_m_bg_tau_sig_frac("zjpsi_m_bg_tau_sig_frac", "zjpsi_m_bg_tau_sig_frac", 0.15, 0.0, 1.0);
+
   RooRealVar zjpsi_m_sig_tau_sig_frac("zjpsi_m_sig_tau_sig_frac", "zjpsi_m_sig_tau_sig_frac", 0.2, 0.0, 1.0);
   RooRealVar zjpsi_m_sig_tau_bg_frac("zjpsi_m_sig_tau_bg_frac", "zjpsi_m_sig_tau_bg_frac", 0.6, 0.0, 1.0);
-  //RooRealVar zjpsi_m_bg_tau_bg_frac("zjpsi_m_bg_tau_bg_frac", "zjpsi_m_bg_tau_bg_frac", 0.05, 0.0, 1.0);
   RooRealVar zjpsi_m_bg_tau_sig_frac("zjpsi_m_bg_tau_sig_frac", "zjpsi_m_bg_tau_sig_frac", 0.15, 0.0, 1.0);
 
   RooProdPdf zjpsi_m_sig_tau_sig("zjpsi_m_sig_tau_sig", "zjpsi_m_sig_tau_sig", RooArgList(zjpsi_dimuon_gauss, zjpsi_tau_xy_gauss_sum_fitpdf ));
@@ -328,14 +328,24 @@ std::vector<double> RooFitLifetimeAndMassSlices(
                                   pow(integral * prompt_fraction_fit_err, 2.0 ) +
                                   pow(integral_error * prompt_fraction_fit_err, 2.0) , 0.5);
 
-  zjpsi_nonprompt_events = integral * nonprompt_fraction_fit_value;
-  //zjpsi_non_prompt_events = integral * (1 - prompt_fraction_fit_value);
-  //zjpsi_non_prompt_events_error = pow(pow((1.0 - prompt_fraction_fit_value) * integral_error , 2.0) +
-  //                                pow(integral * prompt_fraction_fit_err, 2.0 ) +
-  //                                pow(integral_error * prompt_fraction_fit_err, 2.0) , 0.5);
-  zjpsi_nonprompt_events_error = pow(pow(nonprompt_fraction_fit_value * integral_error , 2.0) +
-                                  pow(integral * nonprompt_fraction_fit_err, 2.0 ) +
-                                  pow(integral_error * nonprompt_fraction_fit_err, 2.0) , 0.5);
+  //
+  //correct nonprompt fraction because RooAddPdf is in recursive mode
+  //c1*PDF_1 + (1-c1)(c2*PDF_2 + (1-c2)*(c3*PDF_3 + ....))
+  //
+
+  double nonprompt_fraction_fit_value_recursive = nonprompt_fraction_fit_value * (1.0 - prompt_fraction_fit_value);
+  double nonprompt_fraction_fit_err_recursive = pow(pow(nonprompt_fraction_fit_err * prompt_fraction_fit_err , 2.0) +
+      pow(((1.0 - prompt_fraction_fit_value)) * nonprompt_fraction_fit_err, 2.0 ) +
+      pow(nonprompt_fraction_fit_value * prompt_fraction_fit_err, 2.0) , 0.5);
+
+  //zjpsi_nonprompt_events = integral * nonprompt_fraction_fit_value;
+  //zjpsi_nonprompt_events_error = pow(pow(nonprompt_fraction_fit_value * integral_error , 2.0) +
+  //                                pow(integral * nonprompt_fraction_fit_err, 2.0 ) +
+  //                                pow(integral_error * nonprompt_fraction_fit_err, 2.0) , 0.5);
+  zjpsi_nonprompt_events = integral * nonprompt_fraction_fit_value_recursive;
+  zjpsi_nonprompt_events_error = pow(pow(nonprompt_fraction_fit_value_recursive * integral_error , 2.0) +
+                                  pow(integral * nonprompt_fraction_fit_err_recursive, 2.0 ) +
+                                  pow(integral_error * nonprompt_fraction_fit_err_recursive, 2.0) , 0.5);
 
   std::cout << "zjpsi_prompt_events: " << zjpsi_prompt_events << std::endl;
   std::cout << "zjpsi_prompt_events_error: " << zjpsi_prompt_events_error << std::endl;
@@ -527,7 +537,7 @@ int main(int argc, char* argv[]) {
     double zjpsi_non_prompt_events_all = 0.0;
     double zjpsi_non_prompt_events_all_error = 0.0;
     double zjpsi_non_prompt_events_pt_summed = 0.0;
-    double zjpsi_non_prompt_events_pt_summed_error = 0.0;
+    double zjpsi_non_prompt_events_pt_summed_sq_error = 0.0;
 
     for (int i=0 ; i < 6 ; ++i) {
       //for now, if i==0, jpsi_all
@@ -544,7 +554,7 @@ int main(int argc, char* argv[]) {
           zjpsi_prompt_events_pt_summed += zjpsi_info[0] ;
           zjpsi_prompt_events_pt_summed_sq_error += pow(zjpsi_info[1],2) ;
           zjpsi_non_prompt_events_pt_summed += zjpsi_info[2] ;
-          zjpsi_non_prompt_events_pt_summed_error += zjpsi_info[3];
+          zjpsi_non_prompt_events_pt_summed_sq_error += zjpsi_info[3] * zjpsi_info[3];
         }
       }
     }
@@ -555,6 +565,8 @@ int main(int argc, char* argv[]) {
     std::cout << "zjpsi_non_prompt_events_pt_all_error: " << zjpsi_non_prompt_events_all_error << std::endl;
     std::cout << "zjpsi_prompt_events_pt_summed: " << zjpsi_prompt_events_pt_summed << std::endl;
     std::cout << "zjpsi_prompt_events_pt_summed_error: " << pow(zjpsi_prompt_events_pt_summed_sq_error , 0.5) << std::endl;
+    std::cout << "zjpsi_non_prompt_events_pt_summed: " << zjpsi_non_prompt_events_pt_summed << std::endl;
+    std::cout << "zjpsi_non_prompt_events_pt_summed_error: " << pow(zjpsi_non_prompt_events_pt_summed_sq_error , 0.5) << std::endl;
     //RooFitLifetimeAndMassSlices(DATA_FILE_1, DATA_FILE_2, USE_Z_TO_EE, OUT_DIR);
     return 0;
   }

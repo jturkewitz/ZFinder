@@ -83,7 +83,8 @@ namespace zf {
             TH1D* jpsi_rapidity_;
             TH1D* jpsi_pt_;
             TH2D* jpsi_pt_vs_rap_;
-            //TH2D* jpsi_rap_vs_pt_;
+            TH2D* jpsi_pt_vs_rap_polarization_long;
+            TH2D* jpsi_pt_vs_rap_polarization_TPlusZero;
             TH1D* jpsi_efficiency_;
             TH1D* jpsi_acc_eff_;
             TH1D* jpsi_scale_factor_;
@@ -188,7 +189,6 @@ namespace zf {
             TH1D* jpsi_vtx_distance_z_vtx_y_;
             TH1D* jpsi_vtx_distance_z_vtx_z_;
 
-            //TODO make this its own folder
             TH1D* jpsi_iso_mu0_;
             TH1D* jpsi_iso_sum_charged_hadron_pt_mu0_;
             TH1D* jpsi_iso_sum_charged_particle_pt_mu0_;

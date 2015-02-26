@@ -158,7 +158,7 @@ std::vector<double> RooFitLifetime(
     return zjpsi_info;
   }
 
-  std::string inclusive_jpsi_hist = "ZFinder/Jpsi/";
+  std::string inclusive_jpsi_hist = "ZFinder/Dimuon_Jpsi_Primary_Vertex/";
   std::string zjpsi_hist = "";
   if (USE_Z_TO_EE) {
     zjpsi_hist += "ZFinder/Z_To_Electrons_And_Jpsi/";
@@ -269,10 +269,10 @@ std::vector<double> RooFitLifetime(
   canvas->cd(1);
 
   //TODO testing
-  gPad->SetLogy();
+  //gPad->SetLogy();
   //RooPlot* tau_xy_fitframe = tau_xy.frame(-0.3,5.0);
   //RooPlot* tau_xy_fitframe = tau_xy.frame( Title(jpsi_hist_name.c_str()) , Range(tau_xy_min, tau_xy_max ));
-  RooPlot* tau_xy_fitframe = tau_xy.frame( Title("J/Psi Lifetime") , Range(tau_xy_min, tau_xy_max ));
+  RooPlot* tau_xy_fitframe = tau_xy.frame( Title("Inclusive J/Psi Lifetime (Dimuon8 J/Psi Trigger)") , Range(tau_xy_min, tau_xy_max ));
   //tau_xy_fitframe->SetName(0); // Unset title
   tau_xy_data_hist.plotOn(tau_xy_fitframe);
   tau_xy_fitpdf.plotOn(tau_xy_fitframe, Components(decay_exp), LineColor(kGreen-2));
