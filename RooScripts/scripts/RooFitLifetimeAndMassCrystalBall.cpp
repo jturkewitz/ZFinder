@@ -565,7 +565,11 @@ int main(int argc, char* argv[]) {
     double zjpsi_non_prompt_events_error[6];
 
     //note first value is for all pT
-    double acc_eff_weight[6] = {0.212812,0.120437,0.261938,0.451175,0.571078,0.703425};
+    //double acc_eff_weight[6] = {0.212812,0.120437,0.261938,0.451175,0.571078,0.703425};
+    
+    //double acc_eff_weight[6] = {0.277712,0.199279,0.321599,0.470349,0.576247,0.705206}; //vertex_comp no primary vert requirement
+    double acc_eff_weight[6] = {0.387726,0.28599,0.450387,0.628361,0.731672,0.81846}; //vertex_comp no primary vert requirement
+    //double acc_eff_weight[6] = {0.222701,0.155924,0.257241,0.391154,0.498353,0.647919}; //vertex_comp no primary vert requirement
 
     //TODO TESTING speeding up this for loop by reading files only once
     TFile* f_data_1 = new TFile(DATA_FILE_1.c_str(), "READ");

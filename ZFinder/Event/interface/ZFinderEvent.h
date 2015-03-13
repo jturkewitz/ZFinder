@@ -30,6 +30,10 @@
 #include "ZFinder/Event/interface/ZFinderElectron.h"  // ZFinderElectron, ZFinderElectron
 #include "ZFinder/Event/interface/ZFinderCuts.h"  // ZFinderMuon, ZFinderMuon
 
+//Math
+#include <math.h>
+#include <TLorentzVector.h>
+
 namespace zf {
 
   // Cut level struct
@@ -115,6 +119,7 @@ namespace zf {
         double vtx_x;
         double vtx_y;
         double vtx_z;
+        math::PtEtaPhiMLorentzVector zlv;
         TransientVertex vtx;
       } reco_z, reco_z_from_muons, truth_z;
 
@@ -149,6 +154,7 @@ namespace zf {
         std::vector<double> muons_delta_eta;
         std::vector<double> muons_deltaR;
         std::vector<double> z_delta_phi;
+        std::vector<double> four_lepton_mass;
         std::vector<reco::Muon> muon0;
         std::vector<reco::Muon> muon1;
         std::vector<double> jpsi_acc_eff;

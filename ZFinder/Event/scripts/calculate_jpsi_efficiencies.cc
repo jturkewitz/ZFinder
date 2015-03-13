@@ -47,14 +47,21 @@ void calculate_jpsi_efficiencies (string file_name )
 
 
   //TH2D *jpsi_pt_vs_rap_mc = (TH2D*) theFile0->Get("ZFinder/MC_All/jpsi_pt_vs_rap");
+  //TH2D *jpsi_pt_vs_rap_jpsi = (TH2D*) theFile0->Get("ZFinder/Dimuon_Jpsi_Vertex_Compatible/jpsi_pt_vs_rap");
   //TH2D *jpsi_pt_vs_rap_jpsi = (TH2D*) theFile0->Get("ZFinder/Jpsi/jpsi_pt_vs_rap");
   //TH2D *jpsi_pt_vs_rap_mc = (TH2D*) theFile0->Get("ZFinder/MC_All/jpsi_pt_vs_rap_polarization_long");
   //TH2D *jpsi_pt_vs_rap_jpsi = (TH2D*) theFile0->Get("ZFinder/Jpsi/jpsi_pt_vs_rap_polarization_long");
-  TH2D *jpsi_pt_vs_rap_mc = (TH2D*) theFile0->Get("ZFinder/MC_All/jpsi_pt_vs_rap_polarization_TPlusZero");
-  TH2D *jpsi_pt_vs_rap_jpsi = (TH2D*) theFile0->Get("ZFinder/Jpsi/jpsi_pt_vs_rap_polarization_TPlusZero");
+  //TH2D *jpsi_pt_vs_rap_mc = (TH2D*) theFile0->Get("ZFinder/MC_All/jpsi_pt_vs_rap_polarization_TPlusZero");
+  //TH2D *jpsi_pt_vs_rap_jpsi = (TH2D*) theFile0->Get("ZFinder/Jpsi/jpsi_pt_vs_rap_polarization_TPlusZero");
 
-  //jpsi_pt_vs_rap_mc->Rebin2D(21,1);
-  //jpsi_pt_vs_rap_jpsi->Rebin2D(21,1);
+
+  TH2D *jpsi_pt_vs_rap_mc = (TH2D*) theFile0->Get("ZFinder/MC_All/jpsi_pt_vs_rap");
+  TH2D *jpsi_pt_vs_rap_jpsi = (TH2D*) theFile0->Get("ZFinder/Dimuon_Jpsi_Vertex_Compatible/jpsi_pt_vs_rap");
+  //TH2D *jpsi_pt_vs_rap_mc = (TH2D*) theFile0->Get("ZFinder/MC_All/jpsi_pt_vs_rap_polarization_long");
+  //TH2D *jpsi_pt_vs_rap_jpsi = (TH2D*) theFile0->Get("ZFinder/Dimuon_Jpsi_Vertex_Compatible/jpsi_pt_vs_rap_polarization_long");
+  //TH2D *jpsi_pt_vs_rap_mc = (TH2D*) theFile0->Get("ZFinder/MC_All/jpsi_pt_vs_rap_polarization_TPlusZero");
+  //TH2D *jpsi_pt_vs_rap_jpsi = (TH2D*) theFile0->Get("ZFinder/Dimuon_Jpsi_Vertex_Compatible/jpsi_pt_vs_rap_polarization_TPlusZero");
+
   jpsi_pt_vs_rap_mc->Rebin2D(21,1);
   jpsi_pt_vs_rap_jpsi->Rebin2D(21,1);
   std::cout << jpsi_pt_vs_rap_mc->Integral() << std::endl;

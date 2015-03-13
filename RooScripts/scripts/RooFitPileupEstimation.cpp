@@ -77,6 +77,7 @@ int RooFitPileupEstimation(
 
   //std::string inclusive_jpsi_hist = "ZFinder/Jpsi/";
   std::string inclusive_jpsi_hist = "ZFinder/Dimuon_Jpsi_Vertex_Compatible/";
+  //std::string inclusive_jpsi_hist = "ZFinder/Prompt_Jpsi/";
   inclusive_jpsi_hist.append( "jpsi_vtx_z - z_vtx_z" );
   std::string jpsi_hist_name = "";
   jpsi_hist_name.append( "distance_z");
@@ -162,7 +163,7 @@ int RooFitPileupEstimation(
   pileup_gauss_test.plotOn(distance_z_fitframe, LineColor(kGreen-2), NormRange("negative,positive"));
   pileup_gauss.plotOn(distance_z_fitframe, LineColor(kRed-2));
   distance_z_fitframe->SetMinimum(0.5);
-  distance_z_fitframe->SetMaximum(5e4);
+  distance_z_fitframe->SetMaximum(1e7);
 
   distance_z_fitframe->Draw();
 

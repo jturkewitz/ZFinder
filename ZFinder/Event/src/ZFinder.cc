@@ -158,7 +158,9 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
 
   zfp_dimuon_jpsi = new zf::ZFinderPlotter(tdir_dimuon_jpsi, !USE_MC, APPLY_MUON_MIN_PT);
   zfp_dimuon_jpsi_soft = new zf::ZFinderPlotter(tdir_dimuon_jpsi_soft, !USE_MC, APPLY_MUON_MIN_PT, APPLY_SOFT_MUONS);
-  zfp_dimuon_jpsi_vtx_compatible = new zf::ZFinderPlotter(tdir_dimuon_jpsi_vtx_compatible, !USE_MC, APPLY_MUON_MIN_PT, APPLY_SOFT_MUONS, APPLY_DIMUON_VTX_COMPATIBILITY);
+  //TODO adding in mass requirement here for acceptance*eff, fix this bit of a kludge
+  //zfp_dimuon_jpsi_vtx_compatible = new zf::ZFinderPlotter(tdir_dimuon_jpsi_vtx_compatible, !USE_MC, APPLY_MUON_MIN_PT, APPLY_SOFT_MUONS, APPLY_DIMUON_VTX_COMPATIBILITY);
+  zfp_dimuon_jpsi_vtx_compatible = new zf::ZFinderPlotter(tdir_dimuon_jpsi_vtx_compatible, !USE_MC, APPLY_MUON_MIN_PT, APPLY_SOFT_MUONS, APPLY_DIMUON_VTX_COMPATIBILITY, APPLY_JPSI_MASS_WINDOW);
   zfp_dimuon_jpsi_primary_vertex = new zf::ZFinderPlotter(tdir_dimuon_jpsi_primary_vertex, !USE_MC, APPLY_MUON_MIN_PT, APPLY_SOFT_MUONS, APPLY_DIMUON_VTX_COMPATIBILITY, !APPLY_JPSI_MASS_WINDOW, APPLY_VERTEX_Z_POS_WINDOW);
   //TODO should I apply vertex z pos window here??
   zfp_jpsi = new zf::ZFinderPlotter(tdir_jpsi, !USE_MC, APPLY_MUON_MIN_PT, APPLY_SOFT_MUONS, APPLY_DIMUON_VTX_COMPATIBILITY, APPLY_JPSI_MASS_WINDOW, APPLY_VERTEX_Z_POS_WINDOW);

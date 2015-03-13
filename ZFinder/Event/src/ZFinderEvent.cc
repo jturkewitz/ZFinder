@@ -307,8 +307,6 @@ namespace zf {
         //TriggerMatch(iEvent, DOUBLE_MUON_LOOSE_LEG_TRIGGER, z_muon1.eta(), z_muon1.phi(), TRIG_DR_) ) {
       found_good_muons_from_z = true;
     }
-    else {
-    }
     if (reco_z_from_muons.m > -1 && 
         reco_z_from_muons.vtx_prob >= MIN_VERTEX_PROB ) {
       found_dimuon_z_compatible_vertex = true;
@@ -561,13 +559,13 @@ namespace zf {
         }
       }
       // Set Z properties
+      const double ELECTRON_MASS = 5.109989e-4;
+      math::PtEtaPhiMLorentzVector e0lv(e0->pt, e0->eta, e0->phi, ELECTRON_MASS);
+      math::PtEtaPhiMLorentzVector e1lv(e1->pt, e1->eta, e1->phi, ELECTRON_MASS);
+      math::PtEtaPhiMLorentzVector zlv;
+      zlv = e0lv + e1lv;
+      reco_z.zlv = zlv;
       if ( dielectron_vertex.isValid()) {
-        const double ELECTRON_MASS = 5.109989e-4;
-        math::PtEtaPhiMLorentzVector e0lv(e0->pt, e0->eta, e0->phi, ELECTRON_MASS);
-        math::PtEtaPhiMLorentzVector e1lv(e1->pt, e1->eta, e1->phi, ELECTRON_MASS);
-        math::PtEtaPhiMLorentzVector zlv;
-        zlv = e0lv + e1lv;
-
         reco_z.vtx_x = dielectron_vertex.position().x();
         reco_z.vtx_y = dielectron_vertex.position().y();
         reco_z.vtx_z = dielectron_vertex.position().z();
@@ -600,13 +598,14 @@ namespace zf {
         reco_z_from_muons.vtx_prob = TMath::Prob(dimuon_vertex.totalChiSquared(), int(dimuon_vertex.degreesOfFreedom()));
       }
     }
+    const double MUON_MASS = 0.1056583715;
+    math::PtEtaPhiMLorentzVector muon0lv(z_muon0.pt(), z_muon0.eta(), z_muon0.phi(), MUON_MASS);
+    math::PtEtaPhiMLorentzVector muon1lv(z_muon1.pt(), z_muon1.eta(), z_muon1.phi(), MUON_MASS);
+    math::PtEtaPhiMLorentzVector zlv;
+    zlv = muon0lv + muon1lv;
+    reco_z_from_muons.zlv = zlv;
 
     if ( dimuon_vertex.isValid()) {
-      const double MUON_MASS = 0.1056583715;
-      math::PtEtaPhiMLorentzVector muon0lv(z_muon0.pt(), z_muon0.eta(), z_muon0.phi(), MUON_MASS);
-      math::PtEtaPhiMLorentzVector muon1lv(z_muon1.pt(), z_muon1.eta(), z_muon1.phi(), MUON_MASS);
-      math::PtEtaPhiMLorentzVector zlv;
-      zlv = muon0lv + muon1lv;
 
       reco_z_from_muons.vtx_x = dimuon_vertex.position().x();
       reco_z_from_muons.vtx_y = dimuon_vertex.position().y();
@@ -628,7 +627,18 @@ namespace zf {
     math::PtEtaPhiMLorentzVector mu0lv(mu0.pt(), mu0.eta(), mu0.phi(), MUON_MASS);
     math::PtEtaPhiMLorentzVector mu1lv(mu1.pt(), mu1.eta(), mu1.phi(), MUON_MASS);
     math::PtEtaPhiMLorentzVector jpsi_lv;
+    math::PtEtaPhiMLorentzVector four_lepton_lv;
     jpsi_lv = mu0lv + mu1lv;
+
+    if(found_z_to_electrons) {
+      four_lepton_lv = jpsi_lv + reco_z.zlv;
+    }
+    else if(found_z_to_muons) {
+      four_lepton_lv = jpsi_lv + reco_z_from_muons.zlv;
+    }
+    else {
+      four_lepton_lv = jpsi_lv;
+    }
 
     //math::PtEtaPhiMLorentzVector mu0lv_boosted(mu0.pt(), mu0.eta(), mu0.phi(), MUON_MASS);
     //mu0lv_boosted.boost(jpsi_lv.px() / jpsi_lv.energy(), jpsi_lv.py() / jpsi_lv.energy(), jpsi_lv.pz() / jpsi_lv.energy());
@@ -821,6 +831,8 @@ namespace zf {
       reco_jpsi.muon1_scale_factor.push_back ( mu0_scale_factor ); 
     }
 
+    reco_jpsi.four_lepton_mass.push_back(four_lepton_lv.mass());
+
     reco_jpsi.jpsi_acc_eff.push_back(jpsi_acc_eff);
 
     reco_jpsi.muon0_deltaR_to_z_muons.push_back(JpsiMuonZMuonMatch(mu0));
@@ -938,7 +950,9 @@ namespace zf {
     }
 
     //TODO primary vertex or vertex from z?
-    if ( fabs(reco_vert.primary_z - pos_z ) <= MAX_JPSI_VERTEX_Z_DISPLACEMENT ) {
+    //if ( fabs(reco_vert.primary_z - pos_z ) <= MAX_JPSI_VERTEX_Z_DISPLACEMENT ) {
+    //from Z boson if it exists, otherwise primary vertex
+    if ( fabs( z ) <= MAX_JPSI_VERTEX_Z_DISPLACEMENT ) {
       reco_jpsi.has_dimuon_vertex_compatible_with_primary_vertex.push_back(true);
     }
     else {
@@ -1082,6 +1096,8 @@ namespace zf {
     reco_z.vtx_x = -100;
     reco_z.vtx_y = -100;
     reco_z.vtx_z = -100;
+    math::PtEtaPhiMLorentzVector lv(0,0,0,0);
+    reco_z.zlv = lv;
 
     reco_z_from_muons.m = -1;
     reco_z_from_muons.y = -1000;
@@ -1093,6 +1109,7 @@ namespace zf {
     reco_z_from_muons.vtx_x = -100;
     reco_z_from_muons.vtx_y = -100;
     reco_z_from_muons.vtx_z = -100;
+    reco_z_from_muons.zlv = lv;
 
     truth_z.m = -1;
     truth_z.y = -1000;
@@ -1180,6 +1197,7 @@ namespace zf {
       }
     }
     for (unsigned int i = 0; i < jpsi.size() ; ++i ) {
+      //TODO it seems that jpsi.size should only be 1, do not use a list here?
       //TODO: decide how to handle FSR!
       //if ( jpsi.at(i)->numberOfDaughters() != 2 ) {
       //  std::cout << "JPSI TO LESS THAN 2 DAUGHTERS: " << jpsi.at(i)->numberOfDaughters() << std::endl;
@@ -1203,6 +1221,9 @@ namespace zf {
         jpsi_muon0.push_back(d_mu1);
         jpsi_muon1.push_back(d_mu0);
       }
+      truth_jpsi.vtx_x.push_back(jpsi.at(i)->vx());
+      truth_jpsi.vtx_y.push_back(jpsi.at(i)->vy());
+      truth_jpsi.vtx_z.push_back(jpsi.at(i)->vz());
       truth_jpsi.m.push_back( jpsi.at(i)->mass());
       truth_jpsi.pt.push_back( jpsi.at(i)->pt());
       const double JPSIEPP = jpsi.at(i)->energy() + jpsi.at(i)->pz();

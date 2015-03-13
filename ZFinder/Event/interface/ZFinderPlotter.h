@@ -80,6 +80,8 @@ namespace zf {
             TH1D* jpsi_mass_fine_pt25to30_;
             TH1D* jpsi_mass_fine_ptAbove30_;
 
+            TH1D* jpsi_four_lepton_mass_;
+
             TH1D* jpsi_rapidity_;
             TH1D* jpsi_pt_;
             TH2D* jpsi_pt_vs_rap_;
@@ -101,6 +103,18 @@ namespace zf {
             TH1D* jpsi_cos_mu_plus_jpsi_pt_9to10_;
             TH1D* jpsi_cos_mu_plus_jpsi_pt_10to15_;
             TH1D* jpsi_cos_mu_plus_jpsi_pt_15to20_;
+            TH1D* jpsi_cos_mu_plus_lambdaNeg1_;
+            TH1D* jpsi_cos_mu_plus_lambdaNeg1_jpsi_pt_8to8p5_;
+            TH1D* jpsi_cos_mu_plus_lambdaNeg1_jpsi_pt_8p5to9_;
+            TH1D* jpsi_cos_mu_plus_lambdaNeg1_jpsi_pt_9to10_;
+            TH1D* jpsi_cos_mu_plus_lambdaNeg1_jpsi_pt_10to15_;
+            TH1D* jpsi_cos_mu_plus_lambdaNeg1_jpsi_pt_15to20_;
+            TH1D* jpsi_cos_mu_plus_lambda1_;
+            TH1D* jpsi_cos_mu_plus_lambda1_jpsi_pt_8to8p5_;
+            TH1D* jpsi_cos_mu_plus_lambda1_jpsi_pt_8p5to9_;
+            TH1D* jpsi_cos_mu_plus_lambda1_jpsi_pt_9to10_;
+            TH1D* jpsi_cos_mu_plus_lambda1_jpsi_pt_10to15_;
+            TH1D* jpsi_cos_mu_plus_lambda1_jpsi_pt_15to20_;
             TH1D* jpsi_cos_mu_minus_;
 
             TH1D* mu0_pt_;
@@ -238,6 +252,10 @@ namespace zf {
             TH1D* dimuon_vtx_x_;
             TH1D* dimuon_vtx_y_;
             TH1D* dimuon_vtx_z_;
+
+            TH1D* jpsi_truth_vtx_x_minus_jpsi_reco_vtx_x_;
+            TH1D* jpsi_truth_vtx_y_minus_jpsi_reco_vtx_y_;
+            TH1D* jpsi_truth_vtx_z_minus_jpsi_reco_vtx_z_;
 
             TH2D* primary_vtx_x_vs_z_vtx_x_;
             TH2D* primary_vtx_y_vs_z_vtx_y_;

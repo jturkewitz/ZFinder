@@ -47,7 +47,7 @@ process.source = cms.Source("PoolSource",
 
 process.TFileService = cms.Service("TFileService",
         ##fileName = cms.string("zfinder_mc_test34_test2_pileup_comparing.root")
-        fileName = cms.string("zfinder_mc_test34_JpsiMM.root")
+        fileName = cms.string("zfinder_mc.root")
         )
 
 #

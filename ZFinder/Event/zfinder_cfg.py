@@ -35,7 +35,7 @@ process.source = cms.Source("PoolSource",
 )
 
 process.TFileService = cms.Service("TFileService",
-        fileName = cms.string("test9e2b.root")
+        fileName = cms.string("zfinder.root")
         )
 
 # Run only on lumis specified in the lumi file
