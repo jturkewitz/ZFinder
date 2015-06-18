@@ -72,7 +72,10 @@ void calculate_jpsi_efficiencies (string file_name )
   acc_eff_map->Divide(jpsi_pt_vs_rap_jpsi, jpsi_pt_vs_rap_mc, 1.0, 1.0, "B");
   //acc_eff_map->Divide(jpsi_pt_vs_rap_jpsi, jpsi_pt_vs_rap_mc, 1.0, 1.0);
   //acc_eff_map->Divide(jpsi_pt_vs_rap_jpsi, jpsi_pt_vs_rap_mc, "cl=0.683 b(1,1) mode");
-  acc_eff_map->Draw("colz");
+
+
+
+  //acc_eff_map->Draw("colz");
   
 
   //TEfficiency * pEff = 0;

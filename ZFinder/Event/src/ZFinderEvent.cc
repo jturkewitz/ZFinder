@@ -11,6 +11,7 @@
 #include "DataFormats/RecoCandidate/interface/RecoEcalCandidateFwd.h"  // reco::RecoEcalCandidateCollection
 #include "DataFormats/MuonReco/interface/MuonFwd.h" // reco::MuonCollection
 #include "EgammaAnalysis/ElectronTools/interface/EGammaCutBasedEleId.h"  // EgammaCutBasedEleId::PassWP, EgammaCutBasedEleId::*
+#include "EgammaAnalysis/ElectronTools/interface/ElectronEffectiveArea.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h" // GenEventInfoProduct
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"  // PileupSummaryInfo
 #include "DataFormats/HLTReco/interface/TriggerEvent.h" // trigger::TriggerEvent
@@ -486,12 +487,14 @@ namespace zf {
       const double ISO_EM = (*(isoVals[1]))[ele_ref];
       const double ISO_NH = (*(isoVals[2]))[ele_ref];
 
+      //const double EA_TARGET = GetElectronEffectiveArea(ElectronEffectiveAreaType type, Double_t SCEta, ElectronEffectiveAreaTarget EffectiveAreaTarget = kEleEAData2011)
+
       // test ID
       // working points
-      const bool VETO = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::VETO, ele_ref, conversions_h, beamSpot, vtx_h, ISO_CH, ISO_EM, ISO_NH, RHO_ISO);
-      const bool LOOSE = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::LOOSE, ele_ref, conversions_h, beamSpot, vtx_h, ISO_CH, ISO_EM, ISO_NH, RHO_ISO);
-      const bool MEDIUM = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::MEDIUM, ele_ref, conversions_h, beamSpot, vtx_h, ISO_CH, ISO_EM, ISO_NH, RHO_ISO);
-      const bool TIGHT = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::TIGHT, ele_ref, conversions_h, beamSpot, vtx_h, ISO_CH, ISO_EM, ISO_NH, RHO_ISO);
+      const bool VETO = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::VETO, ele_ref, conversions_h, beamSpot, vtx_h, ISO_CH, ISO_EM, ISO_NH, RHO_ISO,ElectronEffectiveArea::kEleEAData2012);
+      const bool LOOSE = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::LOOSE, ele_ref, conversions_h, beamSpot, vtx_h, ISO_CH, ISO_EM, ISO_NH, RHO_ISO,ElectronEffectiveArea::kEleEAData2012);
+      const bool MEDIUM = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::MEDIUM, ele_ref, conversions_h, beamSpot, vtx_h, ISO_CH, ISO_EM, ISO_NH, RHO_ISO,ElectronEffectiveArea::kEleEAData2012);
+      const bool TIGHT = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::TIGHT, ele_ref, conversions_h, beamSpot, vtx_h, ISO_CH, ISO_EM, ISO_NH, RHO_ISO,ElectronEffectiveArea::kEleEAData2012);
 
       // eop/fbrem cuts for extra tight ID
       const bool FBREMEOPIN = EgammaCutBasedEleId::PassEoverPCuts(ele_ref);
