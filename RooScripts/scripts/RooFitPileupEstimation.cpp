@@ -67,7 +67,7 @@ int RooFitPileupEstimation(
   double distance_z_min = -20.0;
   double distance_z_max = 20.0;
   // Set up the variables we're going to read in from the files
-  RooRealVar distance_z("distance_z", "distance_z" , distance_z_min, distance_z_max, "cm");
+  RooRealVar distance_z("distance_z", "#Delta z" , distance_z_min, distance_z_max, "cm");
   //TODO clean up, use variable names
   distance_z.setRange("negative",-20.0,-3.0);
   distance_z.setRange("positive",3.0,20.0);
@@ -157,12 +157,12 @@ int RooFitPileupEstimation(
   //RooPlot* distance_z_fitframe = distance_z.frame(-0.3,5.0);
   //RooPlot* distance_z_fitframe = distance_z.frame( Title(jpsi_hist_name.c_str()) , Range("negative, positive" ));
   //RooPlot* distance_z_fitframe = distance_z.frame( Title(jpsi_hist_name.c_str()) );
-  RooPlot* distance_z_fitframe = distance_z.frame( Title("Difference in Z Position Between Primary Vertex and J/Psi Vertex") );
+  RooPlot* distance_z_fitframe = distance_z.frame( Title("#Delta z Between Primary Vertex and J/#psi Vertex") );
   //distance_z_fitframe->SetName(0); // Unset title
   distance_z_data_hist.plotOn(distance_z_fitframe);
   pileup_gauss_test.plotOn(distance_z_fitframe, LineColor(kGreen-2), NormRange("negative,positive"));
   pileup_gauss.plotOn(distance_z_fitframe, LineColor(kRed-2));
-  distance_z_fitframe->SetMinimum(0.5);
+  distance_z_fitframe->SetMinimum(10);
   distance_z_fitframe->SetMaximum(1e7);
 
   distance_z_fitframe->Draw();

@@ -45,6 +45,7 @@
 #include "ZFinder/Event/interface/PileupReweighting.h" // RUN_2012_ABCD_TRUE_PILEUP, SUMMER12_53X_MC_TRUE_PILEUP
 #include "ZFinder/Event/interface/MuonEfficiency.h"
 #include "ZFinder/Event/interface/JpsiEfficiencyTables.h"
+#include "ZFinder/Event/interface/JpsiEfficiencyTablesModified.h"
 
 //Math
 #include <math.h>
@@ -787,12 +788,19 @@ namespace zf {
       vertex_probability = TMath::Prob(dimuon_vertex.totalChiSquared(), int(dimuon_vertex.degreesOfFreedom()));
     }
 
-    double mu0_eff = GetEfficiency (SOFT_MUON_DATA_EFF_TABLE, mu0.eta(), mu0.pt() ) ;
-    double mu1_eff = GetEfficiency (SOFT_MUON_DATA_EFF_TABLE, mu1.eta(), mu1.pt() ) ;
-    double mu0_scale_factor = GetEfficiency (SOFT_MUON_SCALE_FACTOR_TABLE, mu0.eta(), mu0.pt());
-    double mu1_scale_factor = GetEfficiency (SOFT_MUON_SCALE_FACTOR_TABLE, mu1.eta(), mu1.pt());
+    //TODO testing
+    //double mu0_eff = GetEfficiency (SOFT_MUON_DATA_EFF_TABLE, mu0.eta(), mu0.pt() ) ;
+    //double mu1_eff = GetEfficiency (SOFT_MUON_DATA_EFF_TABLE, mu1.eta(), mu1.pt() ) ;
+    //double mu0_scale_factor = GetEfficiency (SOFT_MUON_SCALE_FACTOR_TABLE, mu0.eta(), mu0.pt());
+    //double mu1_scale_factor = GetEfficiency (SOFT_MUON_SCALE_FACTOR_TABLE, mu1.eta(), mu1.pt());
+    //double jpsi_acc_eff = GetAccEff (SOFT_MUON_DATA_ACC_EFF_TABLE, jpsi_lv.Rapidity(), jpsi_lv.pt() );
 
-    double jpsi_acc_eff = GetAccEff (SOFT_MUON_DATA_ACC_EFF_TABLE, jpsi_lv.Rapidity(), jpsi_lv.pt() );
+    double mu0_eff = GetEfficiency (SOFT_MUON_DATA_EFF_TABLE_MODIFIED, mu0.eta(), mu0.pt() ) ;
+    double mu1_eff = GetEfficiency (SOFT_MUON_DATA_EFF_TABLE_MODIFIED, mu1.eta(), mu1.pt() ) ;
+    double mu0_scale_factor = GetEfficiency (SOFT_MUON_SCALE_FACTOR_TABLE_MODIFIED, mu0.eta(), mu0.pt());
+    double mu1_scale_factor = GetEfficiency (SOFT_MUON_SCALE_FACTOR_TABLE_MODIFIED, mu1.eta(), mu1.pt());
+    double jpsi_acc_eff = GetAccEff (SOFT_MUON_DATA_ACC_EFF_TABLE_MODIFIED, jpsi_lv.Rapidity(), jpsi_lv.pt() );
+
 
     //TODO do this with a function, instead of by hand, cos(theta) = dot_product / (a.len() * b.len() )
 
@@ -906,10 +914,14 @@ namespace zf {
       reco_jpsi.is_high_pt.push_back(false);
     }
 
+    //TODO testing
     if (mu0.pt() > mu1.pt() ) {
       if ( mu0.pt() >= MIN_JPSI_LEADING_MUON_PT && mu1.pt() >= MIN_JPSI_SUBLEADING_MUON_PT ) {
         reco_jpsi.has_high_pt_muons.push_back(true);
-      } 
+      }
+      else if ( mu0.pt() >= MIN_JPSI_LEADING_MUON_PT && mu1.pt() >= MIN_JPSI_SUBLEADING_MUON_PT_HIGH_ETA && fabs(mu1.eta()) >= 1.2) {
+        reco_jpsi.has_high_pt_muons.push_back(true);
+      }
       else {
         reco_jpsi.has_high_pt_muons.push_back(false);
       }
@@ -918,12 +930,15 @@ namespace zf {
       if ( mu1.pt() >= MIN_JPSI_LEADING_MUON_PT && mu0.pt() >= MIN_JPSI_SUBLEADING_MUON_PT ) {
         reco_jpsi.has_high_pt_muons.push_back(true);
       }
+      else if ( mu1.pt() >= MIN_JPSI_LEADING_MUON_PT && mu0.pt() >= MIN_JPSI_SUBLEADING_MUON_PT_HIGH_ETA && fabs(mu0.eta()) >= 1.2) {
+        reco_jpsi.has_high_pt_muons.push_back(true);
+      }
       else {
         reco_jpsi.has_high_pt_muons.push_back(false);
       }
     }
     
-    if (fabs(mu0.eta()) < MAX_JPSI_MUON_ETA  && fabs(mu1.eta()) < MAX_JPSI_MUON_ETA ) {
+    if (fabs(mu0.eta()) <= MAX_JPSI_MUON_ETA  && fabs(mu1.eta()) <= MAX_JPSI_MUON_ETA ) {
       reco_jpsi.has_muons_in_eta_window.push_back(true);
     }
     else {
@@ -1293,9 +1308,14 @@ namespace zf {
 
 
 
+      //TODO 1.2 should not be hardcoded
       if (jpsi_muon0.at(i)->pt() > jpsi_muon1.at(i)->pt() ) {
         if (jpsi_muon0.at(i)->pt() >= MIN_JPSI_LEADING_MUON_PT && jpsi_muon1.at(i)->pt() >= MIN_JPSI_SUBLEADING_MUON_PT 
             && jpsi.at(i)->pt() >= MIN_JPSI_PT) {
+          truth_jpsi.has_high_pt_muons.push_back( true );
+        }
+        else if (jpsi_muon0.at(i)->pt() >= MIN_JPSI_LEADING_MUON_PT && jpsi_muon1.at(i)->pt() >= MIN_JPSI_SUBLEADING_MUON_PT_HIGH_ETA
+            && jpsi.at(i)->pt() >= MIN_JPSI_PT && (fabs(jpsi_muon1.at(i)->eta()) >= 1.2)) {
           truth_jpsi.has_high_pt_muons.push_back( true );
         }
         else {
@@ -1307,11 +1327,15 @@ namespace zf {
             && jpsi.at(i)->pt() >= MIN_JPSI_PT) {
           truth_jpsi.has_high_pt_muons.push_back( true );
         }
+        else if (jpsi_muon1.at(i)->pt() >= MIN_JPSI_LEADING_MUON_PT && jpsi_muon0.at(i)->pt() >= MIN_JPSI_SUBLEADING_MUON_PT_HIGH_ETA
+            && jpsi.at(i)->pt() >= MIN_JPSI_PT && (fabs(jpsi_muon0.at(i)->eta()) >= 1.2)) {
+          truth_jpsi.has_high_pt_muons.push_back( true );
+        }
         else {
           truth_jpsi.has_high_pt_muons.push_back( false );
         }
       }
-      if (fabs(jpsi_muon0.at(i)->eta() <= MAX_JPSI_MUON_ETA) && fabs(jpsi_muon1.at(i)->eta() <= MAX_JPSI_MUON_ETA) ) {
+      if (fabs(jpsi_muon0.at(i)->eta()) <= MAX_JPSI_MUON_ETA && fabs(jpsi_muon1.at(i)->eta()) <= MAX_JPSI_MUON_ETA ) {
         truth_jpsi.has_muons_in_eta_window.push_back( true );
       }
       else {
