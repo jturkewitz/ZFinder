@@ -5,10 +5,11 @@
 To set up a working area, run the following commands:
 
 ```bash
-scram project CMSSW CMSSW_5_3_13
-cd CMSSW_5_3_13
-git clone https://github.com/UMN-CMS/ZFinder.git src/
-cmsenv
+scramv1 project -n CMSSW_5_3_28_ZPhysics CMSSW CMSSW_5_3_28
+cd CMSSW_5_3_28_ZPhysics/
+
+git clone -b JPsi --single-branch https://github.com/jturkewitz/ZFinder.git src/
 cd src
+cmsenv
 scram build -j 4
 ```

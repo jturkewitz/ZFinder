@@ -541,6 +541,12 @@ namespace zf {
       jpsi_zpt_difference_->GetXaxis()->SetTitle("pT [GeV]");
       jpsi_zpt_difference_->GetYaxis()->SetTitle("Counts / 1 GeV ");
 
+      // jpsi_zmumupt_difference_
+      const std::string jpsi_zmumupt_difference__name = "zmumupt - jpsipT";
+      jpsi_zmumupt_difference_ = tdir.make<TH1D>(jpsi_zmumupt_difference__name.c_str(), jpsi_zmumupt_difference__name.c_str(), 200, -100., 100.);
+      jpsi_zmumupt_difference_->GetXaxis()->SetTitle("pT [GeV]");
+      jpsi_zmumupt_difference_->GetYaxis()->SetTitle("Counts / 1 GeV ");
+
       // jpsi_tau_xy
       const std::string jpsi_tau_xy_name = "jpsi tau_xy";
       jpsi_tau_xy_ = tdir.make<TH1D>(jpsi_tau_xy_name.c_str(), jpsi_tau_xy_name.c_str(), 200, -100., 100.);
@@ -561,123 +567,123 @@ namespace zf {
 
       // jpsi_tau_xy_very_fine_ptUnder10
       const std::string jpsi_tau_xy_very_fine_ptUnder10_name = "jpsi_tau_xy_very_fine_ptUnder10";
-      jpsi_tau_xy_very_fine_ptUnder10_ = tdir.make<TH1D>(jpsi_tau_xy_very_fine_ptUnder10_name.c_str(), jpsi_tau_xy_very_fine_ptUnder10_name.c_str(), 2000, -10., 10.);
+      jpsi_tau_xy_very_fine_ptUnder10_ = tdir.make<TH1D>(jpsi_tau_xy_very_fine_ptUnder10_name.c_str(), jpsi_tau_xy_very_fine_ptUnder10_name.c_str(), 200, -10., 10.);
       jpsi_tau_xy_very_fine_ptUnder10_->GetXaxis()->SetTitle("tau_xy_very_fine [ps]");
-      jpsi_tau_xy_very_fine_ptUnder10_->GetYaxis()->SetTitle("Counts / 0.01 ps ");
+      jpsi_tau_xy_very_fine_ptUnder10_->GetYaxis()->SetTitle("Counts / 0.1 ps ");
 
       // jpsi_tau_xy_very_fine_pt10to15
       const std::string jpsi_tau_xy_very_fine_pt10to15_name = "jpsi_tau_xy_very_fine_pt_10_to_15";
-      jpsi_tau_xy_very_fine_pt10to15_ = tdir.make<TH1D>(jpsi_tau_xy_very_fine_pt10to15_name.c_str(), jpsi_tau_xy_very_fine_pt10to15_name.c_str(), 2000, -10., 10.);
+      jpsi_tau_xy_very_fine_pt10to15_ = tdir.make<TH1D>(jpsi_tau_xy_very_fine_pt10to15_name.c_str(), jpsi_tau_xy_very_fine_pt10to15_name.c_str(), 200, -10., 10.);
       jpsi_tau_xy_very_fine_pt10to15_->GetXaxis()->SetTitle("tau_xy_very_fine [ps]");
-      jpsi_tau_xy_very_fine_pt10to15_->GetYaxis()->SetTitle("Counts / 0.01 ps ");
+      jpsi_tau_xy_very_fine_pt10to15_->GetYaxis()->SetTitle("Counts / 0.1 ps ");
 
       // jpsi_tau_xy_very_fine_pt15to20
       const std::string jpsi_tau_xy_very_fine_pt15to20_name = "jpsi_tau_xy_very_fine_pt_15_to_20";
-      jpsi_tau_xy_very_fine_pt15to20_ = tdir.make<TH1D>(jpsi_tau_xy_very_fine_pt15to20_name.c_str(), jpsi_tau_xy_very_fine_pt15to20_name.c_str(), 2000, -10., 10.);
+      jpsi_tau_xy_very_fine_pt15to20_ = tdir.make<TH1D>(jpsi_tau_xy_very_fine_pt15to20_name.c_str(), jpsi_tau_xy_very_fine_pt15to20_name.c_str(), 200, -10., 10.);
       jpsi_tau_xy_very_fine_pt15to20_->GetXaxis()->SetTitle("tau_xy_very_fine [ps]");
-      jpsi_tau_xy_very_fine_pt15to20_->GetYaxis()->SetTitle("Counts / 0.01 ps ");
+      jpsi_tau_xy_very_fine_pt15to20_->GetYaxis()->SetTitle("Counts / 0.1 ps ");
 
       // jpsi_tau_xy_very_fine_pt20to25
       const std::string jpsi_tau_xy_very_fine_pt20to25_name = "jpsi_tau_xy_very_fine_pt_20_to_25";
-      jpsi_tau_xy_very_fine_pt20to25_ = tdir.make<TH1D>(jpsi_tau_xy_very_fine_pt20to25_name.c_str(), jpsi_tau_xy_very_fine_pt20to25_name.c_str(), 2000, -10., 10.);
+      jpsi_tau_xy_very_fine_pt20to25_ = tdir.make<TH1D>(jpsi_tau_xy_very_fine_pt20to25_name.c_str(), jpsi_tau_xy_very_fine_pt20to25_name.c_str(), 200, -10., 10.);
       jpsi_tau_xy_very_fine_pt20to25_->GetXaxis()->SetTitle("tau_xy_very_fine [ps]");
-      jpsi_tau_xy_very_fine_pt20to25_->GetYaxis()->SetTitle("Counts / 0.01 ps ");
+      jpsi_tau_xy_very_fine_pt20to25_->GetYaxis()->SetTitle("Counts / 0.1 ps ");
 
       // jpsi_tau_xy_very_fine_pt25to30
       const std::string jpsi_tau_xy_very_fine_pt25to30_name = "jpsi_tau_xy_very_fine_pt_25_to_30";
-      jpsi_tau_xy_very_fine_pt25to30_ = tdir.make<TH1D>(jpsi_tau_xy_very_fine_pt25to30_name.c_str(), jpsi_tau_xy_very_fine_pt25to30_name.c_str(), 2000, -10., 10.);
+      jpsi_tau_xy_very_fine_pt25to30_ = tdir.make<TH1D>(jpsi_tau_xy_very_fine_pt25to30_name.c_str(), jpsi_tau_xy_very_fine_pt25to30_name.c_str(), 200, -10., 10.);
       jpsi_tau_xy_very_fine_pt25to30_->GetXaxis()->SetTitle("tau_xy_very_fine [ps]");
-      jpsi_tau_xy_very_fine_pt25to30_->GetYaxis()->SetTitle("Counts / 0.01 ps ");
+      jpsi_tau_xy_very_fine_pt25to30_->GetYaxis()->SetTitle("Counts / 0.1 ps ");
 
       // jpsi_tau_xy_very_fine_ptAbove30
       const std::string jpsi_tau_xy_very_fine_ptAbove30_name = "jpsi_tau_xy_very_fine_ptAbove30";
-      jpsi_tau_xy_very_fine_ptAbove30_ = tdir.make<TH1D>(jpsi_tau_xy_very_fine_ptAbove30_name.c_str(), jpsi_tau_xy_very_fine_ptAbove30_name.c_str(), 2000, -10., 10.);
+      jpsi_tau_xy_very_fine_ptAbove30_ = tdir.make<TH1D>(jpsi_tau_xy_very_fine_ptAbove30_name.c_str(), jpsi_tau_xy_very_fine_ptAbove30_name.c_str(), 200, -10., 10.);
       jpsi_tau_xy_very_fine_ptAbove30_->GetXaxis()->SetTitle("tau_xy_very_fine [ps]");
-      jpsi_tau_xy_very_fine_ptAbove30_->GetYaxis()->SetTitle("Counts / 0.01 ps ");
+      jpsi_tau_xy_very_fine_ptAbove30_->GetYaxis()->SetTitle("Counts / 0.1 ps ");
 
       // jpsi_tau_xy_very_fine_rap0_0to0_3
       const std::string jpsi_tau_xy_very_fine_rap0_0to0_3_name = "jpsi_tau_xy_very_fine_rap_0.0_to_0.3";
-      jpsi_tau_xy_very_fine_rap0_0to0_3_ = tdir.make<TH1D>(jpsi_tau_xy_very_fine_rap0_0to0_3_name.c_str(), jpsi_tau_xy_very_fine_rap0_0to0_3_name.c_str(), 2000, -10., 10.);
+      jpsi_tau_xy_very_fine_rap0_0to0_3_ = tdir.make<TH1D>(jpsi_tau_xy_very_fine_rap0_0to0_3_name.c_str(), jpsi_tau_xy_very_fine_rap0_0to0_3_name.c_str(), 200, -10., 10.);
       jpsi_tau_xy_very_fine_rap0_0to0_3_->GetXaxis()->SetTitle("tau_xy_very_fine [ps]");
-      jpsi_tau_xy_very_fine_rap0_0to0_3_->GetYaxis()->SetTitle("Counts / 0.01 ps ");
+      jpsi_tau_xy_very_fine_rap0_0to0_3_->GetYaxis()->SetTitle("Counts / 0.1 ps ");
 
       // jpsi_tau_xy_very_fine_rap0_3to0_6
       const std::string jpsi_tau_xy_very_fine_rap0_3to0_6_name = "jpsi_tau_xy_very_fine_rap_0.3_to_0.6";
-      jpsi_tau_xy_very_fine_rap0_3to0_6_ = tdir.make<TH1D>(jpsi_tau_xy_very_fine_rap0_3to0_6_name.c_str(), jpsi_tau_xy_very_fine_rap0_3to0_6_name.c_str(), 2000, -10., 10.);
+      jpsi_tau_xy_very_fine_rap0_3to0_6_ = tdir.make<TH1D>(jpsi_tau_xy_very_fine_rap0_3to0_6_name.c_str(), jpsi_tau_xy_very_fine_rap0_3to0_6_name.c_str(), 200, -10., 10.);
       jpsi_tau_xy_very_fine_rap0_3to0_6_->GetXaxis()->SetTitle("tau_xy_very_fine [ps]");
-      jpsi_tau_xy_very_fine_rap0_3to0_6_->GetYaxis()->SetTitle("Counts / 0.01 ps ");
+      jpsi_tau_xy_very_fine_rap0_3to0_6_->GetYaxis()->SetTitle("Counts / 0.1 ps ");
 
       // jpsi_tau_xy_very_fine_rap0_6to0_9
       const std::string jpsi_tau_xy_very_fine_rap0_6to0_9_name = "jpsi_tau_xy_very_fine_rap_0.6_to_0.9";
-      jpsi_tau_xy_very_fine_rap0_6to0_9_ = tdir.make<TH1D>(jpsi_tau_xy_very_fine_rap0_6to0_9_name.c_str(), jpsi_tau_xy_very_fine_rap0_6to0_9_name.c_str(), 2000, -10., 10.);
+      jpsi_tau_xy_very_fine_rap0_6to0_9_ = tdir.make<TH1D>(jpsi_tau_xy_very_fine_rap0_6to0_9_name.c_str(), jpsi_tau_xy_very_fine_rap0_6to0_9_name.c_str(), 200, -10., 10.);
       jpsi_tau_xy_very_fine_rap0_6to0_9_->GetXaxis()->SetTitle("tau_xy_very_fine [ps]");
-      jpsi_tau_xy_very_fine_rap0_6to0_9_->GetYaxis()->SetTitle("Counts / 0.01 ps ");
+      jpsi_tau_xy_very_fine_rap0_6to0_9_->GetYaxis()->SetTitle("Counts / 0.1 ps ");
 
       // jpsi_tau_xy_very_fine_rap0_9to1_2
       const std::string jpsi_tau_xy_very_fine_rap0_9to1_2_name = "jpsi_tau_xy_very_fine_rap_0.9_to_1.2";
-      jpsi_tau_xy_very_fine_rap0_9to1_2_ = tdir.make<TH1D>(jpsi_tau_xy_very_fine_rap0_9to1_2_name.c_str(), jpsi_tau_xy_very_fine_rap0_9to1_2_name.c_str(), 2000, -10., 10.);
+      jpsi_tau_xy_very_fine_rap0_9to1_2_ = tdir.make<TH1D>(jpsi_tau_xy_very_fine_rap0_9to1_2_name.c_str(), jpsi_tau_xy_very_fine_rap0_9to1_2_name.c_str(), 200, -10., 10.);
       jpsi_tau_xy_very_fine_rap0_9to1_2_->GetXaxis()->SetTitle("tau_xy_very_fine [ps]");
-      jpsi_tau_xy_very_fine_rap0_9to1_2_->GetYaxis()->SetTitle("Counts / 0.01 ps ");
+      jpsi_tau_xy_very_fine_rap0_9to1_2_->GetYaxis()->SetTitle("Counts / 0.1 ps ");
 
       // jpsi_tau_xy_very_fine_rap1_2to1_5
       const std::string jpsi_tau_xy_very_fine_rap1_2to1_5_name = "jpsi_tau_xy_very_fine_rap_1.2_to_1.5";
-      jpsi_tau_xy_very_fine_rap1_2to1_5_ = tdir.make<TH1D>(jpsi_tau_xy_very_fine_rap1_2to1_5_name.c_str(), jpsi_tau_xy_very_fine_rap1_2to1_5_name.c_str(), 2000, -10., 10.);
+      jpsi_tau_xy_very_fine_rap1_2to1_5_ = tdir.make<TH1D>(jpsi_tau_xy_very_fine_rap1_2to1_5_name.c_str(), jpsi_tau_xy_very_fine_rap1_2to1_5_name.c_str(), 200, -10., 10.);
       jpsi_tau_xy_very_fine_rap1_2to1_5_->GetXaxis()->SetTitle("tau_xy_very_fine [ps]");
-      jpsi_tau_xy_very_fine_rap1_2to1_5_->GetYaxis()->SetTitle("Counts / 0.01 ps ");
+      jpsi_tau_xy_very_fine_rap1_2to1_5_->GetYaxis()->SetTitle("Counts / 0.1 ps ");
 
       // jpsi_tau_xy_very_fine_rap1_5to1_8
       const std::string jpsi_tau_xy_very_fine_rap1_5to1_8_name = "jpsi_tau_xy_very_fine_rap_1.5_to_1.8";
-      jpsi_tau_xy_very_fine_rap1_5to1_8_ = tdir.make<TH1D>(jpsi_tau_xy_very_fine_rap1_5to1_8_name.c_str(), jpsi_tau_xy_very_fine_rap1_5to1_8_name.c_str(), 2000, -10., 10.);
+      jpsi_tau_xy_very_fine_rap1_5to1_8_ = tdir.make<TH1D>(jpsi_tau_xy_very_fine_rap1_5to1_8_name.c_str(), jpsi_tau_xy_very_fine_rap1_5to1_8_name.c_str(), 200, -10., 10.);
       jpsi_tau_xy_very_fine_rap1_5to1_8_->GetXaxis()->SetTitle("tau_xy_very_fine [ps]");
-      jpsi_tau_xy_very_fine_rap1_5to1_8_->GetYaxis()->SetTitle("Counts / 0.01 ps ");
+      jpsi_tau_xy_very_fine_rap1_5to1_8_->GetYaxis()->SetTitle("Counts / 0.1 ps ");
 
       // jpsi_tau_xy_very_fine_rap1_8to2_1
       const std::string jpsi_tau_xy_very_fine_rap1_8to2_1_name = "jpsi_tau_xy_very_fine_rap_1.8_to_2.1";
-      jpsi_tau_xy_very_fine_rap1_8to2_1_ = tdir.make<TH1D>(jpsi_tau_xy_very_fine_rap1_8to2_1_name.c_str(), jpsi_tau_xy_very_fine_rap1_8to2_1_name.c_str(), 2000, -10., 10.);
+      jpsi_tau_xy_very_fine_rap1_8to2_1_ = tdir.make<TH1D>(jpsi_tau_xy_very_fine_rap1_8to2_1_name.c_str(), jpsi_tau_xy_very_fine_rap1_8to2_1_name.c_str(), 200, -10., 10.);
       jpsi_tau_xy_very_fine_rap1_8to2_1_->GetXaxis()->SetTitle("tau_xy_very_fine [ps]");
-      jpsi_tau_xy_very_fine_rap1_8to2_1_->GetYaxis()->SetTitle("Counts / 0.01 ps ");
+      jpsi_tau_xy_very_fine_rap1_8to2_1_->GetYaxis()->SetTitle("Counts / 0.1 ps ");
 
       // jpsi_tau_xy_very_fine_rap2_1to2_4
       const std::string jpsi_tau_xy_very_fine_rap2_1to2_4_name = "jpsi_tau_xy_very_fine_rap_2.1_to_2.4";
-      jpsi_tau_xy_very_fine_rap2_1to2_4_ = tdir.make<TH1D>(jpsi_tau_xy_very_fine_rap2_1to2_4_name.c_str(), jpsi_tau_xy_very_fine_rap2_1to2_4_name.c_str(), 2000, -10., 10.);
+      jpsi_tau_xy_very_fine_rap2_1to2_4_ = tdir.make<TH1D>(jpsi_tau_xy_very_fine_rap2_1to2_4_name.c_str(), jpsi_tau_xy_very_fine_rap2_1to2_4_name.c_str(), 200, -10., 10.);
       jpsi_tau_xy_very_fine_rap2_1to2_4_->GetXaxis()->SetTitle("tau_xy_very_fine [ps]");
-      jpsi_tau_xy_very_fine_rap2_1to2_4_->GetYaxis()->SetTitle("Counts / 0.01 ps ");
+      jpsi_tau_xy_very_fine_rap2_1to2_4_->GetYaxis()->SetTitle("Counts / 0.1 ps ");
 
       // jpsi_tau_xy_very_fine_rap0_0to0_9_pt10to15
       const std::string jpsi_tau_xy_very_fine_rap0_0to0_9pt10to15_name = "jpsi_tau_xy_very_fine_rap_0.0_to_0.9_pt10to15";
-      jpsi_tau_xy_very_fine_rap0_0to0_9pt10to15_ = tdir.make<TH1D>(jpsi_tau_xy_very_fine_rap0_0to0_9pt10to15_name.c_str(), jpsi_tau_xy_very_fine_rap0_0to0_9pt10to15_name.c_str(), 2000, -10., 10.);
+      jpsi_tau_xy_very_fine_rap0_0to0_9pt10to15_ = tdir.make<TH1D>(jpsi_tau_xy_very_fine_rap0_0to0_9pt10to15_name.c_str(), jpsi_tau_xy_very_fine_rap0_0to0_9pt10to15_name.c_str(), 200, -10., 10.);
       jpsi_tau_xy_very_fine_rap0_0to0_9pt10to15_->GetXaxis()->SetTitle("tau_xy_very_fine [ps]");
-      jpsi_tau_xy_very_fine_rap0_0to0_9pt10to15_->GetYaxis()->SetTitle("Counts / 0.01 ps ");
+      jpsi_tau_xy_very_fine_rap0_0to0_9pt10to15_->GetYaxis()->SetTitle("Counts / 0.1 ps ");
 
       // jpsi_tau_xy_very_fine_rap0_9to1_2_pt10to15
       const std::string jpsi_tau_xy_very_fine_rap0_9to1_2pt10to15_name = "jpsi_tau_xy_very_fine_rap_0.9_to_1.2_pt10to15";
-      jpsi_tau_xy_very_fine_rap0_9to1_2pt10to15_ = tdir.make<TH1D>(jpsi_tau_xy_very_fine_rap0_9to1_2pt10to15_name.c_str(), jpsi_tau_xy_very_fine_rap0_9to1_2pt10to15_name.c_str(), 2000, -10., 10.);
+      jpsi_tau_xy_very_fine_rap0_9to1_2pt10to15_ = tdir.make<TH1D>(jpsi_tau_xy_very_fine_rap0_9to1_2pt10to15_name.c_str(), jpsi_tau_xy_very_fine_rap0_9to1_2pt10to15_name.c_str(), 200, -10., 10.);
       jpsi_tau_xy_very_fine_rap0_9to1_2pt10to15_->GetXaxis()->SetTitle("tau_xy_very_fine [ps]");
-      jpsi_tau_xy_very_fine_rap0_9to1_2pt10to15_->GetYaxis()->SetTitle("Counts / 0.01 ps ");
+      jpsi_tau_xy_very_fine_rap0_9to1_2pt10to15_->GetYaxis()->SetTitle("Counts / 0.1 ps ");
 
       // jpsi_tau_xy_very_fine_rap1_2to2_1_pt10to15
       const std::string jpsi_tau_xy_very_fine_rap1_2to2_1pt10to15_name = "jpsi_tau_xy_very_fine_rap_1.2_to_2.1_pt10to15";
-      jpsi_tau_xy_very_fine_rap1_2to2_1pt10to15_ = tdir.make<TH1D>(jpsi_tau_xy_very_fine_rap1_2to2_1pt10to15_name.c_str(), jpsi_tau_xy_very_fine_rap1_2to2_1pt10to15_name.c_str(), 2000, -10., 10.);
+      jpsi_tau_xy_very_fine_rap1_2to2_1pt10to15_ = tdir.make<TH1D>(jpsi_tau_xy_very_fine_rap1_2to2_1pt10to15_name.c_str(), jpsi_tau_xy_very_fine_rap1_2to2_1pt10to15_name.c_str(), 200, -10., 10.);
       jpsi_tau_xy_very_fine_rap1_2to2_1pt10to15_->GetXaxis()->SetTitle("tau_xy_very_fine [ps]");
-      jpsi_tau_xy_very_fine_rap1_2to2_1pt10to15_->GetYaxis()->SetTitle("Counts / 0.01 ps ");
+      jpsi_tau_xy_very_fine_rap1_2to2_1pt10to15_->GetYaxis()->SetTitle("Counts / 0.1 ps ");
 
       // jpsi_tau_xy_very_fine_above_12_tracker_layers
       const std::string jpsi_tau_xy_very_fine_above_12_tracker_layers_name = "jpsi_tau_xy_very_fine_above_12_tracker_layers_";
-      jpsi_tau_xy_very_fine_above_12_tracker_layers_ = tdir.make<TH1D>(jpsi_tau_xy_very_fine_above_12_tracker_layers_name.c_str(), jpsi_tau_xy_very_fine_above_12_tracker_layers_name.c_str(), 2000, -10., 10.);
+      jpsi_tau_xy_very_fine_above_12_tracker_layers_ = tdir.make<TH1D>(jpsi_tau_xy_very_fine_above_12_tracker_layers_name.c_str(), jpsi_tau_xy_very_fine_above_12_tracker_layers_name.c_str(), 200, -10., 10.);
       jpsi_tau_xy_very_fine_above_12_tracker_layers_->GetXaxis()->SetTitle("tau_xy_very_fine [ps]");
-      jpsi_tau_xy_very_fine_above_12_tracker_layers_->GetYaxis()->SetTitle("Counts / 0.01 ps ");
+      jpsi_tau_xy_very_fine_above_12_tracker_layers_->GetYaxis()->SetTitle("Counts / 0.1 ps ");
 
       // jpsi_tau_xy_very_fine_similar_pt_muons_
       const std::string jpsi_tau_xy_very_fine_similar_pt_muons_name = "jpsi_tau_xy_very_fine_similar_pt_muons_";
-      jpsi_tau_xy_very_fine_similar_pt_muons_ = tdir.make<TH1D>(jpsi_tau_xy_very_fine_similar_pt_muons_name.c_str(), jpsi_tau_xy_very_fine_similar_pt_muons_name.c_str(), 2000, -10., 10.);
+      jpsi_tau_xy_very_fine_similar_pt_muons_ = tdir.make<TH1D>(jpsi_tau_xy_very_fine_similar_pt_muons_name.c_str(), jpsi_tau_xy_very_fine_similar_pt_muons_name.c_str(), 200, -10., 10.);
       jpsi_tau_xy_very_fine_similar_pt_muons_->GetXaxis()->SetTitle("tau_xy_very_fine [ps]");
-      jpsi_tau_xy_very_fine_similar_pt_muons_->GetYaxis()->SetTitle("Counts / 0.01 ps ");
+      jpsi_tau_xy_very_fine_similar_pt_muons_->GetYaxis()->SetTitle("Counts / 0.1 ps ");
 
       // jpsi_tau_xy_dimuon_continuum_bg_
       const std::string jpsi_tau_xy_dimuon_continuum_bg_name = "jpsi_tau_xy_dimuon_continuum_bg_";
-      jpsi_tau_xy_dimuon_continuum_bg_ = tdir.make<TH1D>(jpsi_tau_xy_dimuon_continuum_bg_name.c_str(), jpsi_tau_xy_dimuon_continuum_bg_name.c_str(), 2000, -10., 10.);
+      jpsi_tau_xy_dimuon_continuum_bg_ = tdir.make<TH1D>(jpsi_tau_xy_dimuon_continuum_bg_name.c_str(), jpsi_tau_xy_dimuon_continuum_bg_name.c_str(), 200, -10., 10.);
       jpsi_tau_xy_dimuon_continuum_bg_->GetXaxis()->SetTitle("tau_xy [ps]");
-      jpsi_tau_xy_dimuon_continuum_bg_->GetYaxis()->SetTitle("Counts / 0.01 ps ");
+      jpsi_tau_xy_dimuon_continuum_bg_->GetYaxis()->SetTitle("Counts / 0.1 ps ");
 
       // jpsi_tau_z
       const std::string jpsi_tau_z_name = "jpsi tau_z";
@@ -699,15 +705,27 @@ namespace zf {
 
       // jpsi_mass_vs_chi2
       const std::string jpsi_mass_vs_chi2_name = "jpsi mass vs chi2";
-      jpsi_mass_vs_chi2_ = tdir.make<TH2D>(jpsi_mass_vs_chi2_name.c_str(), jpsi_mass_vs_chi2_name.c_str(), 100, 0., 10., 100, 0., 10.);
+      jpsi_mass_vs_chi2_ = tdir.make<TH2D>(jpsi_mass_vs_chi2_name.c_str(), jpsi_mass_vs_chi2_name.c_str(), 100, 0., 10., 50, 0., 10.);
       jpsi_mass_vs_chi2_->GetXaxis()->SetTitle("chi2");
       jpsi_mass_vs_chi2_->GetYaxis()->SetTitle("mass");
 
       // jpsi_tau_xy_vs_tau_z
       const std::string jpsi_tau_xy_vs_tau_z_name = "jpsi tau_xy vs tau_z";
-      jpsi_tau_xy_vs_tau_z_ = tdir.make<TH2D>(jpsi_tau_xy_vs_tau_z_name.c_str(), jpsi_tau_xy_vs_tau_z_name.c_str(), 200, -10., 10., 200, -10., 10.);
+      jpsi_tau_xy_vs_tau_z_ = tdir.make<TH2D>(jpsi_tau_xy_vs_tau_z_name.c_str(), jpsi_tau_xy_vs_tau_z_name.c_str(), 100, -10., 10., 100, -10., 10.);
       jpsi_tau_xy_vs_tau_z_->GetXaxis()->SetTitle("tau_xy [ps]");
       jpsi_tau_xy_vs_tau_z_->GetYaxis()->SetTitle("tau_z [ps]");
+
+      // dimuon_pt_vs_zee_pt
+      const std::string dimuon_pt_vs_zee_pt_name = "dimuon_pt_vs_zee_pt";
+      dimuon_pt_vs_zee_pt_ = tdir.make<TH2D>(dimuon_pt_vs_zee_pt_name.c_str(), dimuon_pt_vs_zee_pt_name.c_str(), 200, 0.0, 200.0, 200, 0.0, 200.);
+      dimuon_pt_vs_zee_pt_->GetXaxis()->SetTitle("J/#psi p_{T} [GeV]");
+      dimuon_pt_vs_zee_pt_->GetYaxis()->SetTitle("Z->ee p_{T} [GeV]");
+
+      // dimuon_pt_vs_zmumu_pt
+      const std::string dimuon_pt_vs_zmumu_pt_name = "dimuon_pt_vs_zmumu_pt";
+      dimuon_pt_vs_zmumu_pt_ = tdir.make<TH2D>(dimuon_pt_vs_zmumu_pt_name.c_str(), dimuon_pt_vs_zmumu_pt_name.c_str(), 200, 0.0, 200.0, 200, 0.0, 200.);
+      dimuon_pt_vs_zmumu_pt_->GetXaxis()->SetTitle("J/#psi p_{T} [GeV]");
+      dimuon_pt_vs_zmumu_pt_->GetYaxis()->SetTitle("Z->#mu#mu p_{T} [GeV]");
 
       // dimuon_mass_vs_dimuon_tau_xy
       const std::string dimuon_mass_vs_dimuon_tau_xy_name = "dimuon_mass_vs_dimuon_tau_xy";
@@ -717,43 +735,115 @@ namespace zf {
 
       // dimuon_mass_vs_dimuon_tau_xy_fine
       const std::string dimuon_mass_vs_dimuon_tau_xy_fine_name = "dimuon_mass_vs_dimuon_tau_xy_fine";
-      dimuon_mass_vs_dimuon_tau_xy_fine_ = tdir.make<TH2D>(dimuon_mass_vs_dimuon_tau_xy_fine_name.c_str(), dimuon_mass_vs_dimuon_tau_xy_fine_name.c_str(), 50, 2.85, 3.35, 1000, -5., 5.);
+      dimuon_mass_vs_dimuon_tau_xy_fine_ = tdir.make<TH2D>(dimuon_mass_vs_dimuon_tau_xy_fine_name.c_str(), dimuon_mass_vs_dimuon_tau_xy_fine_name.c_str(), 50, 2.85, 3.35, 750, -5., 10.);
       dimuon_mass_vs_dimuon_tau_xy_fine_->GetXaxis()->SetTitle("dimuon mass [GeV]");
       dimuon_mass_vs_dimuon_tau_xy_fine_->GetYaxis()->SetTitle("tau_xy [ps]");
 
       // dimuon_mass_vs_dimuon_tau_xy_8p5to10p0
       const std::string dimuon_mass_vs_dimuon_tau_xy_8p5to10p0_name = "dimuon_mass_vs_dimuon_tau_xy_8p5to10p0";
-      dimuon_mass_vs_dimuon_tau_xy_8p5to10p0_ = tdir.make<TH2D>(dimuon_mass_vs_dimuon_tau_xy_8p5to10p0_name.c_str(), dimuon_mass_vs_dimuon_tau_xy_8p5to10p0_name.c_str(), 50, 2.85, 3.35, 1000, -5., 5.);
+      dimuon_mass_vs_dimuon_tau_xy_8p5to10p0_ = tdir.make<TH2D>(dimuon_mass_vs_dimuon_tau_xy_8p5to10p0_name.c_str(), dimuon_mass_vs_dimuon_tau_xy_8p5to10p0_name.c_str(), 50, 2.85, 3.35, 750, -5., 10.);
       dimuon_mass_vs_dimuon_tau_xy_8p5to10p0_->GetXaxis()->SetTitle("dimuon mass (pt 8.5 to 10.0) [GeV]");
       dimuon_mass_vs_dimuon_tau_xy_8p5to10p0_->GetYaxis()->SetTitle("tau_xy [ps]");
 
       // dimuon_mass_vs_dimuon_tau_xy_10to14
       const std::string dimuon_mass_vs_dimuon_tau_xy_10to14_name = "dimuon_mass_vs_dimuon_tau_xy_10to14";
-      dimuon_mass_vs_dimuon_tau_xy_10to14_ = tdir.make<TH2D>(dimuon_mass_vs_dimuon_tau_xy_10to14_name.c_str(), dimuon_mass_vs_dimuon_tau_xy_10to14_name.c_str(), 50, 2.85, 3.35, 1000, -5., 5.);
+      dimuon_mass_vs_dimuon_tau_xy_10to14_ = tdir.make<TH2D>(dimuon_mass_vs_dimuon_tau_xy_10to14_name.c_str(), dimuon_mass_vs_dimuon_tau_xy_10to14_name.c_str(), 50, 2.85, 3.35, 750, -5., 10.);
       dimuon_mass_vs_dimuon_tau_xy_10to14_->GetXaxis()->SetTitle("dimuon mass (pt 10 to 14)[GeV]");
       dimuon_mass_vs_dimuon_tau_xy_10to14_->GetYaxis()->SetTitle("tau_xy [ps]");
 
       // dimuon_mass_vs_dimuon_tau_xy_14to18
       const std::string dimuon_mass_vs_dimuon_tau_xy_14to18_name = "dimuon_mass_vs_dimuon_tau_xy_14to18";
-      dimuon_mass_vs_dimuon_tau_xy_14to18_ = tdir.make<TH2D>(dimuon_mass_vs_dimuon_tau_xy_14to18_name.c_str(), dimuon_mass_vs_dimuon_tau_xy_14to18_name.c_str(), 50, 2.85, 3.35, 1000, -5., 5.);
+      dimuon_mass_vs_dimuon_tau_xy_14to18_ = tdir.make<TH2D>(dimuon_mass_vs_dimuon_tau_xy_14to18_name.c_str(), dimuon_mass_vs_dimuon_tau_xy_14to18_name.c_str(), 50, 2.85, 3.35, 750, -5., 10.);
       dimuon_mass_vs_dimuon_tau_xy_14to18_->GetXaxis()->SetTitle("dimuon mass (pt 14 to 18)[GeV]");
       dimuon_mass_vs_dimuon_tau_xy_14to18_->GetYaxis()->SetTitle("tau_xy [ps]");
 
       // dimuon_mass_vs_dimuon_tau_xy_18to30
       const std::string dimuon_mass_vs_dimuon_tau_xy_18to30_name = "dimuon_mass_vs_dimuon_tau_xy_18to30";
-      dimuon_mass_vs_dimuon_tau_xy_18to30_ = tdir.make<TH2D>(dimuon_mass_vs_dimuon_tau_xy_18to30_name.c_str(), dimuon_mass_vs_dimuon_tau_xy_18to30_name.c_str(), 50, 2.85, 3.35, 1000, -5., 5.);
+      dimuon_mass_vs_dimuon_tau_xy_18to30_ = tdir.make<TH2D>(dimuon_mass_vs_dimuon_tau_xy_18to30_name.c_str(), dimuon_mass_vs_dimuon_tau_xy_18to30_name.c_str(), 50, 2.85, 3.35, 750, -5., 10.);
       dimuon_mass_vs_dimuon_tau_xy_18to30_->GetXaxis()->SetTitle("dimuon mass (pt 18 to 30) [GeV]");
       dimuon_mass_vs_dimuon_tau_xy_18to30_->GetYaxis()->SetTitle("tau_xy [ps]");
 
       // dimuon_mass_vs_dimuon_tau_xy_30to100
       const std::string dimuon_mass_vs_dimuon_tau_xy_30to100_name = "dimuon_mass_vs_dimuon_tau_xy_30to100";
-      dimuon_mass_vs_dimuon_tau_xy_30to100_ = tdir.make<TH2D>(dimuon_mass_vs_dimuon_tau_xy_30to100_name.c_str(), dimuon_mass_vs_dimuon_tau_xy_30to100_name.c_str(), 50, 2.85, 3.35, 1000, -5., 5.);
+      dimuon_mass_vs_dimuon_tau_xy_30to100_ = tdir.make<TH2D>(dimuon_mass_vs_dimuon_tau_xy_30to100_name.c_str(), dimuon_mass_vs_dimuon_tau_xy_30to100_name.c_str(), 50, 2.85, 3.35, 750, -5., 10.);
       dimuon_mass_vs_dimuon_tau_xy_30to100_->GetXaxis()->SetTitle("dimuon mass (pt 30 to 100) [GeV]");
       dimuon_mass_vs_dimuon_tau_xy_30to100_->GetYaxis()->SetTitle("tau_xy [ps]");
 
+      // low_rap_dimuon_mass_vs_dimuon_tau_xy_fine
+      const std::string low_rap_dimuon_mass_vs_dimuon_tau_xy_fine_name = "low_rap_dimuon_mass_vs_dimuon_tau_xy_fine";
+      low_rap_dimuon_mass_vs_dimuon_tau_xy_fine_ = tdir.make<TH2D>(low_rap_dimuon_mass_vs_dimuon_tau_xy_fine_name.c_str(), low_rap_dimuon_mass_vs_dimuon_tau_xy_fine_name.c_str(), 50, 2.85, 3.35, 750, -5., 10.);
+      low_rap_dimuon_mass_vs_dimuon_tau_xy_fine_->GetXaxis()->SetTitle("dimuon mass [GeV]");
+      low_rap_dimuon_mass_vs_dimuon_tau_xy_fine_->GetYaxis()->SetTitle("tau_xy [ps]");
+
+      // low_rap_dimuon_mass_vs_dimuon_tau_xy_8p5to10p0
+      const std::string low_rap_dimuon_mass_vs_dimuon_tau_xy_8p5to10p0_name = "low_rap_dimuon_mass_vs_dimuon_tau_xy_8p5to10p0";
+      low_rap_dimuon_mass_vs_dimuon_tau_xy_8p5to10p0_ = tdir.make<TH2D>(low_rap_dimuon_mass_vs_dimuon_tau_xy_8p5to10p0_name.c_str(), low_rap_dimuon_mass_vs_dimuon_tau_xy_8p5to10p0_name.c_str(), 50, 2.85, 3.35, 750, -5., 10.);
+      low_rap_dimuon_mass_vs_dimuon_tau_xy_8p5to10p0_->GetXaxis()->SetTitle("dimuon mass (pt 8.5 to 10.0) [GeV]");
+      low_rap_dimuon_mass_vs_dimuon_tau_xy_8p5to10p0_->GetYaxis()->SetTitle("tau_xy [ps]");
+
+      // low_rap_dimuon_mass_vs_dimuon_tau_xy_10to14
+      const std::string low_rap_dimuon_mass_vs_dimuon_tau_xy_10to14_name = "low_rap_dimuon_mass_vs_dimuon_tau_xy_10to14";
+      low_rap_dimuon_mass_vs_dimuon_tau_xy_10to14_ = tdir.make<TH2D>(low_rap_dimuon_mass_vs_dimuon_tau_xy_10to14_name.c_str(), low_rap_dimuon_mass_vs_dimuon_tau_xy_10to14_name.c_str(), 50, 2.85, 3.35, 750, -5., 10.);
+      low_rap_dimuon_mass_vs_dimuon_tau_xy_10to14_->GetXaxis()->SetTitle("dimuon mass (pt 10 to 14)[GeV]");
+      low_rap_dimuon_mass_vs_dimuon_tau_xy_10to14_->GetYaxis()->SetTitle("tau_xy [ps]");
+
+      // low_rap_dimuon_mass_vs_dimuon_tau_xy_14to18
+      const std::string low_rap_dimuon_mass_vs_dimuon_tau_xy_14to18_name = "low_rap_dimuon_mass_vs_dimuon_tau_xy_14to18";
+      low_rap_dimuon_mass_vs_dimuon_tau_xy_14to18_ = tdir.make<TH2D>(low_rap_dimuon_mass_vs_dimuon_tau_xy_14to18_name.c_str(), low_rap_dimuon_mass_vs_dimuon_tau_xy_14to18_name.c_str(), 50, 2.85, 3.35, 750, -5., 10.);
+      low_rap_dimuon_mass_vs_dimuon_tau_xy_14to18_->GetXaxis()->SetTitle("dimuon mass (pt 14 to 18)[GeV]");
+      low_rap_dimuon_mass_vs_dimuon_tau_xy_14to18_->GetYaxis()->SetTitle("tau_xy [ps]");
+
+      // low_rap_dimuon_mass_vs_dimuon_tau_xy_18to30
+      const std::string low_rap_dimuon_mass_vs_dimuon_tau_xy_18to30_name = "low_rap_dimuon_mass_vs_dimuon_tau_xy_18to30";
+      low_rap_dimuon_mass_vs_dimuon_tau_xy_18to30_ = tdir.make<TH2D>(low_rap_dimuon_mass_vs_dimuon_tau_xy_18to30_name.c_str(), low_rap_dimuon_mass_vs_dimuon_tau_xy_18to30_name.c_str(), 50, 2.85, 3.35, 750, -5., 10.);
+      low_rap_dimuon_mass_vs_dimuon_tau_xy_18to30_->GetXaxis()->SetTitle("dimuon mass (pt 18 to 30) [GeV]");
+      low_rap_dimuon_mass_vs_dimuon_tau_xy_18to30_->GetYaxis()->SetTitle("tau_xy [ps]");
+
+      // low_rap_dimuon_mass_vs_dimuon_tau_xy_30to100
+      const std::string low_rap_dimuon_mass_vs_dimuon_tau_xy_30to100_name = "low_rap_dimuon_mass_vs_dimuon_tau_xy_30to100";
+      low_rap_dimuon_mass_vs_dimuon_tau_xy_30to100_ = tdir.make<TH2D>(low_rap_dimuon_mass_vs_dimuon_tau_xy_30to100_name.c_str(), low_rap_dimuon_mass_vs_dimuon_tau_xy_30to100_name.c_str(), 50, 2.85, 3.35, 750, -5., 10.);
+      low_rap_dimuon_mass_vs_dimuon_tau_xy_30to100_->GetXaxis()->SetTitle("dimuon mass (pt 30 to 100) [GeV]");
+      low_rap_dimuon_mass_vs_dimuon_tau_xy_30to100_->GetYaxis()->SetTitle("tau_xy [ps]");
+
+      // high_rap_dimuon_mass_vs_dimuon_tau_xy_fine
+      const std::string high_rap_dimuon_mass_vs_dimuon_tau_xy_fine_name = "high_rap_dimuon_mass_vs_dimuon_tau_xy_fine";
+      high_rap_dimuon_mass_vs_dimuon_tau_xy_fine_ = tdir.make<TH2D>(high_rap_dimuon_mass_vs_dimuon_tau_xy_fine_name.c_str(), high_rap_dimuon_mass_vs_dimuon_tau_xy_fine_name.c_str(), 50, 2.85, 3.35, 750, -5., 10.);
+      high_rap_dimuon_mass_vs_dimuon_tau_xy_fine_->GetXaxis()->SetTitle("dimuon mass [GeV]");
+      high_rap_dimuon_mass_vs_dimuon_tau_xy_fine_->GetYaxis()->SetTitle("tau_xy [ps]");
+
+      // high_rap_dimuon_mass_vs_dimuon_tau_xy_8p5to10p0
+      const std::string high_rap_dimuon_mass_vs_dimuon_tau_xy_8p5to10p0_name = "high_rap_dimuon_mass_vs_dimuon_tau_xy_8p5to10p0";
+      high_rap_dimuon_mass_vs_dimuon_tau_xy_8p5to10p0_ = tdir.make<TH2D>(high_rap_dimuon_mass_vs_dimuon_tau_xy_8p5to10p0_name.c_str(), high_rap_dimuon_mass_vs_dimuon_tau_xy_8p5to10p0_name.c_str(), 50, 2.85, 3.35, 750, -5., 10.);
+      high_rap_dimuon_mass_vs_dimuon_tau_xy_8p5to10p0_->GetXaxis()->SetTitle("dimuon mass (pt 8.5 to 10.0) [GeV]");
+      high_rap_dimuon_mass_vs_dimuon_tau_xy_8p5to10p0_->GetYaxis()->SetTitle("tau_xy [ps]");
+
+      // high_rap_dimuon_mass_vs_dimuon_tau_xy_10to14
+      const std::string high_rap_dimuon_mass_vs_dimuon_tau_xy_10to14_name = "high_rap_dimuon_mass_vs_dimuon_tau_xy_10to14";
+      high_rap_dimuon_mass_vs_dimuon_tau_xy_10to14_ = tdir.make<TH2D>(high_rap_dimuon_mass_vs_dimuon_tau_xy_10to14_name.c_str(), high_rap_dimuon_mass_vs_dimuon_tau_xy_10to14_name.c_str(), 50, 2.85, 3.35, 750, -5., 10.);
+      high_rap_dimuon_mass_vs_dimuon_tau_xy_10to14_->GetXaxis()->SetTitle("dimuon mass (pt 10 to 14)[GeV]");
+      high_rap_dimuon_mass_vs_dimuon_tau_xy_10to14_->GetYaxis()->SetTitle("tau_xy [ps]");
+
+      // high_rap_dimuon_mass_vs_dimuon_tau_xy_14to18
+      const std::string high_rap_dimuon_mass_vs_dimuon_tau_xy_14to18_name = "high_rap_dimuon_mass_vs_dimuon_tau_xy_14to18";
+      high_rap_dimuon_mass_vs_dimuon_tau_xy_14to18_ = tdir.make<TH2D>(high_rap_dimuon_mass_vs_dimuon_tau_xy_14to18_name.c_str(), high_rap_dimuon_mass_vs_dimuon_tau_xy_14to18_name.c_str(), 50, 2.85, 3.35, 750, -5., 10.);
+      high_rap_dimuon_mass_vs_dimuon_tau_xy_14to18_->GetXaxis()->SetTitle("dimuon mass (pt 14 to 18)[GeV]");
+      high_rap_dimuon_mass_vs_dimuon_tau_xy_14to18_->GetYaxis()->SetTitle("tau_xy [ps]");
+
+      // high_rap_dimuon_mass_vs_dimuon_tau_xy_18to30
+      const std::string high_rap_dimuon_mass_vs_dimuon_tau_xy_18to30_name = "high_rap_dimuon_mass_vs_dimuon_tau_xy_18to30";
+      high_rap_dimuon_mass_vs_dimuon_tau_xy_18to30_ = tdir.make<TH2D>(high_rap_dimuon_mass_vs_dimuon_tau_xy_18to30_name.c_str(), high_rap_dimuon_mass_vs_dimuon_tau_xy_18to30_name.c_str(), 50, 2.85, 3.35, 750, -5., 10.);
+      high_rap_dimuon_mass_vs_dimuon_tau_xy_18to30_->GetXaxis()->SetTitle("dimuon mass (pt 18 to 30) [GeV]");
+      high_rap_dimuon_mass_vs_dimuon_tau_xy_18to30_->GetYaxis()->SetTitle("tau_xy [ps]");
+
+      // high_rap_dimuon_mass_vs_dimuon_tau_xy_30to100
+      const std::string high_rap_dimuon_mass_vs_dimuon_tau_xy_30to100_name = "high_rap_dimuon_mass_vs_dimuon_tau_xy_30to100";
+      high_rap_dimuon_mass_vs_dimuon_tau_xy_30to100_ = tdir.make<TH2D>(high_rap_dimuon_mass_vs_dimuon_tau_xy_30to100_name.c_str(), high_rap_dimuon_mass_vs_dimuon_tau_xy_30to100_name.c_str(), 50, 2.85, 3.35, 750, -5., 10.);
+      high_rap_dimuon_mass_vs_dimuon_tau_xy_30to100_->GetXaxis()->SetTitle("dimuon mass (pt 30 to 100) [GeV]");
+      high_rap_dimuon_mass_vs_dimuon_tau_xy_30to100_->GetYaxis()->SetTitle("tau_xy [ps]");
+
       // dimuon_mass_vs_dimuon_tau_xy_fine_weighted
       const std::string dimuon_mass_vs_dimuon_tau_xy_fine_weighted_name = "dimuon_mass_vs_dimuon_tau_xy_fine_weighted";
-      dimuon_mass_vs_dimuon_tau_xy_fine_weighted_ = tdir.make<TH2D>(dimuon_mass_vs_dimuon_tau_xy_fine_weighted_name.c_str(), dimuon_mass_vs_dimuon_tau_xy_fine_weighted_name.c_str(), 50, 2.85, 3.35, 1000, -5., 5.);
+      dimuon_mass_vs_dimuon_tau_xy_fine_weighted_ = tdir.make<TH2D>(dimuon_mass_vs_dimuon_tau_xy_fine_weighted_name.c_str(), dimuon_mass_vs_dimuon_tau_xy_fine_weighted_name.c_str(), 50, 2.85, 3.35, 750, -5., 10.);
       dimuon_mass_vs_dimuon_tau_xy_fine_weighted_->GetXaxis()->SetTitle("dimuon mass [GeV]");
       dimuon_mass_vs_dimuon_tau_xy_fine_weighted_->GetYaxis()->SetTitle("tau_xy [ps]");
 
@@ -993,9 +1083,9 @@ namespace zf {
 
       // jet_btag_discriminator_
       const std::string jet_btag_discriminator_name = "jet btag discriminator";
-      jet_btag_discriminator_ = tdir.make<TH1D>(jet_btag_discriminator_name.c_str(), jet_btag_discriminator_name.c_str(), 1400, -120., 20.);
+      jet_btag_discriminator_ = tdir.make<TH1D>(jet_btag_discriminator_name.c_str(), jet_btag_discriminator_name.c_str(), 140, -120., 20.);
       jet_btag_discriminator_->GetXaxis()->SetTitle("discriminator");
-      jet_btag_discriminator_->GetYaxis()->SetTitle("Counts / 0.1");
+      jet_btag_discriminator_->GetYaxis()->SetTitle("Counts / 1.0");
 
       // muon_jet_pt
       const std::string muon_jet_pt_name = "p_{T,muon_jet}";
@@ -1047,9 +1137,9 @@ namespace zf {
 
       // muon_jet_btag_discriminator_
       const std::string muon_jet_btag_discriminator_name = "muon jet btag discriminator";
-      muon_jet_btag_discriminator_ = tdir.make<TH1D>(muon_jet_btag_discriminator_name.c_str(), muon_jet_btag_discriminator_name.c_str(), 1400, -120., 20.);
+      muon_jet_btag_discriminator_ = tdir.make<TH1D>(muon_jet_btag_discriminator_name.c_str(), muon_jet_btag_discriminator_name.c_str(), 140, -120., 20.);
       muon_jet_btag_discriminator_->GetXaxis()->SetTitle("discriminator");
-      muon_jet_btag_discriminator_->GetYaxis()->SetTitle("Counts / 0.1");
+      muon_jet_btag_discriminator_->GetYaxis()->SetTitle("Counts / 1.0");
 
       // vtx_x_
       const std::string vtx_x_name = "vertex position x";
@@ -1124,6 +1214,42 @@ namespace zf {
       z_from_muons_vtx_z_->GetXaxis()->SetTitle("Position [cm]");
       z_from_muons_vtx_z_->GetYaxis()->SetTitle("z Vertex / 0.01 cm");
 
+      //primary_vtx_x_minus_z_vtx_x_  
+      const std::string primary_vtx_x_minus_z_vtx_x_name = "primary_vtx_x_minus_z_vtx_position_x";
+      primary_vtx_x_minus_z_vtx_x_ = tdir.make<TH1D>(primary_vtx_x_minus_z_vtx_x_name.c_str(), primary_vtx_x_minus_z_vtx_x_name.c_str(), 2000, -10., 10.);
+      primary_vtx_x_minus_z_vtx_x_->GetXaxis()->SetTitle("#Delta x Position [cm]");
+      primary_vtx_x_minus_z_vtx_x_->GetYaxis()->SetTitle("z_from_muons Vertex / 0.001 cm");
+
+      //primary_vtx_y_minus_z_vtx_y_  
+      const std::string primary_vtx_y_minus_z_vtx_y_name = "primary_vtx_y_minus_z_vtx_position_y";
+      primary_vtx_y_minus_z_vtx_y_ = tdir.make<TH1D>(primary_vtx_y_minus_z_vtx_y_name.c_str(), primary_vtx_y_minus_z_vtx_y_name.c_str(), 2000, -10., 10.);
+      primary_vtx_y_minus_z_vtx_y_->GetXaxis()->SetTitle("#Delta y Position [cm]");
+      primary_vtx_y_minus_z_vtx_y_->GetYaxis()->SetTitle("z_from_muons Vertex / 0.001 cm");
+
+      //primary_vtx_z_minus_z_vtx_z_ 
+      const std::string primary_vtx_z_minus_z_vtx_z_name = "primary_vtx_z_minus_z_vtx_position_z";
+      primary_vtx_z_minus_z_vtx_z_ = tdir.make<TH1D>(primary_vtx_z_minus_z_vtx_z_name.c_str(), primary_vtx_z_minus_z_vtx_z_name.c_str(), 2000, -10., 10.);
+      primary_vtx_z_minus_z_vtx_z_->GetXaxis()->SetTitle("#Delta z Position [cm]");
+      primary_vtx_z_minus_z_vtx_z_->GetYaxis()->SetTitle("z Vertex / 0.01 cm");
+
+      //primary_vtx_x_minus_zmumu_vtx_x_  
+      const std::string primary_vtx_x_minus_zmumu_vtx_x_name = "primary_vtx_x_minus_zmumu_vtx_position_x";
+      primary_vtx_x_minus_zmumu_vtx_x_ = tdir.make<TH1D>(primary_vtx_x_minus_zmumu_vtx_x_name.c_str(), primary_vtx_x_minus_zmumu_vtx_x_name.c_str(), 2000, -10., 10.);
+      primary_vtx_x_minus_zmumu_vtx_x_->GetXaxis()->SetTitle("#Delta x Position [cm]");
+      primary_vtx_x_minus_zmumu_vtx_x_->GetYaxis()->SetTitle("z_from_muons Vertex / 0.001 cm");
+
+      //primary_vtx_y_minus_zmumu_vtx_y_  
+      const std::string primary_vtx_y_minus_zmumu_vtx_y_name = "primary_vtx_y_minus_zmumu_vtx_position_y";
+      primary_vtx_y_minus_zmumu_vtx_y_ = tdir.make<TH1D>(primary_vtx_y_minus_zmumu_vtx_y_name.c_str(), primary_vtx_y_minus_zmumu_vtx_y_name.c_str(), 2000, -10., 10.);
+      primary_vtx_y_minus_zmumu_vtx_y_->GetXaxis()->SetTitle("#Delta y Position [cm]");
+      primary_vtx_y_minus_zmumu_vtx_y_->GetYaxis()->SetTitle("z_from_muons Vertex / 0.001 cm");
+
+      //primary_vtx_z_minus_zmumu_vtx_z_ 
+      const std::string primary_vtx_z_minus_zmumu_vtx_z_name = "primary_vtx_z_minus_zmumu_vtx_position_z";
+      primary_vtx_z_minus_zmumu_vtx_z_ = tdir.make<TH1D>(primary_vtx_z_minus_zmumu_vtx_z_name.c_str(), primary_vtx_z_minus_zmumu_vtx_z_name.c_str(), 2000, -10., 10.);
+      primary_vtx_z_minus_zmumu_vtx_z_->GetXaxis()->SetTitle("#Delta z Position [cm]");
+      primary_vtx_z_minus_zmumu_vtx_z_->GetYaxis()->SetTitle("Events / 0.001 cm");
+
       // primary_vtx_x_vs_z_vtx_x_
       const std::string primary_vtx_x_vs_z_vtx_x_name = "primary vertex x pos vs Z vertex x pos";
       primary_vtx_x_vs_z_vtx_x_ = tdir.make<TH2D>(primary_vtx_x_vs_z_vtx_x_name.c_str(), primary_vtx_x_vs_z_vtx_x_name.c_str(), 200, -1., 1., 200, -1., 1.);
@@ -1141,6 +1267,24 @@ namespace zf {
       primary_vtx_z_vs_z_vtx_z_ = tdir.make<TH2D>(primary_vtx_z_vs_z_vtx_z_name.c_str(), primary_vtx_z_vs_z_vtx_z_name.c_str(), 200, -10., 10., 200, -10., 10.);
       primary_vtx_z_vs_z_vtx_z_->GetXaxis()->SetTitle("Z Vertex z Pos [cm]");
       primary_vtx_z_vs_z_vtx_z_->GetYaxis()->SetTitle("Primary Vertex z Pos [cm]");
+
+      // primary_vtx_x_vs_zmuons_vtx_x_
+      const std::string primary_vtx_x_vs_zmuons_vtx_x_name = "primary vertex x pos vs Zmumu vertex x pos";
+      primary_vtx_x_vs_zmuons_vtx_x_ = tdir.make<TH2D>(primary_vtx_x_vs_zmuons_vtx_x_name.c_str(), primary_vtx_x_vs_zmuons_vtx_x_name.c_str(), 200, -1., 1., 200, -1., 1.);
+      primary_vtx_x_vs_zmuons_vtx_x_->GetXaxis()->SetTitle("Z Muons Vertex x Pos [cm]");
+      primary_vtx_x_vs_zmuons_vtx_x_->GetYaxis()->SetTitle("Primary Vertex x Pos [cm]");
+
+      // primary_vtx_y_vs_zmuons_vtx_y_
+      const std::string primary_vtx_y_vs_zmuons_vtx_y_name = "primary vertex y pos vs Zmumu vertex y pos";
+      primary_vtx_y_vs_zmuons_vtx_y_ = tdir.make<TH2D>(primary_vtx_y_vs_zmuons_vtx_y_name.c_str(), primary_vtx_y_vs_zmuons_vtx_y_name.c_str(), 200, -1., 1., 200, -1., 1.);
+      primary_vtx_y_vs_zmuons_vtx_y_->GetXaxis()->SetTitle("Z Muons Vertex y Pos [cm]");
+      primary_vtx_y_vs_zmuons_vtx_y_->GetYaxis()->SetTitle("Primary Vertex y Pos [cm]");
+
+      // primary_vtx_z_vs_zmuons_vtx_z_
+      const std::string primary_vtx_z_vs_zmuons_vtx_z_name = "primary vertex z pos vs Zmumu vertex z pos";
+      primary_vtx_z_vs_zmuons_vtx_z_ = tdir.make<TH2D>(primary_vtx_z_vs_zmuons_vtx_z_name.c_str(), primary_vtx_z_vs_zmuons_vtx_z_name.c_str(), 200, -10., 10., 200, -10., 10.);
+      primary_vtx_z_vs_zmuons_vtx_z_->GetXaxis()->SetTitle("Z Muons Vertex z Pos [cm]");
+      primary_vtx_z_vs_zmuons_vtx_z_->GetYaxis()->SetTitle("Primary Vertex z Pos [cm]");
 
       // dimuon_vtx_x_
       const std::string dimuon_vtx_x_name = "dimuon vertex position x";
@@ -1275,9 +1419,21 @@ namespace zf {
         muon1_from_z_charge_->Fill(zfe.z_muon1.charge(), event_weight);
       }
 
+      primary_vtx_x_minus_z_vtx_x_->Fill( zfe.reco_vert.primary_x - zfe.reco_z.vtx_x, event_weight );
+      primary_vtx_y_minus_z_vtx_y_->Fill( zfe.reco_vert.primary_y - zfe.reco_z.vtx_y, event_weight );
+      primary_vtx_z_minus_z_vtx_z_->Fill( zfe.reco_vert.primary_z - zfe.reco_z.vtx_z, event_weight );
+
+      primary_vtx_x_minus_zmumu_vtx_x_->Fill( zfe.reco_vert.primary_x - zfe.reco_z_from_muons.vtx_x, event_weight );
+      primary_vtx_y_minus_zmumu_vtx_y_->Fill( zfe.reco_vert.primary_y - zfe.reco_z_from_muons.vtx_y, event_weight );
+      primary_vtx_z_minus_zmumu_vtx_z_->Fill( zfe.reco_vert.primary_z - zfe.reco_z_from_muons.vtx_z, event_weight );
+
       primary_vtx_x_vs_z_vtx_x_->Fill(zfe.reco_z.vtx_x, zfe.reco_vert.primary_x, event_weight );
       primary_vtx_y_vs_z_vtx_y_->Fill(zfe.reco_z.vtx_y, zfe.reco_vert.primary_y, event_weight );
       primary_vtx_z_vs_z_vtx_z_->Fill(zfe.reco_z.vtx_z, zfe.reco_vert.primary_z, event_weight );
+
+      primary_vtx_x_vs_zmuons_vtx_x_->Fill(zfe.reco_z_from_muons.vtx_x, zfe.reco_vert.primary_x, event_weight );
+      primary_vtx_y_vs_zmuons_vtx_y_->Fill(zfe.reco_z_from_muons.vtx_y, zfe.reco_vert.primary_y, event_weight );
+      primary_vtx_z_vs_zmuons_vtx_z_->Fill(zfe.reco_z_from_muons.vtx_z, zfe.reco_vert.primary_z, event_weight );
 
       int n_jpsi = 0;
       for (unsigned int i = 0; i < zfe.reco_jpsi.m.size() ; ++i ) {
@@ -1373,6 +1529,7 @@ namespace zf {
         jpsi_dist_err_xy_->Fill(zfe.reco_jpsi.dist_err_xy.at(i), event_weight);
         jpsi_chi2_xy_->Fill(zfe.reco_jpsi.chi2_xy.at(i), event_weight);
         jpsi_zpt_difference_->Fill( zfe.reco_z.pt - zfe.reco_jpsi.pt.at(i), event_weight);
+        jpsi_zmumupt_difference_->Fill( zfe.reco_z_from_muons.pt - zfe.reco_jpsi.pt.at(i), event_weight);
         jpsi_tau_xy_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight); // multiply by 1000 to go from ns to ps
         jpsi_tau_xy_fine_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight); // multiply by 1000 to go from ns to ps
         jpsi_tau_xy_very_fine_->Fill(zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight); // multiply by 1000 to go from ns to ps
@@ -1469,6 +1626,10 @@ namespace zf {
         jpsi_tau_z_fine_->Fill(zfe.reco_jpsi.tau_z.at(i) * 1000, event_weight); // multiply by 1000 to go from ns to ps
         jpsi_tau_z_very_fine_->Fill(zfe.reco_jpsi.tau_z.at(i) * 1000, event_weight); // multiply by 1000 to go from ns to ps
         jpsi_mass_vs_chi2_->Fill(zfe.reco_jpsi.m.at(i) , zfe.reco_jpsi.chi2.at(i), event_weight );
+
+        dimuon_pt_vs_zee_pt_->Fill(zfe.reco_jpsi.pt.at(i) , zfe.reco_z.pt, event_weight );
+        dimuon_pt_vs_zmumu_pt_->Fill(zfe.reco_jpsi.pt.at(i) , zfe.reco_z_from_muons.pt, event_weight );
+
         dimuon_mass_vs_dimuon_tau_xy_->Fill(zfe.reco_jpsi.m.at(i) , zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight );
         dimuon_mass_vs_dimuon_tau_xy_fine_->Fill(zfe.reco_jpsi.m.at(i) , zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight );
         dimuon_mass_vs_dimuon_tau_xy_fine_weighted_->Fill(zfe.reco_jpsi.m.at(i) , zfe.reco_jpsi.tau_xy.at(i) * 1000, 
@@ -1488,6 +1649,43 @@ namespace zf {
         }
         if (zfe.reco_jpsi.pt.at(i) >= 30.0 && zfe.reco_jpsi.pt.at(i) < 100.0 ) {
           dimuon_mass_vs_dimuon_tau_xy_30to100_->Fill(zfe.reco_jpsi.m.at(i) , zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight );
+        }
+
+        if(zfe.reco_jpsi.y.at(i) < 1.2) {
+          low_rap_dimuon_mass_vs_dimuon_tau_xy_fine_->Fill(zfe.reco_jpsi.m.at(i) , zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight );
+          if (zfe.reco_jpsi.pt.at(i) >= 8.5 && zfe.reco_jpsi.pt.at(i) < 10.0 ) {
+            low_rap_dimuon_mass_vs_dimuon_tau_xy_8p5to10p0_->Fill(zfe.reco_jpsi.m.at(i) , zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight );
+          }
+          if (zfe.reco_jpsi.pt.at(i) >= 10.0 && zfe.reco_jpsi.pt.at(i) < 14.0 ) {
+            low_rap_dimuon_mass_vs_dimuon_tau_xy_10to14_->Fill(zfe.reco_jpsi.m.at(i) , zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight );
+          }
+          if (zfe.reco_jpsi.pt.at(i) >= 14.0 && zfe.reco_jpsi.pt.at(i) < 18.0 ) {
+            low_rap_dimuon_mass_vs_dimuon_tau_xy_14to18_->Fill(zfe.reco_jpsi.m.at(i) , zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight );
+          }
+          if (zfe.reco_jpsi.pt.at(i) >= 18.0 && zfe.reco_jpsi.pt.at(i) < 30.0 ) {
+            low_rap_dimuon_mass_vs_dimuon_tau_xy_18to30_->Fill(zfe.reco_jpsi.m.at(i) , zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight );
+          }
+          if (zfe.reco_jpsi.pt.at(i) >= 30.0 && zfe.reco_jpsi.pt.at(i) < 100.0 ) {
+            low_rap_dimuon_mass_vs_dimuon_tau_xy_30to100_->Fill(zfe.reco_jpsi.m.at(i) , zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight );
+          }
+        }
+        else {
+          high_rap_dimuon_mass_vs_dimuon_tau_xy_fine_->Fill(zfe.reco_jpsi.m.at(i) , zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight );
+          if (zfe.reco_jpsi.pt.at(i) >= 8.5 && zfe.reco_jpsi.pt.at(i) < 10.0 ) {
+            high_rap_dimuon_mass_vs_dimuon_tau_xy_8p5to10p0_->Fill(zfe.reco_jpsi.m.at(i) , zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight );
+          }
+          if (zfe.reco_jpsi.pt.at(i) >= 10.0 && zfe.reco_jpsi.pt.at(i) < 14.0 ) {
+            high_rap_dimuon_mass_vs_dimuon_tau_xy_10to14_->Fill(zfe.reco_jpsi.m.at(i) , zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight );
+          }
+          if (zfe.reco_jpsi.pt.at(i) >= 14.0 && zfe.reco_jpsi.pt.at(i) < 18.0 ) {
+            high_rap_dimuon_mass_vs_dimuon_tau_xy_14to18_->Fill(zfe.reco_jpsi.m.at(i) , zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight );
+          }
+          if (zfe.reco_jpsi.pt.at(i) >= 18.0 && zfe.reco_jpsi.pt.at(i) < 30.0 ) {
+            high_rap_dimuon_mass_vs_dimuon_tau_xy_18to30_->Fill(zfe.reco_jpsi.m.at(i) , zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight );
+          }
+          if (zfe.reco_jpsi.pt.at(i) >= 30.0 && zfe.reco_jpsi.pt.at(i) < 100.0 ) {
+            high_rap_dimuon_mass_vs_dimuon_tau_xy_30to100_->Fill(zfe.reco_jpsi.m.at(i) , zfe.reco_jpsi.tau_xy.at(i) * 1000, event_weight );
+          }
         }
 
 

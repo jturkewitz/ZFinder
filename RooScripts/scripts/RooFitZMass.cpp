@@ -78,13 +78,11 @@ int RooFitZMass(
   RooMsgService::instance().setGlobalKillBelow(RooFit::WARNING) ;
   gErrorIgnoreLevel = kWarning;
 
-  //double z_mass_min = 50.0;
-  double z_mass_min = 60.0;
-  //double z_mass_min = 2.85;
-  //double z_mass_max = 3.15;
-  //double z_mass_max = 130.0;
-  double z_mass_max = 120.0;
-  //double z_mass_max = 3.2;
+  //TODO testing
+  double z_mass_min = 50.0;
+  double z_mass_max = 150.0;
+  //double z_mass_min = 60.0;
+  //double z_mass_max = 120.0;
   // Set up the variables we're going to read in from the files
   RooRealVar z_mass("z_mass", "z_mass" , z_mass_min, z_mass_max, "GeV");
   RooRealVar zjpsi_mass("zjpsi_mass", "zjpsi_mass" , z_mass_min, z_mass_max, "GeV");
@@ -105,16 +103,25 @@ int RooFitZMass(
     z_hist_name.append("ztoee_mass");
     //inclusive_zjpsi_hist.append( "ZFinder/Z_To_Electrons_And_Jpsi/z Mass: Coarse" );
     //zjpsi_hist_name.append("ztoee_jpsi_mass");
-    inclusive_zjpsi_hist.append( "ZFinder/Z_To_Electrons_And_Prompt_Jpsi/z Mass: Coarse" );
-    zjpsi_hist_name.append("ztoee_prompt_jpsi_mass");
+
+    //TODO TESTING
+    //inclusive_zjpsi_hist.append( "ZFinder/Z_To_Electrons_And_Jpsi/z Mass: Coarse" );
+    inclusive_zjpsi_hist.append( "ZFinder/Z_To_Electrons_And_Jpsi/z Mass: Coarse" );
+
+    zjpsi_hist_name.append("ztoee_jpsi_mass");
   }
   else {
     inclusive_z_hist.append( "ZFinder/Z_To_Muons/Z From Muons Mass: Coarse" );
     z_hist_name.append("ztomumu_mass");
     //inclusive_zjpsi_hist.append( "ZFinder/Z_To_Muons_And_Jpsi/Z From Muons Mass: Coarse" );
     //zjpsi_hist_name.append("ztomumu_jpsi_mass");
-    inclusive_zjpsi_hist.append( "ZFinder/Z_To_Muons_And_Prompt_Jpsi/Z From Muons Mass: Coarse" );
-    zjpsi_hist_name.append("ztomumu_prompt_jpsi_mass");
+    
+    //inclusive_zjpsi_hist.append( "ZFinder/Z_To_Muons_And_Jpsi/Z From Muons Mass: Coarse" );
+    //TODO TESTING
+    inclusive_zjpsi_hist.append( "ZFinder/Z_To_Muons_And_Jpsi/Z From Muons Mass: Coarse" );
+
+
+    zjpsi_hist_name.append("ztomumu_jpsi_mass");
   }
 
   TH1D *h_z_mass = (TH1D*) DATA_FILE_1->Get( inclusive_z_hist.c_str() );
@@ -131,7 +138,7 @@ int RooFitZMass(
   //RooRealVar n("n", "n", 2., 0.0, 8.);
   //RooCBShape crystal_ball ("crystal_ball", "crystal_ball", z_mass, mean, sigma, alpha, n );
 
-  RooRealVar mean("mean","mean", 95.0, 60.0, 120.0);
+  RooRealVar mean("mean","mean", 91.0, 60, 120);
   RooRealVar width("width","width", 5.0, 0.0, 10.0);
   RooRealVar sigma("sigma","sigma", 5.0, 0.0, 10.0);
   RooVoigtian voigtian("voigtian","voigtian", z_mass, mean, width, sigma);  
@@ -242,11 +249,11 @@ int RooFitZMass(
   RooPlot* zjpsi_mass_fitframe;
   if (USE_Z_TO_EE) { 
     //zjpsi_mass_fitframe = zjpsi_mass.frame( Title("Z->ee + Jpsi: Z mass") );
-    zjpsi_mass_fitframe = zjpsi_mass.frame( Title("Z->ee + Prompt Jpsi: Z mass") );
+    zjpsi_mass_fitframe = zjpsi_mass.frame( Title("Z->ee + Jpsi: Z mass") );
   }
   else {
     //zjpsi_mass_fitframe = zjpsi_mass.frame( Title("Z->mumu + Jpsi: Z mass") );
-    zjpsi_mass_fitframe = zjpsi_mass.frame( Title("Z->mumu + Prompt Jpsi: Z mass") );
+    zjpsi_mass_fitframe = zjpsi_mass.frame( Title("Z->mumu + Jpsi: Z mass") );
   }
   zjpsi_mass_data_hist.plotOn(zjpsi_mass_fitframe);
   zjpsi_mass_fitpdf.plotOn(zjpsi_mass_fitframe, Components(zjpsi_voigtian), LineColor(kGreen-2));

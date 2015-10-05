@@ -177,6 +177,7 @@ namespace zf {
             TH1D* jpsi_tau_z_fine_;
             TH1D* jpsi_tau_z_very_fine_;
             TH1D* jpsi_zpt_difference_;
+            TH1D* jpsi_zmumupt_difference_;
 
             TH1D* dimuon_vtx_prob_;
             TH1D* dimuon_delta_phi_;
@@ -222,13 +223,31 @@ namespace zf {
             TH2D* jpsi_tau_xy_vs_distance_z_;
             TH2D* jpsi_tau_z_vs_distance_z_;
             TH2D* dimuon_mass_vs_dimuon_tau_xy_;
-            TH2D* dimuon_mass_vs_dimuon_tau_xy_fine_;
 
+            TH2D* dimuon_pt_vs_zee_pt_;
+            TH2D* dimuon_pt_vs_zmumu_pt_;
+
+            TH2D* dimuon_mass_vs_dimuon_tau_xy_fine_;
             TH2D* dimuon_mass_vs_dimuon_tau_xy_8p5to10p0_;
             TH2D* dimuon_mass_vs_dimuon_tau_xy_10to14_;
             TH2D* dimuon_mass_vs_dimuon_tau_xy_14to18_;
             TH2D* dimuon_mass_vs_dimuon_tau_xy_18to30_;
             TH2D* dimuon_mass_vs_dimuon_tau_xy_30to100_;
+
+            TH2D* low_rap_dimuon_mass_vs_dimuon_tau_xy_fine_;
+            TH2D* low_rap_dimuon_mass_vs_dimuon_tau_xy_8p5to10p0_;
+            TH2D* low_rap_dimuon_mass_vs_dimuon_tau_xy_10to14_;
+            TH2D* low_rap_dimuon_mass_vs_dimuon_tau_xy_14to18_;
+            TH2D* low_rap_dimuon_mass_vs_dimuon_tau_xy_18to30_;
+            TH2D* low_rap_dimuon_mass_vs_dimuon_tau_xy_30to100_;
+
+            TH2D* high_rap_dimuon_mass_vs_dimuon_tau_xy_fine_;
+            TH2D* high_rap_dimuon_mass_vs_dimuon_tau_xy_8p5to10p0_;
+            TH2D* high_rap_dimuon_mass_vs_dimuon_tau_xy_10to14_;
+            TH2D* high_rap_dimuon_mass_vs_dimuon_tau_xy_14to18_;
+            TH2D* high_rap_dimuon_mass_vs_dimuon_tau_xy_18to30_;
+            TH2D* high_rap_dimuon_mass_vs_dimuon_tau_xy_30to100_;
+
 
 
             TH2D* dimuon_mass_vs_dimuon_tau_xy_fine_weighted_;
@@ -257,9 +276,21 @@ namespace zf {
             TH1D* jpsi_truth_vtx_y_minus_jpsi_reco_vtx_y_;
             TH1D* jpsi_truth_vtx_z_minus_jpsi_reco_vtx_z_;
 
+            TH1D* primary_vtx_x_minus_z_vtx_x_;
+            TH1D* primary_vtx_y_minus_z_vtx_y_;
+            TH1D* primary_vtx_z_minus_z_vtx_z_;
+
+            TH1D* primary_vtx_x_minus_zmumu_vtx_x_;
+            TH1D* primary_vtx_y_minus_zmumu_vtx_y_;
+            TH1D* primary_vtx_z_minus_zmumu_vtx_z_;
+
             TH2D* primary_vtx_x_vs_z_vtx_x_;
             TH2D* primary_vtx_y_vs_z_vtx_y_;
             TH2D* primary_vtx_z_vs_z_vtx_z_;
+
+            TH2D* primary_vtx_x_vs_zmuons_vtx_x_;
+            TH2D* primary_vtx_y_vs_zmuons_vtx_y_;
+            TH2D* primary_vtx_z_vs_zmuons_vtx_z_;
 
             TH1D* nmuons_;
             TH1D* njets_;

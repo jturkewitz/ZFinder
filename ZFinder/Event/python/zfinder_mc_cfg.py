@@ -28,21 +28,8 @@ process.options = cms.untracked.PSet(
 )
 
 process.source = cms.Source("PoolSource",
-    ##fileNames = cms.untracked.vstring( 'file:/hdfs/cms/user/turkewitz/tmp/jpsi_inclusive_mc_test_file.root')
-    ##fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/tmp/0012F37A-CE09-E211-ABDA-00261894396F.root')
-    ##fileNames = cms.untracked.vstring( 'file:/home/user1/turkewitz/Work/CMSSW/CMSSW_5_3_7_patch6_ZbMCStudy/src/Jpsi_MM_step3_test.root')
-    ##fileNames = cms.untracked.vstring( 'file:/home/user1/turkewitz/Work/CMSSW/CMSSW_5_3_7_patch6_ZbMCStudy/src/Jpsi_MM_step3_test7.root')
-    ##fileNames = cms.untracked.vstring( 'file:/home/user1/turkewitz/Work/CMSSW/CMSSW_5_3_7_patch6_ZbMCStudy/src/Jpsi_MM_step2_test10.root')
-    ##fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/tmp/Jpsi_MM_step3_test15_pileup.root')
-    ##fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/tmp/Jpsi_MM_step3_test30.root')
-    ##fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/tmp/Jpsi_MM_step3_test31.root')
-    ##fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/tmp/Jpsi_MM_step3_test33.root')
-    #fileNames = cms.untracked.vstring( 'file:/hdfs/cms/user/turkewitz/tmp/Jpsi_MM_step3_test34.root')
-    fileNames = cms.untracked.vstring( 'file:/hdfs/cms/user/turkewitz/ZPhysics/MC_Generated/JPsi/jpsi_mc_Test43_step3/jpsi_mc_Test43_step3_000-pool.root')
-    #/fileNames = cms.untracked.vstring( 'file:/data/whybee0a/user/turkewitz_2/test/turkewitz/jpsi_mc_Test41_step3/jpsi_mc_Test41_step3_000-pool.root',
-    #'file:/data/whybee0a/user/turkewitz_2/test/turkewitz/jpsi_mc_Test41_step3/jpsi_mc_Test41_step3_001-pool.root')
-    ##fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/tmp/Jpsi_MM_step3_test34.root')
-    ##fileNames = cms.untracked.vstring( 'file:/local/cms/user/turkewitz/tmp/Jpsi_MM_step3_test13_pileup.root')
+    #fileNames = cms.untracked.vstring( 'file:/hdfs/cms/user/turkewitz/ZPhysics/MC_Generated/JPsi/jpsi_mc_Test43_step3/jpsi_mc_Test43_step3_000-pool.root')
+    fileNames = cms.untracked.vstring( 'file:/data/whybee0a/user/turkewitz_2/test/turkewitz/temp/MC/DYToMuMu_M_20_Tune4C_8TeV_pythia8_step3.root')
 )
 
 process.TFileService = cms.Service("TFileService",

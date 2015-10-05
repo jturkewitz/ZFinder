@@ -72,7 +72,8 @@ int RooFitPileupEstimation(
   distance_z.setRange("negative",-20.0,-3.0);
   distance_z.setRange("positive",3.0,20.0);
   // Define a range named "signal" in distance_z from -1,1
-  distance_z.setRange("signal",-1.0,1.0) ;
+  //distance_z.setRange("signal",-1.0,1.0) ;
+  distance_z.setRange("signal",-0.5,0.5) ;
   distance_z.setRange("test",-20.0,20.0) ;
 
   //std::string inclusive_jpsi_hist = "ZFinder/Jpsi/";
