@@ -46,6 +46,7 @@ Implementation:
 #include "ZFinder/Event/interface/ZDefinitionWorkspace.h"  // ZDefinitionWorkspace
 #include "ZFinder/Event/interface/ZFinderEvent.h"  // ZFinderEvent
 #include "ZFinder/Event/interface/ZFinderPlotter.h"  // ZFinderPlotter
+#include "ZFinder/Event/interface/ZFinderTree.h"  // ZFinderTree
 #include "ZFinder/Event/interface/ZFinderCuts.h"  // ZFinderCuts
 
 // HLT information
@@ -83,6 +84,8 @@ class ZFinder : public edm::EDAnalyzer {
 
     // ----------member data ---------------------------
     const edm::ParameterSet& iConfig_;
+    zf::ZFinderTree *z_tree;
+
     zf::ZFinderPlotter *zfp_all;
     zf::ZFinderPlotter *zfp_dimuon_jpsi, *zfp_dimuon_jpsi_soft, *zfp_dimuon_jpsi_vtx_compatible, *zfp_dimuon_jpsi_primary_vertex, *zfp_jpsi, *zfp_prompt_jpsi;
     zf::ZFinderPlotter *zfp_dielectron_z, *zfp_dielectron_z_good, *zfp_dielectron_z_good_compatible_vertex, *zfp_z_to_electrons, 
@@ -115,6 +118,8 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
 
   // Setup plotters
   edm::Service<TFileService> fs;
+
+  TFileDirectory tdir_tree(fs->mkdir("Tree"));
 
   TFileDirectory tdir_all(fs->mkdir("All"));
 
@@ -151,6 +156,10 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
   const bool APPLY_JPSI_MASS_WINDOW = true;
   const bool APPLY_VERTEX_Z_POS_WINDOW = true;
   const bool APPLY_PROMPT_JPSI_WINDOW = true;
+
+  //zf::ZFinderTree* z_tree = new zf::ZFinderTree(*zd_reco, tdir_zd, is_mc_);
+  z_tree = new zf::ZFinderTree(tdir_tree, false);
+  //z_tuples_.push_back(z_tree);
 
   //dimuon => muon pt cut for now
   //TODO switch order of cuts? Other improvements?
@@ -190,6 +199,9 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
 }
 
 ZFinder::~ZFinder() {
+  //for (auto& i_zdeft : z_tuples_) {
+  //  delete i_zdeft;
+  //}
 }
 
 
@@ -220,6 +232,10 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
   // ///////////////////////////////////////////////////////////////////
 
   zf::ZFinderEvent zfe(iEvent, iSetup, iConfig_);
+
+  //Fill Tree
+  z_tree->Fill(zfe);
+
 
   //Fill histograms
   zfp_all->Fill(zfe);
@@ -300,6 +316,29 @@ void ZFinder::beginJob() {
 
 // ------------ method called once each job just after ending the event loop  ------------
 void ZFinder::endJob() {
+  //// Since large trees will automatically make new files, we need to get
+  //// the current file from each tree and write it, but only if it is new
+  //// and hasn't be previously written
+  //TFile* file = nullptr;
+  //std::vector<TFile*> seen;
+
+
+  ////for (auto& i_zdeft : z_tuples_) {
+  ////  file = i_zdeft->GetCurrentFile();
+  ////  // Check if we have seen this file before. If we have not then
+  ////  // write the file and add it to the vector
+  ////  if (std::find(seen.begin(), seen.end(), file) == seen.end()) {
+  ////    file->Write();
+  ////    seen.push_back(file);
+  ////  }
+  ////}
+  //file = z_tree->GetCurrentFile();
+  //// Check if we have seen this file before. If we have not then
+  //// write the file and add it to the vector
+  //if (std::find(seen.begin(), seen.end(), file) == seen.end()) {
+  //  file->Write();
+  //  seen.push_back(file);
+  //}
 }
 
 // ------------ method called when starting to processes a run  ------------
