@@ -163,10 +163,23 @@ namespace zf {
           event_number = 0;
           run_number = 0;
           n_verts = 0;
-          found_z_to_electrons = false;
-          found_z_to_muons = false;
-          found_jpsi = false;
           is_mc = false;
+          found_high_pt_muons_from_z = false;
+          found_good_muons_from_z = false;
+          found_dimuon_z_compatible_vertex = false;
+          found_z_to_muons_mass = false;
+
+          found_high_pt_electrons_from_z = false;
+          found_good_electrons_from_z = false;
+          found_dielectron_z_compatible_vertex = false;
+          found_z_to_electrons_mass = false;
+
+          found_dimuon_jpsi_with_muons_in_eta_window = false;
+          found_dimuon_jpsi_with_high_pt_muons = false;
+          found_dimuon_jpsi_with_soft_id_and_high_pt_muons = false;
+          found_dimuon_jpsi_with_good_muons_and_compatible_muon_vertex = false;
+          found_good_dimuon_jpsi_compatible_with_primary_vertex = false;
+          found_jpsi = false;
         }
 
         // Constructor
@@ -178,8 +191,21 @@ namespace zf {
         int n_verts;
 
         bool is_mc;
-        bool found_z_to_electrons;
-        bool found_z_to_muons;
+        bool found_high_pt_muons_from_z;
+        bool found_good_muons_from_z;
+        bool found_dimuon_z_compatible_vertex;
+        bool found_z_to_muons_mass;
+
+        bool found_high_pt_electrons_from_z;
+        bool found_good_electrons_from_z;
+        bool found_dielectron_z_compatible_vertex;
+        bool found_z_to_electrons_mass;
+
+        bool found_dimuon_jpsi_with_muons_in_eta_window;
+        bool found_dimuon_jpsi_with_high_pt_muons;
+        bool found_dimuon_jpsi_with_soft_id_and_high_pt_muons;
+        bool found_dimuon_jpsi_with_good_muons_and_compatible_muon_vertex;
+        bool found_good_dimuon_jpsi_compatible_with_primary_vertex;
         bool found_jpsi;
       } event_;
 

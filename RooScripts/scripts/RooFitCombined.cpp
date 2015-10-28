@@ -44,7 +44,9 @@
 
 using namespace RooFit;
 
+//first bin is overall, next 5 bins are ascending in pT 8.5-10,10-14,14-18,18-30,30-100
 const double ACC_EFF[6] = {0.374168,0.291977,0.41167,0.549881,0.646403,0.755547}; //vertex_comp no primary vert requirement
+
 const double NUM_ZTOMUMU = 8.481e6;
 const double NUM_ZTOEE = 5.274e6;
 
@@ -111,6 +113,8 @@ std::vector<double> RooFitCombined(
 
   double dimuon_mass_min = 2.85;
   double dimuon_mass_max = 3.35;
+  
+  //these aren't used right now
   double dimuon_mass_signal_min = 3.0;
   double dimuon_mass_signal_max = 3.2;
   // Set up the variables we're going to read in from the files
@@ -173,8 +177,9 @@ std::vector<double> RooFitCombined(
   zee_jpsi_hist.append( pt_slice_list[PT_SLICE] );
   zmumu_jpsi_hist.append( pt_slice_list[PT_SLICE] );
 
-  //TODO remove/uncomment, testing low rapidity
   inclusive_jpsi_hist.append(pt_slice_list[PT_SLICE]);
+  
+  //TODO remove/uncomment, testing low rapidity
   //inclusive_jpsi_hist.append(pt_slice_low_rapidity_list[PT_SLICE]);
 
   //2d fit - goal is to fit continuum_bg * prompt, continuum_bg* nonprompt, gauss * prompt (signal), gauss * nonprompt 
@@ -184,9 +189,11 @@ std::vector<double> RooFitCombined(
   TH2D *h_zee_dimuon_mass = (TH2D*) DATA_FILE_3->Get( zee_jpsi_hist.c_str() );
 
   TH2D *h_z_dimuon_mass;
-  //h_z_dimuon_mass->Add( h_zee_dimuon_mass, h_zmumu_dimuon_mass);
+  //combine Z->mumu and Z->ee channels
   h_zmumu_dimuon_mass->Add( h_zee_dimuon_mass);
   h_z_dimuon_mass = h_zmumu_dimuon_mass;
+  
+  //rebin histogram as precision was too high already 
   h_z_dimuon_mass->RebinY(5);
 
   //RooDataHist z_dimuon_mass_data_hist("z_dimuon_mass_data_hist", zjpsi_hist_name.c_str(), RooArgSet(dimuon_mass, tau_xy), h_z_dimuon_mass);
@@ -213,14 +220,10 @@ std::vector<double> RooFitCombined(
 
   RooAddPdf tau_xy_gauss_sum_fitpdf("tau_xy_gauss_sum_fitpdf", "tau_xy_gauss_sum_fitpdf", RooArgList(prompt_gauss, prompt_gauss_2), RooArgList(frac_prompt_sharp));
 
-  //RooRealVar mean("mean", "mean", 3.1, 3.00, 3.18);
-
-
   RooRealVar dimuon_mean("dimuon_mean", "dimuon_mean", 3.1, 3.0, 3.2);
   RooRealVar sigma("sigma", "sigma", 0.05, 0.001, 0.1);
   RooRealVar alpha("alpha", "alpha", 1.8, 1.0, 2.5);
   RooRealVar n("n", "n", 2., 1.0, 80.);
-  //RooCBShape crystal_ball ("crystal_ball", "crystal_ball", dimuon_mass, mean, sigma, alpha, n );
   RooCBShape crystal_ball ("crystal_ball", "crystal_ball", dimuon_mass, dimuon_mean, sigma, alpha, n );
 
   RooRealVar dimuon_sigma("dimuon_sigma", "dimuon_sigma", 0.02, 0.001, 0.1);
@@ -317,11 +320,9 @@ std::vector<double> RooFitCombined(
   /////////////////////////////////////////////
 
 
-  //RooRealVar zjpsi_mean("zjpsi_mean", "zjpsi_mean", zjpsi_mean_value);
   RooRealVar zjpsi_sigma("zjpsi_sigma", "zjpsi_sigma", zjpsi_sigma_value);
   RooRealVar zjpsi_alpha("zjpsi_alpha", "zjpsi_alpha", zjpsi_alpha_value);
   RooRealVar zjpsi_n("zjpsi_n", "zjpsi_n", zjpsi_n_value);
-  //RooCBShape zjpsi_crystal_ball ("zjpsi_crystal_ball", "zjpsi_crystal_ball", zjpsi_dimuon_mass, zjpsi_mean, zjpsi_sigma, zjpsi_alpha, zjpsi_n );
   RooRealVar zjpsi_dimuon_mean("zjpsi_dimuon_mean", "zjpsi_dimuon_mean", zjpsi_dimuon_mean_value);
   RooCBShape zjpsi_crystal_ball ("zjpsi_crystal_ball", "zjpsi_crystal_ball", zjpsi_dimuon_mass, zjpsi_dimuon_mean, zjpsi_sigma, zjpsi_alpha, zjpsi_n );
   RooRealVar zjpsi_dimuon_sigma("zjpsi_dimuon_sigma", "zjpsi_dimuon_sigma", zjpsi_dimuon_sigma_value);
@@ -338,7 +339,6 @@ std::vector<double> RooFitCombined(
   RooRealVar zjpsi_m_sig_tau_sig_frac("zjpsi_m_sig_tau_sig_frac", "zjpsi_m_sig_tau_sig_frac", 0.2, 0.0, 1.0);
   RooRealVar zjpsi_m_sig_tau_bg_frac("zjpsi_m_sig_tau_bg_frac", "zjpsi_m_sig_tau_bg_frac", 0.6, 0.0, 1.0);
   RooRealVar zjpsi_m_bg_tau_sig_frac("zjpsi_m_bg_tau_sig_frac", "zjpsi_m_bg_tau_sig_frac", 0.15, 0.0, 1.0);
-  ////RooRealVar zjpsi_m_bg_tau_bg_frac("zjpsi_m_bg_tau_bg_frac", "zjpsi_m_bg_tau_bg_frac", 0.05, 0.0, 1.0);
 
   RooProdPdf zjpsi_m_sig_tau_sig("zjpsi_m_sig_tau_sig", "zjpsi_m_sig_tau_sig", RooArgList(zjpsi_mass_signal, zjpsi_tau_xy_gauss_sum_fitpdf ));
   RooProdPdf zjpsi_m_sig_tau_bg("zjpsi_m_sig_tau_bg", "zjpsi_m_sig_tau_bg", RooArgList(zjpsi_mass_signal, zjpsi_decay_exp ));
@@ -350,12 +350,9 @@ std::vector<double> RooFitCombined(
   RooAddPdf zjpsi_mass_tau_xy_fitpdf("zjpsi_mass_tau_xy_fitpdf","zjpsi_mass_tau_xy_fitpdf",RooArgSet(zjpsi_m_sig_tau_sig, zjpsi_m_sig_tau_bg, zjpsi_m_bg_tau_sig, zjpsi_m_bg_tau_bg ),
                                                                          RooArgList(zjpsi_m_sig_tau_sig_frac, zjpsi_m_sig_tau_bg_frac, zjpsi_m_bg_tau_sig_frac), kTRUE);
 
-  //TODO testing sumw2error i think false is correct for unweighted events
+  //TODO testing sumw2error i think false is correct for unweighted events, Minos or the error is out of whack
   RooFitResult *zjpsi_jpsi_fitres = zjpsi_mass_tau_xy_fitpdf.fitTo(zjpsi_dimuon_mass_data_hist, Minos(kTRUE), NumCPU(N_CPU), Verbose(false), PrintLevel(-1), SumW2Error(kFALSE), Save());
   //RooFitResult *zjpsi_jpsi_fitres = zjpsi_mass_tau_xy_fitpdf.fitTo(zjpsi_dimuon_mass_data_hist, NumCPU(N_CPU), Verbose(false), PrintLevel(-1), SumW2Error(kFALSE), Save());
-  //RooFitResult *zjpsi_jpsi_fitres = zjpsi_mass_tau_xy_fitpdf.fitTo(zjpsi_dimuon_mass_data_hist, NumCPU(N_CPU), Verbose(false), PrintLevel(-1), SumW2Error(kFALSE), Save());
-  //RooFitResult *zjpsi_jpsi_fitres = zjpsi_mass_tau_xy_fitpdf.fitTo(zjpsi_dimuon_mass_data_hist, NumCPU(N_CPU), Verbose(false), PrintLevel(-1), SumW2Error(kFALSE), Constrained(), Save());
-  //RooFitResult *zjpsi_jpsi_fitres = zjpsi_mass_tau_xy_fitpdf.fitTo(zjpsi_dimuon_mass_data_hist, NumCPU(N_CPU), Verbose(false), PrintLevel(-1), SumW2Error(kTRUE), Save());
   zjpsi_jpsi_fitres->Print();
 
   std::cout << zjpsi_hist_name << std::endl;
@@ -372,19 +369,17 @@ std::vector<double> RooFitCombined(
   int y_bmax = y_axis->FindBin(tau_xy_max);
   //TODO testing
   //double integral = h_z_dimuon_mass->Integral(x_bmin, x_bmax, y_bmin, y_bmax);
+  
+  // -1 to fix overflow binning
   double integral = h_z_dimuon_mass->Integral(x_bmin, x_bmax - 1, y_bmin, y_bmax);
   //integral -= h_inclusive_dimuon_mass->GetBinContent(bmin)*(tau_xy_min - axis->GetBinLowEdge(bmin)) / axis->GetBinWidth(bmin);
   //integral -= h_inclusive_dimuon_mass->GetBinContent(bmax)*(axis->GetBinUpEdge(bmax) - tau_xy_max)  / axis->GetBinWidth(bmax); 
   //TODO testing
   std::cout << integral << std::endl;
 
-  //RooRealVar* par1_fitresult = (RooRealVar*) zjpsi_jpsi_fitres->floatParsFinal()->find("par1");
-  //std::cout << par1_fitresult->getAsymErrorHi(); << std::endl;
-
   std::cout << "asym error hi getAsymError" <<  zjpsi_m_sig_tau_sig_frac.getAsymErrorHi() << std::endl;
   std::cout << "asym error low getAsymError" <<  zjpsi_m_sig_tau_sig_frac.getAsymErrorLo() << std::endl;
   std::cout << "asym error hi getErrorHi" <<  zjpsi_m_sig_tau_sig_frac.getErrorHi() << std::endl;
-  //std::cout << "asym error hi " <<  zjpsi_m_sig_tau_sig_frac.GetAsymErrorHi() << std::endl;
 
   
 
@@ -430,8 +425,6 @@ std::vector<double> RooFitCombined(
   zjpsi_info.push_back(zjpsi_prompt_events_error);
   zjpsi_info.push_back(zjpsi_nonprompt_events);
   zjpsi_info.push_back(zjpsi_nonprompt_events_error);
-
-  //TCanvas *canvas = new TCanvas("canvas", "canvas", 2000, 750);
 
   TCanvas *canvas = new TCanvas("canvas", "canvas", 1000, 500);
 
@@ -565,9 +558,11 @@ int main(int argc, char* argv[]) {
   const int ARGC = 5;
   if (argc < ARGC) {
     std::cout << "Not enough arguments.";
+    std::cout << "Needs ./RoofitCombined.exe inclusive_jpsi.root DoubleMuon.root DoubleElectron.root output_directory";
     return 1;
   } else if (argc > ARGC) {
     std::cout << "Too many arguments.";
+    std::cout << "Needs ./RoofitCombined.exe inclusive_jpsi.root DoubleMuon.root DoubleElectron.root output_directory";
     return 1;
   } else {
     /* Read in arguments */

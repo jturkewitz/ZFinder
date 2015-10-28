@@ -85,6 +85,7 @@ namespace zf {
             TH1D* jpsi_rapidity_;
             TH1D* jpsi_pt_;
             TH2D* jpsi_pt_vs_rap_;
+            TH2D* jpsi_pt_vs_rap_fine_;
             TH2D* jpsi_pt_vs_rap_polarization_long;
             TH2D* jpsi_pt_vs_rap_polarization_TPlusZero;
             TH1D* jpsi_efficiency_;

@@ -294,7 +294,7 @@ namespace zf {
     found_high_pt_muons_from_z = false;
     found_good_muons_from_z = false;
     found_dimuon_z_compatible_vertex = false;
-    found_z_to_muons = false;
+    found_z_to_muons_mass = false;
 
     //TODO z rapidity
     if (reco_z_from_muons.m > -1 &&
@@ -314,14 +314,14 @@ namespace zf {
       found_dimuon_z_compatible_vertex = true;
     }
     if (reco_z_from_muons.m >= MIN_Z_MASS && reco_z_from_muons.m <= MAX_Z_MASS) {
-      found_z_to_muons = true;
+      found_z_to_muons_mass = true;
     }
 
     //Z to electrons cut levels
     found_high_pt_electrons_from_z = false;
     found_good_electrons_from_z = false;
     found_dielectron_z_compatible_vertex = false;
-    found_z_to_electrons = false;
+    found_z_to_electrons_mass = false;
 
     if (reco_z.m > -1 && e0 != NULL && e1 != NULL) {
       if ( e0->pt >= MIN_ELECTRON_PT && e1->pt >= MIN_ELECTRON_PT ) {
@@ -341,7 +341,7 @@ namespace zf {
     }
     if (reco_z.m > -1 && e0 != NULL && e1 != NULL) {
       if ( reco_z.m >= MIN_Z_MASS && reco_z.m <= MAX_Z_MASS ) {
-        found_z_to_electrons = true;
+        found_z_to_electrons_mass = true;
       }
     }
 
@@ -356,13 +356,13 @@ namespace zf {
       for ( int i=0 ; i < (n_reco_muons - 1) ; ++i ) {
         const reco::Muon muon0 = muons_h->at(i);
         //Ensure that muons are not shared between JPsi and Z candidates
-        if (found_z_to_muons && (i == leading_z_muon_list_position || i == sub_leading_z_muon_list_position)) {
+        if (found_z_to_muons_mass && (i == leading_z_muon_list_position || i == sub_leading_z_muon_list_position)) {
           continue;
         }
         for ( int j=i+1 ; j < n_reco_muons ; ++j ) {
           const reco::Muon muon1 = muons_h->at(j);
           //Ensure that muons are not shared between JPsi and Z candidates
-          if (found_z_to_muons && (j == leading_z_muon_list_position || j == sub_leading_z_muon_list_position)) {
+          if (found_z_to_muons_mass && (j == leading_z_muon_list_position || j == sub_leading_z_muon_list_position)) {
             continue;
           }
           //Ensure oppositely charged muons for jpsi candidates
@@ -634,10 +634,10 @@ namespace zf {
     math::PtEtaPhiMLorentzVector four_lepton_lv;
     jpsi_lv = mu0lv + mu1lv;
 
-    if(found_z_to_electrons) {
+    if(found_z_to_electrons_mass) {
       four_lepton_lv = jpsi_lv + reco_z.zlv;
     }
-    else if(found_z_to_muons) {
+    else if(found_z_to_muons_mass) {
       four_lepton_lv = jpsi_lv + reco_z_from_muons.zlv;
     }
     else {
@@ -706,7 +706,7 @@ namespace zf {
     //double mu1_pz = mu1.pz();
 
  
-    if ( found_z_to_electrons ) {
+    if ( found_z_to_electrons_mass ) {
       x = (pos_x - reco_z.vtx.position().x() );
       y = (pos_y - reco_z.vtx.position().y() );
       z = (pos_z - reco_z.vtx.position().z() );
@@ -728,7 +728,7 @@ namespace zf {
         chi2_xy = vertTool_xy.compatibility(reco_z.vtx, dimuon_vertex);
       }
     }
-    else if ( found_z_to_muons ) {
+    else if ( found_z_to_muons_mass ) {
       x = (pos_x - reco_z_from_muons.vtx.position().x() );
       y = (pos_y - reco_z_from_muons.vtx.position().y() );
       z = (pos_z - reco_z_from_muons.vtx.position().z() );

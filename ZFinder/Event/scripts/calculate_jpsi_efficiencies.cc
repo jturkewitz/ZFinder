@@ -62,8 +62,8 @@ void calculate_jpsi_efficiencies (string file_name )
   //TH2D *jpsi_pt_vs_rap_mc = (TH2D*) theFile0->Get("ZFinder/MC_All/jpsi_pt_vs_rap_polarization_TPlusZero");
   //TH2D *jpsi_pt_vs_rap_jpsi = (TH2D*) theFile0->Get("ZFinder/Dimuon_Jpsi_Vertex_Compatible/jpsi_pt_vs_rap_polarization_TPlusZero");
 
-  jpsi_pt_vs_rap_mc->Rebin2D(21,1);
-  jpsi_pt_vs_rap_jpsi->Rebin2D(21,1);
+  //jpsi_pt_vs_rap_mc->Rebin2D(21,1);
+  //jpsi_pt_vs_rap_jpsi->Rebin2D(21,1);
   std::cout << jpsi_pt_vs_rap_mc->Integral() << std::endl;
   std::cout << jpsi_pt_vs_rap_jpsi->Integral() << std::endl;
   jpsi_pt_vs_rap_mc->Sumw2();
@@ -139,8 +139,6 @@ void calculate_jpsi_efficiencies (string file_name )
   //  }
   //}
 
-  //TFile output("acc_eff_map.root","new");
-  //acc_eff_map->Write();
-
-
+  TFile output("acc_eff_map.root","new");
+  acc_eff_map->Write();
 }

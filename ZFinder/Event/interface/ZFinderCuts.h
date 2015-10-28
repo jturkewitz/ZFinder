@@ -15,7 +15,7 @@ namespace zf {
   const double MIN_JPSI_LEADING_MUON_PT = 3.5; //GeV
   const double MIN_JPSI_SUBLEADING_MUON_PT = 3.5; //GeV
 
-  const double MIN_JPSI_LEADING_MUON_PT_HIGH_ETA = 2.5; //GeV
+  const double MIN_JPSI_LEADING_MUON_PT_HIGH_ETA = 3.5; //GeV
   const double MIN_JPSI_SUBLEADING_MUON_PT_HIGH_ETA = 2.5; //GeV
 
   const double MIN_JPSI_PT = 8.5; //GeV

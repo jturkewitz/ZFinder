@@ -257,12 +257,12 @@ namespace zf {
       bool found_high_pt_muons_from_z;
       bool found_good_muons_from_z;
       bool found_dimuon_z_compatible_vertex; 
-      bool found_z_to_muons;
+      bool found_z_to_muons_mass;
 
       bool found_high_pt_electrons_from_z;
       bool found_good_electrons_from_z;
       bool found_dielectron_z_compatible_vertex; 
-      bool found_z_to_electrons;
+      bool found_z_to_electrons_mass;
 
       bool found_dimuon_jpsi_with_muons_in_eta_window;
       bool found_dimuon_jpsi_with_high_pt_muons;

@@ -271,7 +271,7 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
       zfp_dielectron_z_good->Fill(zfe);
       if(zfe.found_dielectron_z_compatible_vertex ) {
         zfp_dielectron_z_good_compatible_vertex->Fill(zfe);
-        if(zfe.found_z_to_electrons) {
+        if(zfe.found_z_to_electrons_mass) {
           zfp_z_to_electrons->Fill(zfe);
           if (zfe.found_good_dimuon_jpsi_compatible_with_primary_vertex) {
             zfp_z_to_electrons_and_good_dimuon_jpsi->Fill(zfe);
@@ -293,7 +293,7 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
       zfp_dimuon_z_good->Fill(zfe);
       if(zfe.found_dimuon_z_compatible_vertex ) {
         zfp_dimuon_z_good_compatible_vertex->Fill(zfe);
-        if(zfe.found_z_to_muons) {
+        if(zfe.found_z_to_muons_mass) {
           zfp_z_to_muons->Fill(zfe);
           if (zfe.found_good_dimuon_jpsi_compatible_with_primary_vertex) {
             zfp_z_to_muons_and_good_dimuon_jpsi->Fill(zfe);
