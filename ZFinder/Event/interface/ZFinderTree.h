@@ -105,6 +105,9 @@ namespace zf {
         int muon0_charge;
         int muon1_charge;
 
+        int has_muons_in_eta_window;
+        int has_high_pt_muons;
+
       } reco_jpsi_, truth_jpsi_;
 
       struct z_branch {
@@ -156,13 +159,16 @@ namespace zf {
 
         int daughter0_charge;
         int daughter1_charge;
-      } reco_z_, reco_z_from_muons_, truth_z_;
+      } reco_z_, reco_z_from_muons_, truth_z_muons_,truth_z_electrons_;
 
       struct event_branch {
         void clear_values() {
+          event_weight = -1.0;
+
           event_number = 0;
           run_number = 0;
           n_verts = 0;
+          truth_n_verts = 0;
           is_mc = false;
           found_high_pt_muons_from_z = false;
           found_good_muons_from_z = false;
@@ -180,15 +186,19 @@ namespace zf {
           found_dimuon_jpsi_with_good_muons_and_compatible_muon_vertex = false;
           found_good_dimuon_jpsi_compatible_with_primary_vertex = false;
           found_jpsi = false;
+
         }
 
         // Constructor
         event_branch() {
           clear_values();
         }
+        double event_weight;
+
         unsigned int event_number;
         unsigned int run_number;
         int n_verts;
+        int truth_n_verts;
 
         bool is_mc;
         bool found_high_pt_muons_from_z;
@@ -207,6 +217,7 @@ namespace zf {
         bool found_dimuon_jpsi_with_good_muons_and_compatible_muon_vertex;
         bool found_good_dimuon_jpsi_compatible_with_primary_vertex;
         bool found_jpsi;
+
       } event_;
 
       // File Directory to write to

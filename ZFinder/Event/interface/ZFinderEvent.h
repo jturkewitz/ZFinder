@@ -121,7 +121,7 @@ namespace zf {
         double vtx_z;
         math::PtEtaPhiMLorentzVector zlv;
         TransientVertex vtx;
-      } reco_z, reco_z_from_muons, truth_z;
+      } reco_z, reco_z_from_muons, truth_z_muons, truth_z_electrons;
 
       // JPsi Data
       struct JPsiData{
@@ -227,6 +227,12 @@ namespace zf {
 
       std::vector<const reco::Candidate*> jpsi_muon0;
       std::vector<const reco::Candidate*> jpsi_muon1;
+
+      const reco::Candidate* z_truth_muon0;
+      const reco::Candidate* z_truth_muon1;
+
+      const reco::Candidate* z_truth_electron0;
+      const reco::Candidate* z_truth_electron1;
       //void set_mu0(ZFinderMuon* muon) { mu0 = muon; }
       //void set_mu1(ZFinderMuon* muon) { mu1 = muon; }
       //void set_both_mu(ZFinderMuon* muon0, ZFinderMuon* muon1) { mu0 = muon0; mu1 = muon1; }

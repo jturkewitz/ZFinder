@@ -1129,11 +1129,17 @@ namespace zf {
     reco_z_from_muons.vtx_z = -100;
     reco_z_from_muons.zlv = lv;
 
-    truth_z.m = -1;
-    truth_z.y = -1000;
-    truth_z.pt = -1;
-    truth_z.phistar = -1;
-    truth_z.eta = -1000;
+    truth_z_electrons.m = -1;
+    truth_z_electrons.y = -1000;
+    truth_z_electrons.pt = -1;
+    truth_z_electrons.phistar = -1;
+    truth_z_electrons.eta = -1000;
+
+    truth_z_muons.m = -1;
+    truth_z_muons.y = -1000;
+    truth_z_muons.pt = -1;
+    truth_z_muons.phistar = -1;
+    truth_z_muons.eta = -1000;
 
     // Electrons
     e0 = NULL;
@@ -1175,17 +1181,22 @@ namespace zf {
      */
     const reco::GenParticle* electron_0 = NULL;
     const reco::GenParticle* electron_1 = NULL;
-    const reco::GenParticle* z_boson = NULL;
+    const reco::GenParticle* muon_0 = NULL;
+    const reco::GenParticle* muon_1 = NULL;
+    const reco::GenParticle* z_boson_electrons = NULL;
+    const reco::GenParticle* z_boson_muons = NULL;
 
     std::vector<const reco::GenParticle*> jpsi;
 
+    //this code is inherited really convoluted, TODO fix it
     for(unsigned int i = 0; i < mc_particles->size(); ++i) {
       const reco::GenParticle* gen_particle = &mc_particles->at(i);
       // Is a Z
-      if (gen_particle->pdgId() == ZBOSON && z_boson == NULL) {
+      //if (gen_particle->pdgId() == ZBOSON && z_boson_electrons == NULL) {
+      if (gen_particle->pdgId() == ZBOSON && z_boson_electrons == NULL) {
         for (size_t j = 0; j < gen_particle->numberOfDaughters(); ++j) {
           if (gen_particle->daughter(j)->pdgId() == ELECTRON) {
-            z_boson = gen_particle;
+            z_boson_electrons = gen_particle;
             break;
           }
         }
@@ -1204,6 +1215,31 @@ namespace zf {
           }
         }
       }
+
+      //Z->muons 
+      if (gen_particle->pdgId() == ZBOSON && z_boson_muons == NULL) {
+        for (size_t j = 0; j < gen_particle->numberOfDaughters(); ++j) {
+          if (gen_particle->daughter(j)->pdgId() == MUON) {
+            z_boson_muons = gen_particle;
+            break;
+          }
+        }
+        // Is an electron
+        // TODO - fix this, should just ask for the daugher particles of the z_boson
+      } else if (   fabs(gen_particle->pdgId()) == MUON  // In pdgId, fabs(POSITRON) == ELECTRON
+          && (muon_0 == NULL || muon_1 == NULL)
+          ) {
+        for (size_t j = 0; j < gen_particle->numberOfMothers(); ++j) {
+          if (gen_particle->mother(j)->pdgId() == ZBOSON) {
+            if (muon_0 == NULL) {
+              muon_0 = gen_particle;
+            } else {
+              muon_1 = gen_particle;
+            }
+          }
+        }
+      }
+
       //selecting jpsi that go to at least one muon
       if ( gen_particle->pdgId() == JPSI ) {
         for (size_t j = 0; j < gen_particle->numberOfDaughters(); ++j) {
@@ -1248,6 +1284,7 @@ namespace zf {
       const double JPSIEMP = jpsi.at(i)->energy() - jpsi.at(i)->pz();
       truth_jpsi.y.push_back( 0.5 * log(JPSIEPP / JPSIEMP));
       truth_jpsi.eta.push_back( jpsi.at(i)->eta());
+      truth_jpsi.phi.push_back( jpsi.at(i)->phi());
 
 
       ////////////////////////////////////////////////////////////////////////////////////
@@ -1359,10 +1396,24 @@ namespace zf {
     }
 
     // Continue only if all particles have been found
-    if (z_boson != NULL && electron_0 != NULL && electron_1 != NULL) {
+    if (z_boson_electrons != NULL && electron_0 != NULL && electron_1 != NULL) {
       // We set electron_0 to the higher pt electron
       if (electron_0->pt() < electron_1->pt()) {
         std::swap(electron_0, electron_1);
+      }
+
+      const reco::Candidate * d_e0 = z_boson_electrons->daughter( 0 );
+      const reco::Candidate * d_e1 = z_boson_electrons->daughter( 1 );
+      if (abs(d_e0->pdgId()) != ELECTRON && abs(d_e1->pdgId()) != ELECTRON) {
+        std::cout << "Z TO NOT ELECTRONS" << std::endl;
+      }
+      if ( d_e0->pt() >= d_e1->pt() ) {
+        z_truth_electron0 = d_e0;
+        z_truth_electron1 = d_e1;
+      }
+      else {
+        z_truth_electron0 = d_e1;
+        z_truth_electron1 = d_e0;
       }
 
       // Add electrons
@@ -1372,13 +1423,42 @@ namespace zf {
       set_e1_truth(zf_electron_1);
 
       // Z Properties
-      truth_z.m = z_boson->mass();
-      truth_z.pt = z_boson->pt();
-      const double ZEPP = z_boson->energy() + z_boson->pz();
-      const double ZEMP = z_boson->energy() - z_boson->pz();
-      truth_z.y = 0.5 * log(ZEPP / ZEMP);
-      truth_z.phistar = ReturnPhistar(electron_0->eta(), electron_0->phi(), electron_1->eta(), electron_1->phi());
-      truth_z.eta = z_boson->eta();
+      truth_z_electrons.m = z_boson_electrons->mass();
+      truth_z_electrons.pt = z_boson_electrons->pt();
+      const double ZEPP = z_boson_electrons->energy() + z_boson_electrons->pz();
+      const double ZEMP = z_boson_electrons->energy() - z_boson_electrons->pz();
+      truth_z_electrons.y = 0.5 * log(ZEPP / ZEMP);
+      truth_z_electrons.phistar = ReturnPhistar(electron_0->eta(), electron_0->phi(), electron_1->eta(), electron_1->phi());
+      truth_z_electrons.eta = z_boson_electrons->eta();
+    }
+    if (z_boson_muons != NULL && muon_0 != NULL && muon_1 != NULL) {
+      // We set muon_0 to the higher pt muon
+      if (muon_0->pt() < muon_1->pt()) {
+        std::swap(muon_0, muon_1);
+      }
+
+      const reco::Candidate * d_mu0 = z_boson_muons->daughter( 0 );
+      const reco::Candidate * d_mu1 = z_boson_muons->daughter( 1 );
+      if (abs(d_mu0->pdgId()) != MUON && abs(d_mu1->pdgId()) != MUON) {
+        std::cout << "Z TO NOT MUONS" << std::endl;
+      }
+      if ( d_mu0->pt() >= d_mu1->pt() ) {
+        z_truth_muon0 = d_mu0;
+        z_truth_muon1 = d_mu1;
+      }
+      else {
+        z_truth_muon0 = d_mu1;
+        z_truth_muon1 = d_mu0;
+      }
+
+      // Z Properties
+      truth_z_muons.m = z_boson_muons->mass();
+      truth_z_muons.pt = z_boson_muons->pt();
+      const double ZEPP = z_boson_muons->energy() + z_boson_muons->pz();
+      const double ZEMP = z_boson_muons->energy() - z_boson_muons->pz();
+      truth_z_muons.y = 0.5 * log(ZEPP / ZEMP);
+      truth_z_muons.phistar = ReturnPhistar(muon_0->eta(), muon_0->phi(), muon_1->eta(), muon_1->phi());
+      truth_z_muons.eta = z_boson_muons->eta();
     }
   }
 
@@ -1546,7 +1626,7 @@ namespace zf {
       }
     } else if (TYPE == TRUTH && !is_real_data) {
       if (e0_truth != NULL && e1_truth != NULL) {
-        cout << " Truth Z Mass " << truth_z.m << endl;
+        cout << " Truth Z Mass " << truth_z_electrons.m << endl;
         cout << "\tpt: " << e0_truth->pt;
         cout << " eta: " << e0_truth->eta;
         cout << " phi: " << e0_truth->phi << endl;

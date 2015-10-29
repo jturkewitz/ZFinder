@@ -185,7 +185,7 @@ namespace zf {
                 e_probe = zf_event.e0;
             }
         } else {
-            z_data = &zf_event.truth_z;
+            z_data = &zf_event.truth_z_electrons;
             verts = zf_event.truth_vert.num;
             if (tag == 0) {
                 e_tag = zf_event.e0_truth;

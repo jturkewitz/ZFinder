@@ -25,7 +25,7 @@ namespace zf {
     //const std::string Z_CODE = "z_m/D:z_pt:z_y:z_phi:z_phistar:z_eta:z_vtx_prob:z_vtx_x:z_vtx_y:z_vtx_z:daughter0_pt:daughter1_pt:daughter0_charge/I:daughter1_charge";
     const std::string Z_CODE = "z_m/D:z_pt:z_y:z_phi:z_phistar:z_eta:z_vtx_prob:z_vtx_x:z_vtx_y:z_vtx_z:daughter0_pt:daughter0_eta:daughter0_phi:daughter1_pt:daughter1_eta:daughter1_phi:daughter0_charge/I:daughter1_charge";
     //const std::string Z_CODE_INT = "daughter0_charge/I:daughter1_charge";
-    const std::string JPSI_CODE = "jpsi_m/D:jpsi_pt:jpsi_y:jpsi_phi:jpsi_eta:jpsi_vtx_prob:jpsi_vtx_x:jpsi_vtx_y:jpsi_vtx_z:jpsi_tau_xy:jpsi_tau_z:jpsi_distance_xy:jpsi_distance_z:jpsi_eff:jpsi_acc_eff:jpsi_scale_factor:muon0_pt:muon0_eta:muon0_phi:muon1_pt:muon1_eta:muon1_phi:muon0_charge/I:muon1_charge";
+    const std::string JPSI_CODE = "jpsi_m/D:jpsi_pt:jpsi_y:jpsi_phi:jpsi_eta:jpsi_vtx_prob:jpsi_vtx_x:jpsi_vtx_y:jpsi_vtx_z:jpsi_tau_xy:jpsi_tau_z:jpsi_distance_xy:jpsi_distance_z:jpsi_eff:jpsi_acc_eff:jpsi_scale_factor:muon0_pt:muon0_eta:muon0_phi:muon1_pt:muon1_eta:muon1_phi:muon0_charge/I:muon1_charge:has_muons_in_eta_window:has_high_pt_muons";
     //const std::string CODE = "z_m/D:z_y:z_phistar_born:z_phistar_dressed:z_phistar_naked:z_phistar_sc:z_pt:z_eta:e_pt0:e_pt1:e_eta0:e_eta1:e_phi0:e_phi1:e_rnine0:e_rnine1:n_true_pileup:e_charge0/I:e_charge1:n_verts:t0tight/O:t1tight";
     tree_->Branch("reco_z", &reco_z_, Z_CODE.c_str());
     //tree_->Branch("reco_z", &reco_z_, Z_CODE_INT.c_str());
@@ -34,12 +34,19 @@ namespace zf {
     tree_->Branch("reco_jpsi", &reco_jpsi_, JPSI_CODE.c_str());
     //tree_->Branch("reco", &reco_, CODE.c_str());
 
-    if (IS_MC_) {
-      tree_->Branch("truth_z", &truth_z_, Z_CODE.c_str());
-      tree_->Branch("truth_jpsi", &truth_jpsi_, JPSI_CODE.c_str());
-    }
+    //if (IS_MC_) {
+    //  tree_->Branch("truth_z", &truth_z_, Z_CODE.c_str());
+    //  tree_->Branch("truth_jpsi", &truth_jpsi_, JPSI_CODE.c_str());
+    //}
+    
+    
+    tree_->Branch("truth_z_muons", &truth_z_muons_, Z_CODE.c_str());
+    tree_->Branch("truth_z_electrons", &truth_z_electrons_, Z_CODE.c_str());
+
+    tree_->Branch("truth_jpsi", &truth_jpsi_, JPSI_CODE.c_str());
     //const std::string EVENT_CODE = "event_number/i:run_number:is_mc/O";
-    const std::string EVENT_CODE = "event_number/I:run_number:n_verts:is_mc/O:found_high_pt_muons_from_z:found_good_muons_from_z:found_dimuon_z_compatible_vertex:found_z_to_muons_mass:found_high_pt_electrons_from_z:found_good_electrons_from_z:found_dielectron_z_compatible_vertex:found_z_to_electrons_mass:found_dimuon_jpsi_with_muons_in_eta_window:found_dimuon_jpsi_with_high_pt_muons:found_dimuon_jpsi_with_soft_id_and_high_pt_muons:found_dimuon_jpsi_with_good_muons_and_compatible_muon_vertex:found_good_dimuon_jpsi_compatible_with_primary_vertex:found_jpsi";
+
+    const std::string EVENT_CODE = "event_weight/D:event_number/I:run_number:n_verts:truth_n_verts:is_mc/O:found_high_pt_muons_from_z:found_good_muons_from_z:found_dimuon_z_compatible_vertex:found_z_to_muons_mass:found_high_pt_electrons_from_z:found_good_electrons_from_z:found_dielectron_z_compatible_vertex:found_z_to_electrons_mass:found_dimuon_jpsi_with_muons_in_eta_window:found_dimuon_jpsi_with_high_pt_muons:found_dimuon_jpsi_with_soft_id_and_high_pt_muons:found_dimuon_jpsi_with_good_muons_and_compatible_muon_vertex:found_good_dimuon_jpsi_compatible_with_primary_vertex:found_jpsi";
     tree_->Branch("event_info", &event_, EVENT_CODE.c_str());
 
     //if (IS_MC_) {
@@ -72,7 +79,9 @@ namespace zf {
 
     // Clear our branches
     reco_z_.clear_values();
-    truth_z_.clear_values();
+    reco_z_from_muons_.clear_values();
+    truth_z_electrons_.clear_values();
+    truth_z_muons_.clear_values();
     
     reco_jpsi_.clear_values();
     truth_jpsi_.clear_values();
@@ -175,7 +184,7 @@ namespace zf {
     }
     
     
-    //if (zfe.found_jpsi) {
+    //if (zfe.found_jpsi) {}
     if (true) {
       int n_jpsi = 0;
       for (unsigned int i = 0; i < zfe.reco_jpsi.m.size() ; ++i ) {
@@ -258,9 +267,65 @@ namespace zf {
 
         reco_jpsi_.muon0_charge = zfe.reco_jpsi.muon0.at(i).charge();
         reco_jpsi_.muon1_charge = zfe.reco_jpsi.muon1.at(i).charge();
+
+        reco_jpsi_.has_muons_in_eta_window = zfe.reco_jpsi.has_muons_in_eta_window.at(i);
+        reco_jpsi_.has_high_pt_muons = zfe.reco_jpsi.has_high_pt_muons.at(i);
       }
     }
+    // Truth
+    if (!zfe.is_real_data) {
+      int n_jpsi = 0;
+      for (unsigned int i = 0; i < zfe.truth_jpsi.m.size() ; ++i ) {
+        n_jpsi++;
+        //TODO decide on how to do this for a tree (and histogram method too), for now just take first jpsi
+        //this is definitely a kludge, think of proper way to do this truth should only ever have 1 jpsi
+        if (n_jpsi > 1) {
+          continue;
+        }
+        truth_jpsi_.jpsi_m = zfe.truth_jpsi.m.at(i);
+        truth_jpsi_.jpsi_pt = zfe.truth_jpsi.pt.at(i);
+        truth_jpsi_.jpsi_y = zfe.truth_jpsi.y.at(i);
+        truth_jpsi_.jpsi_phi = zfe.truth_jpsi.phi.at(i);
+        truth_jpsi_.jpsi_eta = zfe.truth_jpsi.eta.at(i);
 
+        //truth_jpsi_.jpsi_distance_xy = zfe.truth_jpsi.distance_xy.at(i);
+        //truth_jpsi_.jpsi_distance_z = zfe.truth_jpsi.distance_z.at(i);
+
+        //truth_jpsi_.jpsi_vtx_prob = zfe.truth_jpsi.y.at(i);
+        truth_jpsi_.jpsi_vtx_x = zfe.truth_jpsi.vtx_x.at(i);
+        truth_jpsi_.jpsi_vtx_y = zfe.truth_jpsi.vtx_y.at(i);
+        truth_jpsi_.jpsi_vtx_z = zfe.truth_jpsi.vtx_z.at(i);
+
+        //truth_jpsi_.jpsi_eff = zfe.truth_jpsi.jpsi_efficiency.at(i);
+        //truth_jpsi_.jpsi_acc_eff = zfe.truth_jpsi.jpsi_acc_eff.at(i);
+        //truth_jpsi_.jpsi_scale_factor = zfe.truth_jpsi.jpsi_scale_factor.at(i);
+        truth_jpsi_.muon0_pt = zfe.jpsi_muon0.at(i)->pt();
+        truth_jpsi_.muon0_eta = zfe.jpsi_muon0.at(i)->eta();
+        truth_jpsi_.muon0_phi = zfe.jpsi_muon0.at(i)->phi();
+
+        truth_jpsi_.muon1_pt = zfe.jpsi_muon1.at(i)->pt();
+        truth_jpsi_.muon1_eta = zfe.jpsi_muon1.at(i)->eta();
+        truth_jpsi_.muon1_phi = zfe.jpsi_muon1.at(i)->phi();
+
+        truth_jpsi_.muon0_charge = zfe.jpsi_muon0.at(i)->charge();
+        truth_jpsi_.muon1_charge = zfe.jpsi_muon1.at(i)->charge();
+
+        truth_jpsi_.has_muons_in_eta_window = zfe.truth_jpsi.has_muons_in_eta_window.at(i);
+        truth_jpsi_.has_high_pt_muons = zfe.truth_jpsi.has_high_pt_muons.at(i);
+      }
+
+      truth_z_electrons_.z_m = zfe.truth_z_electrons.m;
+      truth_z_electrons_.z_pt = zfe.truth_z_electrons.pt;
+      truth_z_electrons_.z_y = zfe.truth_z_electrons.y;
+      truth_z_electrons_.z_phistar = zfe.truth_z_electrons.phistar;
+      truth_z_electrons_.z_eta = zfe.truth_z_electrons.eta;
+
+      truth_z_muons_.z_m = zfe.truth_z_muons.m;
+      truth_z_muons_.z_pt = zfe.truth_z_muons.pt;
+      truth_z_muons_.z_y = zfe.truth_z_muons.y;
+      truth_z_muons_.z_phistar = zfe.truth_z_muons.phistar;
+      truth_z_muons_.z_eta = zfe.truth_z_muons.eta;
+    }
     // Truth
     //if (IS_MC_ && !zf_event.is_real_data) {
     //  truth_.z_m = zf_event.truth_z.m;
@@ -296,10 +361,12 @@ namespace zf {
 
     // General Event info
 
+    event_.event_weight = zfe.event_weight;
     event_.event_number = zfe.id.event_num;
     event_.run_number = zfe.id.run_num;
 
     event_.n_verts = zfe.reco_vert.num;
+    event_.truth_n_verts = zfe.truth_vert.num;
     event_.is_mc = !zfe.is_real_data;
 
     event_.found_high_pt_muons_from_z = zfe.found_high_pt_muons_from_z;
@@ -319,7 +386,6 @@ namespace zf {
     event_.found_good_dimuon_jpsi_compatible_with_primary_vertex = zfe.found_good_dimuon_jpsi_compatible_with_primary_vertex;
     event_.found_jpsi = zfe.found_jpsi;
 
-
     // Fill if there is a good Z in either truth or reco
     //if (zf_event.truth_z.m > -1 || zf_event.reco_z.m > -1) {}
     //if ((zfe.found_z_to_muons || zfe.found_z_to_electrons) && zfe.found_jpsi) {
@@ -332,7 +398,6 @@ namespace zf {
     //    && (zfe.found_jpsi && zfe.found_good_dimuon_jpsi_compatible_with_primary_vertex)) {
     if (true) {
       tree_->Fill();
-
       //tree_->Write();
     }
   }

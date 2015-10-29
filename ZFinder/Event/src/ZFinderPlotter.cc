@@ -472,7 +472,7 @@ namespace zf {
       jpsi_pt_vs_rap_->GetYaxis()->SetTitle("jpsi Pt");
 
       const std::string jpsi_pt_vs_rap_fine_name = "jpsi_pt_vs_rap_fine";
-      jpsi_pt_vs_rap_fine_ = tdir.make<TH2D>(jpsi_pt_vs_rap_fine_name.c_str(), jpsi_pt_vs_rap_fine_name.c_str(), 21, -2.1, 2.1, bin_number, 400, 0, 200);
+      jpsi_pt_vs_rap_fine_ = tdir.make<TH2D>(jpsi_pt_vs_rap_fine_name.c_str(), jpsi_pt_vs_rap_fine_name.c_str(), 21, -2.1, 2.1, 400, 0, 200);
       jpsi_pt_vs_rap_fine_->GetXaxis()->SetTitle("jpsi Rapidity");
       jpsi_pt_vs_rap_fine_->GetYaxis()->SetTitle("jpsi Pt");
 
@@ -1812,12 +1812,12 @@ namespace zf {
       njpsis_->Fill(n_jpsi, event_weight); 
     } 
     else if (USE_MC_ && !zfe.is_real_data) {
-      z_mass_all_->Fill(zfe.truth_z.m, event_weight);
-      z_mass_coarse_->Fill(zfe.truth_z.m, event_weight);
-      z_mass_fine_->Fill(zfe.truth_z.m, event_weight);
-      z_rapidity_->Fill(zfe.truth_z.y, event_weight);
-      z_pt_->Fill(zfe.truth_z.pt, event_weight);
-      phistar_->Fill(zfe.truth_z.phistar, event_weight);
+      z_mass_all_->Fill(zfe.truth_z_electrons.m, event_weight);
+      z_mass_coarse_->Fill(zfe.truth_z_electrons.m, event_weight);
+      z_mass_fine_->Fill(zfe.truth_z_electrons.m, event_weight);
+      z_rapidity_->Fill(zfe.truth_z_electrons.y, event_weight);
+      z_pt_->Fill(zfe.truth_z_electrons.pt, event_weight);
+      phistar_->Fill(zfe.truth_z_electrons.phistar, event_weight);
 
       // Fill the histograms with the information from the approriate electron
       if (zfe.e0_truth != NULL && zfe.e1_truth != NULL) {
@@ -1830,6 +1830,7 @@ namespace zf {
       }
       //jpsi plots
       int n_truth_jpsi = 0;
+      
       for (unsigned int i = 0; i < zfe.truth_jpsi.m.size() ; ++i ) {
         if (APPLY_JPSI_MASS_WINDOW_ && !zfe.truth_jpsi.is_within_jpsi_mass_window.at(i) ) {
           continue;
@@ -1877,7 +1878,6 @@ namespace zf {
       njpsis_->Fill(n_truth_jpsi, event_weight); 
     }
   }
-
   //void ZFinderPlotter::CalculateJpsiLifetime(const ZFinderEvent::JPsiData &jpsi_data, const ZFinderEvent::ZFromMuonsData &z_from_muon ) {
   //  for (unsigned int i = 0; i < jpsi_data.m.size() ; ++i ) {
   //  }
