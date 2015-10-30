@@ -447,15 +447,24 @@ void sPlotFit() {
   //comment out drawings to run script faster for now
   int ZBins = 10;
   TCanvas* cdata_Z = new TCanvas("cdata_Z","sPlot Z", 1200, 1200); cdata_Z->Divide(2,2);
-  RooPlot* frame_Z_ee_prompt = ZMass->frame(Bins(ZBins)); data_prompt_Z_ee_weighted->plotOn(frame_Z_ee_prompt);
-  cdata_Z->cd(1); frame_Z_ee_prompt->Draw();
+  RooPlot* frame_Z_ee_prompt = ZMass->frame(Bins(ZBins));
+  data_prompt_Z_ee_weighted->plotOn(frame_Z_ee_prompt);
+  cdata_Z->cd(1); 
+  frame_Z_ee_prompt->Draw();
 
-  RooPlot* frame_Z_ee_non_prompt = ZMass->frame(Bins(ZBins)); data_non_prompt_Z_ee_weighted->plotOn(frame_Z_ee_non_prompt);
-  cdata_Z->cd(2); frame_Z_ee_non_prompt->Draw();
+  RooPlot* frame_Z_ee_non_prompt = ZMass->frame(Bins(ZBins)); 
+  frame_Z_ee_non_prompt
+  data_non_prompt_Z_ee_weighted->plotOn(frame_Z_ee_non_prompt);
+  cdata_Z->cd(2); 
+  frame_Z_ee_non_prompt->Draw();
 
-  RooPlot* frame_Z_mumu_prompt = ZMass->frame(Bins(ZBins)); data_prompt_Z_mumu_weighted->plotOn(frame_Z_mumu_prompt);
-  cdata_Z->cd(3); frame_Z_mumu_prompt->Draw();
+  RooPlot* frame_Z_mumu_prompt = ZMass->frame(Bins(ZBins)); 
+  data_prompt_Z_mumu_weighted->plotOn(frame_Z_mumu_prompt);
+  cdata_Z->cd(3); 
+  frame_Z_mumu_prompt->Draw();
 
-  RooPlot* frame_Z_mumu_non_prompt = ZMass->frame(Bins(ZBins)); data_non_prompt_Z_mumu_weighted->plotOn(frame_Z_mumu_non_prompt);
-  cdata_Z->cd(4); frame_Z_mumu_non_prompt->Draw();
+  RooPlot* frame_Z_mumu_non_prompt = ZMass->frame(Bins(ZBins)); 
+  data_non_prompt_Z_mumu_weighted->plotOn(frame_Z_mumu_non_prompt);
+  cdata_Z->cd(4); 
+  frame_Z_mumu_non_prompt->Draw();
 }

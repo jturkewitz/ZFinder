@@ -303,10 +303,10 @@ namespace zf {
     }
     if (reco_z_from_muons.m > -1 && 
         muon::isTightMuon(z_muon0, reco_vert.primary_vert ) &&
-        muon::isTightMuon(z_muon1, reco_vert.primary_vert ) ) {
+        muon::isTightMuon(z_muon1, reco_vert.primary_vert ) &&
         //muon::isTightMuon(z_muon1, reco_vert.primary_vert ) &&
-        //TriggerMatch(iEvent, DOUBLE_MUON_TIGHT_LEG_TRIGGER, z_muon0.eta(), z_muon0.phi(), TRIG_DR_) &&
-        //TriggerMatch(iEvent, DOUBLE_MUON_LOOSE_LEG_TRIGGER, z_muon1.eta(), z_muon1.phi(), TRIG_DR_) ) {
+        TriggerMatch(iEvent, DOUBLE_MUON_TIGHT_LEG_TRIGGER, z_muon0.eta(), z_muon0.phi(), TRIG_DR_) &&
+        TriggerMatch(iEvent, DOUBLE_MUON_LOOSE_LEG_TRIGGER, z_muon1.eta(), z_muon1.phi(), TRIG_DR_) ) {
       found_good_muons_from_z = true;
     }
     if (reco_z_from_muons.m > -1 && 
@@ -330,7 +330,10 @@ namespace zf {
     }
     if (reco_z.m > -1 && e0 != NULL && e1 != NULL) {
       //somewhat arbitrary decision between eg_medium vs eg_tight, eg_medium should have a greater acceptance
-      if (e0->CutPassed("eg_medium") && e1->CutPassed("eg_medium") ) {
+      //usually use eg_medium
+      if (e0->CutPassed("eg_medium") && e1->CutPassed("eg_medium") &&
+          (e0->CutPassed("trig(et_et_tight)") && e1->CutPassed("trig(et_et_loose")) ) {
+      //if (e0->CutPassed("eg_loose") && e1->CutPassed("eg_loose") ) {
         found_good_electrons_from_z = true;
       }
     }

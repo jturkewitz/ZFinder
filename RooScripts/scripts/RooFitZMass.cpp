@@ -79,10 +79,10 @@ int RooFitZMass(
   gErrorIgnoreLevel = kWarning;
 
   //TODO testing
-  double z_mass_min = 50.0;
-  double z_mass_max = 150.0;
-  //double z_mass_min = 60.0;
-  //double z_mass_max = 120.0;
+  //double z_mass_min = 50.0;
+  //double z_mass_max = 150.0;
+  double z_mass_min = 60.0;
+  double z_mass_max = 120.0;
   // Set up the variables we're going to read in from the files
   RooRealVar z_mass("z_mass", "z_mass" , z_mass_min, z_mass_max, "GeV");
   RooRealVar zjpsi_mass("zjpsi_mass", "zjpsi_mass" , z_mass_min, z_mass_max, "GeV");
