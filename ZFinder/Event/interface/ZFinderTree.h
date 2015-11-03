@@ -108,7 +108,7 @@ namespace zf {
         int has_muons_in_eta_window;
         int has_high_pt_muons;
 
-      } reco_jpsi_, truth_jpsi_;
+      } reco_jpsi_, truth_jpsi_, reco_jpsi_from_electrons_;
 
       struct z_branch {
         void clear_values() {
@@ -187,6 +187,15 @@ namespace zf {
           found_good_dimuon_jpsi_compatible_with_primary_vertex = false;
           found_jpsi = false;
 
+          //TODO jpsi->ee
+          //--------------------------------------
+          found_dimuon_jpsi_from_electrons_with_muons_in_eta_window = false;
+          found_dimuon_jpsi_from_electrons_with_high_pt_muons = false;
+          found_dimuon_jpsi_from_electrons_with_soft_id_and_high_pt_muons = false;
+          found_dimuon_jpsi_from_electrons_with_good_muons_and_compatible_muon_vertex = false;
+          found_good_dimuon_jpsi_from_electrons_compatible_with_primary_vertex = false;
+          found_jpsi_from_electrons = false;
+          //-------------------------------
         }
 
         // Constructor
@@ -217,6 +226,15 @@ namespace zf {
         bool found_dimuon_jpsi_with_good_muons_and_compatible_muon_vertex;
         bool found_good_dimuon_jpsi_compatible_with_primary_vertex;
         bool found_jpsi;
+        //TODO jpsi->ee
+        //--------------------------------------
+        bool found_dimuon_jpsi_from_electrons_with_muons_in_eta_window;
+        bool found_dimuon_jpsi_from_electrons_with_high_pt_muons;
+        bool found_dimuon_jpsi_from_electrons_with_soft_id_and_high_pt_muons;
+        bool found_dimuon_jpsi_from_electrons_with_good_muons_and_compatible_muon_vertex;
+        bool found_good_dimuon_jpsi_from_electrons_compatible_with_primary_vertex;
+        bool found_jpsi_from_electrons;
+        //---------------------------------------
 
       } event_;
 

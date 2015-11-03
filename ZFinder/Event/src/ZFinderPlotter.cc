@@ -214,6 +214,28 @@ namespace zf {
       jpsi_mass_coarse_->GetXaxis()->SetTitle("m_{mumu} [GeV]");
       jpsi_mass_coarse_->GetYaxis()->SetTitle("Counts / 0.1 GeV");
 
+
+      //TDOO jpsi->ee testing
+      //----------------------------------------------------------
+      // jpsi_mass_fine_
+      const std::string jpsi_from_electrons_mass_fine_name = "jpsi_from_electrons_mass";
+      jpsi_from_electrons_mass_fine_ = tdir.make<TH1D>(jpsi_from_electrons_mass_fine_name.c_str(), jpsi_from_electrons_mass_fine_name.c_str(), 1500, 0.0, 15.0);
+      jpsi_from_electrons_mass_fine_->GetXaxis()->SetTitle("m_{ee} [GeV]");
+      jpsi_from_electrons_mass_fine_->GetYaxis()->SetTitle("Counts / 0.01 GeV");
+
+      // jpsi_from_electrons_pt
+      const std::string jpsi_from_electrons_pt_name = "jpsi_from_electrons p_{T}";
+      jpsi_from_electrons_pt_ = tdir.make<TH1D>(jpsi_from_electrons_pt_name.c_str(), jpsi_from_electrons_pt_name.c_str(), 200, 0., 200.);
+      jpsi_from_electrons_pt_->GetXaxis()->SetTitle("p_{T,jpsi_from_electrons}");
+      jpsi_from_electrons_pt_->GetYaxis()->SetTitle("Counts / GeV");
+
+      // jpsi_from_electrons_tau_xy_very_fine
+      const std::string jpsi_from_electrons_tau_xy_very_fine_name = "jpsi_from_electrons_tau_xy_very_fine_all";
+      jpsi_from_electrons_tau_xy_very_fine_ = tdir.make<TH1D>(jpsi_from_electrons_tau_xy_very_fine_name.c_str(), jpsi_from_electrons_tau_xy_very_fine_name.c_str(), 2000, -10., 10.);
+      jpsi_from_electrons_tau_xy_very_fine_->GetXaxis()->SetTitle("tau_xy_very_fine [ps]");
+      jpsi_from_electrons_tau_xy_very_fine_->GetYaxis()->SetTitle("Counts / 0.01 ps ");
+      //---------------------------------------------------------
+
       // jpsi_mass_fine_
       const std::string jpsi_mass_fine_name = "jpsi_mass";
       jpsi_mass_fine_ = tdir.make<TH1D>(jpsi_mass_fine_name.c_str(), jpsi_mass_fine_name.c_str(), 1500, 0.0, 15.0);
@@ -1439,6 +1461,37 @@ namespace zf {
       primary_vtx_x_vs_zmuons_vtx_x_->Fill(zfe.reco_z_from_muons.vtx_x, zfe.reco_vert.primary_x, event_weight );
       primary_vtx_y_vs_zmuons_vtx_y_->Fill(zfe.reco_z_from_muons.vtx_y, zfe.reco_vert.primary_y, event_weight );
       primary_vtx_z_vs_zmuons_vtx_z_->Fill(zfe.reco_z_from_muons.vtx_z, zfe.reco_vert.primary_z, event_weight );
+
+
+      //TODO testing jpsi->ee
+      //--------------------------------------------
+      for (unsigned int i = 0; i < zfe.reco_jpsi_from_electrons.m.size() ; ++i ) {
+        //jpsi_from_electrons_mass_fine_->Fill(zfe.reco_jpsi_from_electrons.m.at(i), event_weight);
+        //jpsi_from_electrons_pt_->Fill(zfe.reco_jpsi_from_electrons.pt.at(i), event_weight);
+        //jpsi_from_electrons_tau_xy_very_fine_->Fill(zfe.reco_jpsi_from_electrons.tau_xy.at(i) * 1000, event_weight); // multiply by 1000 to go from ns to ps
+        if (APPLY_MUON_MIN_PT_ && (!zfe.reco_jpsi_from_electrons.has_high_pt_muons.at(i) || !zfe.reco_jpsi_from_electrons.has_muons_in_eta_window.at(i) || 
+            !zfe.reco_jpsi_from_electrons.is_high_pt.at(i) ) )  {
+          continue;
+        }
+        if (APPLY_SOFT_MUONS_ && !zfe.reco_jpsi_from_electrons.has_soft_id_muons.at(i) ) {
+          continue;
+        }
+        if (APPLY_JPSI_MASS_WINDOW_ && !zfe.reco_jpsi_from_electrons.is_within_jpsi_mass_window.at(i) ) {
+          continue;
+        }
+        //TODO should this cut be relative to the z position??
+        if (APPLY_VERTEX_Z_POS_WINDOW_ && !zfe.reco_jpsi_from_electrons.has_dimuon_vertex_compatible_with_primary_vertex.at(i) ) {
+          continue;
+        }
+        if (APPLY_DIMUON_VTX_COMPATIBILITY_ && !zfe.reco_jpsi_from_electrons.has_muons_with_compatible_vertex.at(i) ) {
+          continue;
+        }
+        jpsi_from_electrons_mass_fine_->Fill(zfe.reco_jpsi_from_electrons.m.at(i), event_weight);
+        jpsi_from_electrons_pt_->Fill(zfe.reco_jpsi_from_electrons.pt.at(i), event_weight);
+        jpsi_from_electrons_tau_xy_very_fine_->Fill(zfe.reco_jpsi_from_electrons.tau_xy.at(i) * 1000, event_weight); // multiply by 1000 to go from ns to ps
+      }
+      //-------------------------------------------------
+
 
       int n_jpsi = 0;
       for (unsigned int i = 0; i < zfe.reco_jpsi.m.size() ; ++i ) {

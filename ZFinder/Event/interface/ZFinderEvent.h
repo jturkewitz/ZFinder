@@ -189,7 +189,7 @@ namespace zf {
         std::vector<bool> is_in_rap_window;
         std::vector<bool> is_within_jpsi_mass_window;
         std::vector<bool> is_prompt;
-      } reco_jpsi, truth_jpsi;
+      } reco_jpsi, reco_jpsi_from_electrons, truth_jpsi;
 
       struct Jets{
         std::vector<double> pt;
@@ -253,6 +253,9 @@ namespace zf {
 
       // Number of Muons
       int n_reco_muons;
+      
+      //TODO testing jpsi->ee
+      int n_reco_jpsi_from_electrons;
 
       // Number of Jets
       int n_reco_jets;
@@ -278,10 +281,25 @@ namespace zf {
       bool found_jpsi;
       bool found_prompt_jpsi;
 
+
+      //TODO jpsi->ee
+      bool found_dimuon_jpsi_from_electrons_with_muons_in_eta_window;
+      bool found_dimuon_jpsi_from_electrons_with_high_pt_muons;
+      bool found_dimuon_jpsi_from_electrons_with_soft_id_and_high_pt_muons;
+      bool found_dimuon_jpsi_from_electrons_with_good_muons_and_compatible_muon_vertex;
+      bool found_good_dimuon_jpsi_from_electrons_compatible_with_primary_vertex;
+      bool found_jpsi_from_electrons;
+      bool found_prompt_jpsi_from_electrons;
+      //--------------
+
       bool found_truth_jpsi_with_high_pt_muons;
 
       //reco::TrackRef GetElectronTrackRef(const reco::GsfElectron & e);
       reco::TrackRef GetMuonTrackRef(const reco::Muon & mu);
+
+
+      //TODO testing for jpsi->ee
+      //reco::TrackRef GetElectronTrackRef(const reco::GsfElectron & el);
 
       // Output
       void PrintElectrons(const int TYPE = 0, const bool PRINT_CUTS = false);  // 0 is reco, 1 is truth, 2 is trig
@@ -317,6 +335,8 @@ namespace zf {
 
       // Update the JPsi Info from two muons
       void InitJPsi(const reco::Muon& mu0, const reco::Muon& mu1, const TransientVertex &dimuon_vertex);
+      //TODO testing
+      void InitJPsiFromElectrons(const reco::GsfElectron& e0, const reco::GsfElectron& e1, const TransientVertex &dielectron_vertex);
 
       void InitJets(const edm::Event& iEvent, const edm::EventSetup& iSetup) ;
 

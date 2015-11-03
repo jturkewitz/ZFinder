@@ -129,7 +129,6 @@ std::vector<double> RooFitCombined(
   double tau_xy_max = 5.0;
   RooRealVar tau_xy("tau_xy", "tau_xy" , tau_xy_min, tau_xy_max, "ps");
 
-
   RooRealVar zjpsi_dimuon_mass("zjpsi_dimuon_mass", "zjpsi_dimuon_mass" , dimuon_mass_min, dimuon_mass_max, "GeV");
   RooRealVar zjpsi_tau_xy("zjpsi_tau_xy", "zjpsi_tau_xy" , tau_xy_min, tau_xy_max, "ps");
     
