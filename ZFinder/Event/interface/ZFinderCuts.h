@@ -23,6 +23,7 @@ namespace zf {
   const double MAX_PROMPT_JPSI_TIME = 0.0003; // ns
   const double MIN_Z_MUON_PT = 20.0; //GeV
   const double MIN_ELECTRON_PT = 20.0; //GeV
+  const double MAX_Z_LEPTON_ETA = 2.4; //GeV
   const double MAX_JPSI_VERTEX_Z_DISPLACEMENT = 1.0 ; //cm
   const double MIN_VERTEX_PROB = 0.005; //
   //const double MAX_JPSI_MUON_ETA = 2.1; //limited by tag and probe method to measure scale factors

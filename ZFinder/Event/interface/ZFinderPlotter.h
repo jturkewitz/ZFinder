@@ -70,19 +70,9 @@ namespace zf {
             TH1D* nelectrons_;
 
             TH1D* jpsi_mass_all_;
-
-
             TH1D* jpsi_mass_coarse_;
 
             TH1D* jpsi_mass_fine_;
-
-            //TDOO jpsi->ee testing
-            //---------------------
-            TH1D* jpsi_from_electrons_mass_fine_;
-            TH1D* jpsi_from_electrons_pt_;
-            TH1D* jpsi_from_electrons_tau_xy_very_fine_;
-            //------------------------
-
             TH1D* jpsi_mass_fine_ptUnder10_;
             TH1D* jpsi_mass_fine_pt10to15_;
             TH1D* jpsi_mass_fine_pt15to20_;
@@ -94,8 +84,6 @@ namespace zf {
 
             TH1D* jpsi_rapidity_;
             TH1D* jpsi_pt_;
-
-
             TH2D* jpsi_pt_vs_rap_;
             TH2D* jpsi_pt_vs_rap_fine_;
             TH2D* jpsi_pt_vs_rap_polarization_long;

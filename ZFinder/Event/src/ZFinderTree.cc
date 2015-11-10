@@ -32,12 +32,6 @@ namespace zf {
     tree_->Branch("reco_z_from_muons", &reco_z_from_muons_, Z_CODE.c_str());
     //tree_->Branch("reco_z_from_muons", &reco_z_from_muons_, Z_CODE_INT.c_str());
     tree_->Branch("reco_jpsi", &reco_jpsi_, JPSI_CODE.c_str());
-
-    //TODO jpsi->ee
-    //----------------
-    tree_->Branch("reco_jpsi_from_electrons", &reco_jpsi_from_electrons_, JPSI_CODE.c_str());
-    //------------------
-
     //tree_->Branch("reco", &reco_, CODE.c_str());
 
     //if (IS_MC_) {
@@ -52,13 +46,8 @@ namespace zf {
     tree_->Branch("truth_jpsi", &truth_jpsi_, JPSI_CODE.c_str());
     //const std::string EVENT_CODE = "event_number/i:run_number:is_mc/O";
 
-    //const std::string EVENT_CODE = "event_weight/D:event_number/I:run_number:n_verts:truth_n_verts:is_mc/O:found_high_pt_muons_from_z:found_good_muons_from_z:found_dimuon_z_compatible_vertex:found_z_to_muons_mass:found_high_pt_electrons_from_z:found_good_electrons_from_z:found_dielectron_z_compatible_vertex:found_z_to_electrons_mass:found_dimuon_jpsi_with_muons_in_eta_window:found_dimuon_jpsi_with_high_pt_muons:found_dimuon_jpsi_with_soft_id_and_high_pt_muons:found_dimuon_jpsi_with_good_muons_and_compatible_muon_vertex:found_good_dimuon_jpsi_compatible_with_primary_vertex:found_jpsi";
-
-    //TODO jpsi->ee
-    //-----------------
-    const std::string EVENT_CODE = "event_weight/D:event_number/I:run_number:n_verts:truth_n_verts:is_mc/O:found_high_pt_muons_from_z:found_good_muons_from_z:found_dimuon_z_compatible_vertex:found_z_to_muons_mass:found_high_pt_electrons_from_z:found_good_electrons_from_z:found_dielectron_z_compatible_vertex:found_z_to_electrons_mass:found_dimuon_jpsi_with_muons_in_eta_window:found_dimuon_jpsi_with_high_pt_muons:found_dimuon_jpsi_with_soft_id_and_high_pt_muons:found_dimuon_jpsi_with_good_muons_and_compatible_muon_vertex:found_good_dimuon_jpsi_compatible_with_primary_vertex:found_jpsi:found_dimuon_jpsi_from_electrons_with_muons_in_eta_window:found_dimuon_jpsi_from_electrons_with_high_pt_muons:found_dimuon_jpsi_from_electrons_with_soft_id_and_high_pt_muons:found_dimuon_jpsi_from_electrons_with_good_muons_and_compatible_muon_vertex:found_good_dimuon_jpsi_from_electrons_compatible_with_primary_vertex:found_jpsi_from_electrons";
+    const std::string EVENT_CODE = "event_weight/D:event_number/I:run_number:n_verts:truth_n_verts:is_mc/O:found_high_pt_muons_from_z:found_good_muons_from_z:found_dimuon_z_compatible_vertex:found_z_to_muons_mass:found_high_pt_electrons_from_z:found_good_electrons_from_z:found_dielectron_z_compatible_vertex:found_z_to_electrons_mass:found_dimuon_jpsi_with_muons_in_eta_window:found_dimuon_jpsi_with_high_pt_muons:found_dimuon_jpsi_with_soft_id_and_high_pt_muons:found_dimuon_jpsi_with_good_muons_and_compatible_muon_vertex:found_good_dimuon_jpsi_compatible_with_primary_vertex:found_jpsi";
     tree_->Branch("event_info", &event_, EVENT_CODE.c_str());
-    //-------------------
 
     //if (IS_MC_) {
     //  tree_->Branch("weight_size", &weight_size_, "weight_size/I");
@@ -95,12 +84,6 @@ namespace zf {
     truth_z_muons_.clear_values();
     
     reco_jpsi_.clear_values();
-
-
-    //TODO jpsi->ee testing
-    reco_jpsi_from_electrons_.clear_values();
-
-
     truth_jpsi_.clear_values();
    
     event_.clear_values();
@@ -289,101 +272,6 @@ namespace zf {
         reco_jpsi_.has_high_pt_muons = zfe.reco_jpsi.has_high_pt_muons.at(i);
       }
     }
-
-
-    //TODO jpsi->ee
-    //---------------------------------------------------------------------------------------
-    if (true) {
-      int n_jpsi_from_electrons = 0;
-      for (unsigned int i = 0; i < zfe.reco_jpsi_from_electrons.m.size() ; ++i ) {
-        //TODO should fold in eta window cut here??
-        //TODO should fold in jpsi pT window cut here??
-        bool APPLY_MUON_MIN_PT_from_electrons_;
-        bool APPLY_SOFT_MUONS_from_electrons_;
-        bool APPLY_JPSI_MASS_WINDOW_from_electrons_;
-        bool APPLY_VERTEX_Z_POS_WINDOW_from_electrons_;
-        bool APPLY_DIMUON_VTX_COMPATIBILITY_from_electrons_;
-
-        if(zfe.found_jpsi_from_electrons) {
-          APPLY_MUON_MIN_PT_from_electrons_ = true;
-          APPLY_SOFT_MUONS_from_electrons_ = true;
-          APPLY_JPSI_MASS_WINDOW_from_electrons_ = true;
-          APPLY_VERTEX_Z_POS_WINDOW_from_electrons_ = true;
-          APPLY_DIMUON_VTX_COMPATIBILITY_from_electrons_ = true;
-        }
-        else {
-          APPLY_MUON_MIN_PT_from_electrons_ = false;
-          APPLY_SOFT_MUONS_from_electrons_ = false;
-          APPLY_JPSI_MASS_WINDOW_from_electrons_ = false;
-          APPLY_VERTEX_Z_POS_WINDOW_from_electrons_ = false;
-          APPLY_DIMUON_VTX_COMPATIBILITY_from_electrons_ = false;
-        }
-
-        if (APPLY_MUON_MIN_PT_from_electrons_ && (!zfe.reco_jpsi_from_electrons.has_high_pt_muons.at(i) || !zfe.reco_jpsi_from_electrons.has_muons_in_eta_window.at(i) || 
-              !zfe.reco_jpsi_from_electrons.is_high_pt.at(i) ) )  {
-          continue;
-        }
-        if (APPLY_SOFT_MUONS_from_electrons_ && !zfe.reco_jpsi_from_electrons.has_soft_id_muons.at(i) ) {
-          continue;
-        }
-        if (APPLY_JPSI_MASS_WINDOW_from_electrons_ && !zfe.reco_jpsi_from_electrons.is_within_jpsi_mass_window.at(i) ) {
-          continue;
-        }
-        //TODO should this cut be relative to the z position??
-        if (APPLY_VERTEX_Z_POS_WINDOW_from_electrons_ && !zfe.reco_jpsi_from_electrons.has_dimuon_vertex_compatible_with_primary_vertex.at(i) ) {
-          continue;
-        }
-        if (APPLY_DIMUON_VTX_COMPATIBILITY_from_electrons_ && !zfe.reco_jpsi_from_electrons.has_muons_with_compatible_vertex.at(i) ) {
-          continue;
-        }
-        n_jpsi_from_electrons++;
-        //TODO decide on how to do this for a tree (and histogram method too), for now just take first jpsi
-        //this is definitely a kludge, think of proper way to do this
-        if (n_jpsi_from_electrons > 1) {
-          continue;
-        }
-
-        reco_jpsi_from_electrons_.jpsi_m = zfe.reco_jpsi_from_electrons.m.at(i);
-        reco_jpsi_from_electrons_.jpsi_pt = zfe.reco_jpsi_from_electrons.pt.at(i);
-        reco_jpsi_from_electrons_.jpsi_y = zfe.reco_jpsi_from_electrons.y.at(i);
-        reco_jpsi_from_electrons_.jpsi_phi = zfe.reco_jpsi_from_electrons.phi.at(i);
-        reco_jpsi_from_electrons_.jpsi_eta = zfe.reco_jpsi_from_electrons.eta.at(i);
-
-        reco_jpsi_from_electrons_.jpsi_tau_xy = zfe.reco_jpsi_from_electrons.tau_xy.at(i);
-        reco_jpsi_from_electrons_.jpsi_tau_z = zfe.reco_jpsi_from_electrons.tau_z.at(i);
-
-        reco_jpsi_from_electrons_.jpsi_distance_xy = zfe.reco_jpsi_from_electrons.distance_xy.at(i);
-        reco_jpsi_from_electrons_.jpsi_distance_z = zfe.reco_jpsi_from_electrons.distance_z.at(i);
-
-        reco_jpsi_from_electrons_.jpsi_vtx_prob = zfe.reco_jpsi_from_electrons.y.at(i);
-        reco_jpsi_from_electrons_.jpsi_vtx_x = zfe.reco_jpsi_from_electrons.vtx_x.at(i);
-        reco_jpsi_from_electrons_.jpsi_vtx_y = zfe.reco_jpsi_from_electrons.vtx_y.at(i);
-        reco_jpsi_from_electrons_.jpsi_vtx_z = zfe.reco_jpsi_from_electrons.vtx_z.at(i);
-
-        //reco_jpsi_from_electrons_.jpsi_eff = zfe.reco_jpsi.jpsi_efficiency.at(i);
-        //reco_jpsi_from_electrons_.jpsi_acc_eff = zfe.reco_jpsi.jpsi_acc_eff.at(i);
-        //reco_jpsi_from_electrons_.jpsi_scale_factor = zfe.reco_jpsi.jpsi_scale_factor.at(i);
-
-        //reco_jpsi_.muon0_pt = zfe.reco_jpsi.muon0.at(i).pt();
-        //reco_jpsi_.muon0_eta = zfe.reco_jpsi.muon0.at(i).eta();
-        //reco_jpsi_.muon0_phi = zfe.reco_jpsi.muon0.at(i).phi();
-
-        //reco_jpsi_.muon1_pt = zfe.reco_jpsi.muon1.at(i).pt();
-        //reco_jpsi_.muon1_eta = zfe.reco_jpsi.muon1.at(i).eta();
-        //reco_jpsi_.muon1_phi = zfe.reco_jpsi.muon1.at(i).phi();
-
-        //reco_jpsi_.muon0_charge = zfe.reco_jpsi.muon0.at(i).charge();
-        //reco_jpsi_.muon1_charge = zfe.reco_jpsi.muon1.at(i).charge();
-
-        reco_jpsi_from_electrons_.has_muons_in_eta_window = zfe.reco_jpsi_from_electrons.has_muons_in_eta_window.at(i);
-        reco_jpsi_from_electrons_.has_high_pt_muons = zfe.reco_jpsi_from_electrons.has_high_pt_muons.at(i);
-      }
-    }
-    //------------------------------------------------------------------------------------------
-
-
-
-
     // Truth
     if (!zfe.is_real_data) {
       int n_jpsi = 0;
@@ -497,17 +385,6 @@ namespace zf {
     event_.found_dimuon_jpsi_with_good_muons_and_compatible_muon_vertex = zfe.found_dimuon_jpsi_with_good_muons_and_compatible_muon_vertex;
     event_.found_good_dimuon_jpsi_compatible_with_primary_vertex = zfe.found_good_dimuon_jpsi_compatible_with_primary_vertex;
     event_.found_jpsi = zfe.found_jpsi;
-
-
-    //TODO jpsi->ee
-    //------------
-    event_.found_dimuon_jpsi_from_electrons_with_muons_in_eta_window = zfe.found_dimuon_jpsi_from_electrons_with_muons_in_eta_window;
-    event_.found_dimuon_jpsi_from_electrons_with_high_pt_muons = zfe.found_dimuon_jpsi_from_electrons_with_high_pt_muons;
-    event_.found_dimuon_jpsi_from_electrons_with_soft_id_and_high_pt_muons = zfe.found_dimuon_jpsi_from_electrons_with_soft_id_and_high_pt_muons;
-    event_.found_dimuon_jpsi_from_electrons_with_good_muons_and_compatible_muon_vertex = zfe.found_dimuon_jpsi_from_electrons_with_good_muons_and_compatible_muon_vertex;
-    event_.found_good_dimuon_jpsi_from_electrons_compatible_with_primary_vertex = zfe.found_good_dimuon_jpsi_from_electrons_compatible_with_primary_vertex;
-    event_.found_jpsi_from_electrons = zfe.found_jpsi_from_electrons;
-    //------------
 
     // Fill if there is a good Z in either truth or reco
     //if (zf_event.truth_z.m > -1 || zf_event.reco_z.m > -1) {}
