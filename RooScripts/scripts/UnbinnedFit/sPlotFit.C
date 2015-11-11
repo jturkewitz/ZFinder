@@ -2,84 +2,46 @@
 #include "RooGlobalFunc.h"
 #endif
 #include "TMath.h"
-#include "TGraph.h"
-//#include "RooPolynomial.h"
 #include "RooBinning.h"
 #include "RooWorkspace.h"
 #include "TCanvas.h"
-#include "TAxis.h"
 #include "TLegend.h"
 #include "RooRealVar.h"
 #include "RooDataSet.h"
 #include "RooFitResult.h"
 #include "RooDataHist.h"
-#include "RooErrorVar.h"
-//#include "RooVoigtian.h"
 #include "RooGaussian.h"
-//#include "RooLandau.h"
-//#include "RooNLLVar.h"
 #include "TLatex.h"
 #include "RooExponential.h"
 #include "RooAddPdf.h"
-#include "TPaveLabel.h"
-//#include "RooProfileLL.h"
 #include "RooProdPdf.h"
-//#include "RooSimultaneous.h"
-//#include "RooGenericPdf.h"
 #include "RooExtendPdf.h"
-//#include "RooNumConvPdf.h"
-//#include "RooFFTConvPdf.h"
-//#include "RooProduct.h"
 #include "RooPlot.h"
 #include "RooHist.h"
 #include "TCut.h"
 #include "TTree.h"
 #include "TFile.h"
-//#include "TDirectoryFile.h"
-//#include "TBranch.h"
-//#include "TFolder.h"
-//#include "TH1D.h"
 #include "TF1.h"
-//#include "TRandom.h"
-//#include "RooConstVar.h"
-//#include "RooCategory.h"
-//#include "TStyle.h"
 #include "RooCBShape.h"
 #include "RooGaussModel.h"
 #include "RooDecay.h"
-//#include "RooHistPdf.h"
 #include "RooMCStudy.h"
-//#include "RooStats/ModelConfig.h"
 #include "RooStats/SPlot.h"
-//#include "RooStats/ProfileLikelihoodCalculator.h"
-//#include "RooStats/LikelihoodIntervalPlot.h"
-//#include "RooStats/HypoTestResult.h"
-//#include "RooChebychev.h"
-//#include "RooDLLSignificanceMCSModule.h"
-//#include "RooStats/RatioOfProfiledLikelihoodsTestStat.h"
-//#include "RooStats/MaxLikelihoodEstimateTestStat.h"
-//#include "RooStats/NumberCountingPdfFactory.h"
 
 using namespace RooFit ;
 using namespace RooStats ;
 
 
-const float PDGMass = 3.096916;
+const float PDG_JPSI_MASS = 3.096916;
 
 //In general, better to make these command line options then defines
 //same goes for hardcoding file_names, should be a command line option
 
-// Enables residuals on fits
-#define DrawResiduals
+bool draw_residuals = true;
+bool use_polarisation_weights = true;
+bool create_cs_plots = true;
+bool do_pull_calculation = false;
 
-// Enables polarisation weights
-#define Corrections
-
-// create cross-sections plots
-#define crosssection
-
-// enables the pulls calculation
-//#define PULLS
 
 void sPlotfit();
 void sPlotFit() { sPlotfit(); }
@@ -149,8 +111,8 @@ void sPlotfit() {
   RooRealVar jpsi_gaussmean("jpsi_gaussmean", "Mean of the smearing jpsi Gaussian", 0.0);
   RooRealVar jpsi_gausssigma("jpsi_gausssigma", "Width of the smearing jpsi Gaussian", 0.01, 0.000000005, 0.3);
   RooGaussModel jpsi_smear_gauss_model("jpsi_smear_gauss", "Gaussian used to smear the jpsi Exponential Decay", *onia_tau, jpsi_gaussmean, jpsi_gausssigma);
-  RooRealVar jpsi_decay_lifetime("jpsi_decay_lifetime", "jpsi_Tau", 1.3, 1.3-8.27138e-02, 1.3+8.27138e-02);
-  RooDecay jpsi_decay_exp("jpsi_decay_exp", "jpsi_Exponential Decay", *onia_tau,jpsi_decay_lifetime,jpsi_smear_gauss_model,RooDecay::SingleSided);
+  RooRealVar jpsi_decay_time("jpsi_decay_time", "jpsi_Tau", 1.3, 1.3-8.27138e-02, 1.3+8.27138e-02);
+  RooDecay jpsi_decay_exp("jpsi_decay_exp", "jpsi_Exponential Decay", *onia_tau,jpsi_decay_time,jpsi_smear_gauss_model,RooDecay::SingleSided);
 
   RooRealVar jpsi_gauss_prompt_mean("jpsi_gauss_prompt_mean", "Mean of the Prompt jpsi_Gaussian", 1.66632e-03, 1.66632e-03-4.89830e-03, 1.66632e-03+4.89830e-03);
   RooRealVar jpsi_gauss_prompt_sigma("jpsi_gauss_prompt_sigma", "Width of the Prompt jpsi_Gaussian", 7.78034e-02, 7.78034e-02-5.69557e-03, 7.78034e-02+5.69557e-03);
@@ -206,25 +168,31 @@ void sPlotfit() {
   //does not work right now
   RooFitResult *fr_inclusive = model.fitTo(*data, NumCPU(4, kTRUE), Save());
 
-  RooPlot* dummy_m = onia_mass->frame(Bins(40));
+  int num_mass_bins = 40;
+  int num_time_bins = 40;
+
+  RooPlot* dummy_m = onia_mass->frame(Bins(num_mass_bins));
   data->plotOn(dummy_m);
   model.plotOn(dummy_m);
 
-  RooPlot* dummy_t = onia_tau->frame(Bins(40));
+  RooPlot* dummy_t = onia_tau->frame(Bins(num_time_bins));
   data->plotOn(dummy_t);
   model.plotOn(dummy_t);
 
   TCanvas *c_dummy = new TCanvas("c_dummy", "c_dummy", 1200, 600); c_dummy->Divide(2,1);
-  c_dummy->cd(1); dummy_m->Draw();
-  c_dummy->cd(2); dummy_t->Draw(); c_dummy->cd(2)->SetLogy(1);
+  c_dummy->cd(1); 
+  dummy_m->Draw();
+  c_dummy->cd(2); 
+  dummy_t->Draw(); 
+  c_dummy->cd(2)->SetLogy(1);
 
   //Then would do:
 
   double zjpsi_gaussmean_value = jpsi_gaussmean.getVal();
   double zjpsi_gausssigma_value     = jpsi_gausssigma.getVal();
   double zjpsi_gausssigma_value_err = jpsi_gausssigma.getError();
-  double zjpsi_decay_lifetime_value     = jpsi_decay_lifetime.getVal();
-  double zjpsi_decay_lifetime_value_err = jpsi_decay_lifetime.getError();
+  double zjpsi_decay_time_value     = jpsi_decay_time.getVal();
+  double zjpsi_decay_time_value_err = jpsi_decay_time.getError();
   double zjpsi_gauss_prompt_mean_value     = jpsi_gauss_prompt_mean.getVal();
   double zjpsi_gauss_prompt_mean_value_err = jpsi_gauss_prompt_mean.getError();
   double zjpsi_gauss_prompt_sigma_value     = jpsi_gauss_prompt_sigma.getVal();
@@ -262,8 +230,8 @@ void sPlotfit() {
   RooRealVar zjpsi_gaussmean("zjpsi_gaussmean", "Mean of the smearing zjpsi Gaussian", zjpsi_gaussmean_value);
   RooRealVar zjpsi_gausssigma("zjpsi_gausssigma", "Width of the smearing zjpsi Gaussian", zjpsi_gausssigma_value);
   RooGaussModel zjpsi_smear_gauss_model("zjpsi_smear_gauss", "Gaussian used to smear the zjpsi Exponential Decay", *onia_tau, zjpsi_gaussmean, zjpsi_gausssigma);
-  RooRealVar zjpsi_decay_lifetime("zjpsi_decay_lifetime", "zjpsi_Tau", zjpsi_decay_lifetime_value, zjpsi_decay_lifetime_value-zjpsi_decay_lifetime_value_err, zjpsi_decay_lifetime_value+zjpsi_decay_lifetime_value_err);
-  RooDecay zjpsi_decay_exp("zjpsi_decay_exp", "zjpsi_Exponential Decay", *onia_tau,zjpsi_decay_lifetime,zjpsi_smear_gauss_model,RooDecay::SingleSided);
+  RooRealVar zjpsi_decay_time("zjpsi_decay_time", "zjpsi_Tau", zjpsi_decay_time_value, zjpsi_decay_time_value-zjpsi_decay_time_value_err, zjpsi_decay_time_value+zjpsi_decay_time_value_err);
+  RooDecay zjpsi_decay_exp("zjpsi_decay_exp", "zjpsi_Exponential Decay", *onia_tau,zjpsi_decay_time,zjpsi_smear_gauss_model,RooDecay::SingleSided);
 
   RooRealVar zjpsi_gauss_prompt_mean("zjpsi_gauss_prompt_mean", "Mean of the Prompt zjpsi_Gaussian", zjpsi_gauss_prompt_mean_value, zjpsi_gauss_prompt_mean_value-zjpsi_gauss_prompt_mean_value_err, zjpsi_gauss_prompt_mean_value+zjpsi_gauss_prompt_mean_value_err);
   RooRealVar zjpsi_gauss_prompt_sigma("zjpsi_gauss_prompt_sigma", "Width of the Prompt zjpsi_Gaussian", zjpsi_gauss_prompt_sigma_value, zjpsi_gauss_prompt_sigma_value-zjpsi_gauss_prompt_sigma_value_err, zjpsi_gauss_prompt_sigma_value+zjpsi_gauss_prompt_sigma_value_err);
@@ -274,8 +242,6 @@ void sPlotfit() {
 
   RooRealVar zjpsi_frac_prompt_sharp("zjpsi_frac_prompt_sharp", "zjpsi_frac_prompt_sharp" , zjpsi_frac_prompt_sharp_value, zjpsi_frac_prompt_sharp_value-zjpsi_frac_prompt_sharp_value_err, zjpsi_frac_prompt_sharp_value+zjpsi_frac_prompt_sharp_value_err);
   RooAddPdf onia_tau_gauss_sum_fitpdf("onia_tau_gauss_sum_fitpdf", "onia_tau_gauss_sum_fitpdf", RooArgList(zjpsi_prompt_gauss,zjpsi_prompt_gauss_2), RooArgList(zjpsi_frac_prompt_sharp));
-
-  RooRealVar zjpsi_prompt_fraction("zjpsi_prompt_fraction", "zjpsi_prompt_fraction" , 0.01 , 0.0, 1);
 
   RooRealVar zjpsi_sigma("zjpsi_sigma", "zjpsi_sigma", zjpsi_sigma_value, zjpsi_sigma_value-zjpsi_sigma_value_err, zjpsi_sigma_value+zjpsi_sigma_value_err);
   RooRealVar zjpsi_alpha("zjpsi_alpha", "zjpsi_alpha", zjpsi_alpha_value, zjpsi_alpha_value-zjpsi_alpha_value_err, zjpsi_alpha_value+zjpsi_alpha_value_err);
@@ -319,23 +285,31 @@ void sPlotfit() {
 
   RooFitResult *fr = zjpsi_model.fitTo(*zjpsi_data, NumCPU(4, kTRUE), Save());
 
-#ifdef PULLS
-  int Ntoys = 1000;
-  RooMCStudy *SimToy = new RooMCStudy(zjpsi_model, RooArgSet(*onia_mass, *onia_tau), Binned(kFALSE), Silence(), Extended(), FitOptions(Save(kTRUE)), PrintEvalErrors(0), Minos(kTRUE));
+  if (do_pull_calculation) {
+    int num_toys = 1000;
+    RooMCStudy *toy_simulation = new RooMCStudy(zjpsi_model, RooArgSet(*onia_mass, *onia_tau), Binned(kFALSE), Silence(), Extended(), FitOptions(Save(kTRUE)), PrintEvalErrors(0), Minos(kTRUE));
 
-  SimToy->generateAndFit(Ntoys);
+    toy_simulation->generateAndFit(num_toys);
 
-  RooPlot* ngauss_pull_frame        = SimToy->plotPull(Nzjpsi_m_sig_tau_sig, -4, 4, 16, kTRUE);
-  RooPlot* nbkgPrompt_pull_frame    = SimToy->plotPull(Nzjpsi_m_bg_tau_sig,    -4, 4, 16, kTRUE);
-  RooPlot* nsigNonPrompt_pull_frame = SimToy->plotPull(Nzjpsi_m_sig_tau_bg, -4, 4, 16, kTRUE);
-  RooPlot* nbkgNonPrompt_pull_frame = SimToy->plotPull(Nzjpsi_m_bg_tau_bg, -4, 4, 16, kTRUE);
+    RooPlot* sig_prompt_pull_frame        = toy_simulation->plotPull(Nzjpsi_m_sig_tau_sig, -4, 4, 16, kTRUE);
+    RooPlot* mass_bkg_prompt_pull_frame    = toy_simulation->plotPull(Nzjpsi_m_bg_tau_sig,    -4, 4, 16, kTRUE);
+    RooPlot* sig_nonprompt_pull_frame = toy_simulation->plotPull(Nzjpsi_m_sig_tau_bg, -4, 4, 16, kTRUE);
+    RooPlot* mass_bkg_nonprompt_pull_frame = toy_simulation->plotPull(Nzjpsi_m_bg_tau_bg, -4, 4, 16, kTRUE);
 
-  TCanvas* c2 = new TCanvas("c2","toymc", 800, 800); c2->Divide(2,2);
-  c2->cd(1); ngauss_pull_frame->Draw();         ngauss_pull_frame->SetXTitle("Yield Signal Prompt Pull");
-  c2->cd(2); nbkgPrompt_pull_frame->Draw();     nbkgPrompt_pull_frame->SetXTitle("Yield Background Prompt Pull");
-  c2->cd(3); nsigNonPrompt_pull_frame->Draw();  nsigNonPrompt_pull_frame->SetXTitle("Yield Signal Non Prompt Pull");
-  c2->cd(4); nbkgNonPrompt_pull_frame->Draw();  nbkgNonPrompt_pull_frame->SetXTitle("Yield Background Non Prompt Pull");
-#endif
+    TCanvas* c2 = new TCanvas("c2","toymc", 800, 800); c2->Divide(2,2);
+    c2->cd(1); 
+    sig_prompt_pull_frame->Draw();
+    sig_prompt_pull_frame->SetXTitle("Yield Signal Prompt Pull");
+    c2->cd(2); 
+    mass_bkg_prompt_pull_frame->Draw();
+    mass_bkg_prompt_pull_frame->SetXTitle("Yield Mass Background Prompt Pull");
+    c2->cd(3); 
+    sig_nonprompt_pull_frame->Draw();
+    sig_nonprompt_pull_frame->SetXTitle("Yield Signal Non Prompt Pull");
+    c2->cd(4); 
+    mass_bkg_nonprompt_pull_frame->Draw();
+    mass_bkg_nonprompt_pull_frame->SetXTitle("Yield Mass Background Non Prompt Pull");
+  }
 
   // *****************************
   // START OF JPSI PLOTTING
@@ -343,8 +317,8 @@ void sPlotfit() {
 
   //----------- Mass Fit ---------------
   //Plots zjpsi_data on to frame
-  RooPlot* mass_frame = onia_mass->frame(Bins(40));
-  zjpsi_data->plotOn(mass_frame, Name("PlotData"));
+  RooPlot* mass_frame = onia_mass->frame(Bins(num_mass_bins));
+  zjpsi_data->plotOn(mass_frame, Name("zjpsi_mass_data"));
 
   //Plots full model, prompt and non-prompt models to frame
   zjpsi_model.plotOn(mass_frame, LineColor(kRed-2), RooFit::Name("total"));
@@ -353,18 +327,13 @@ void sPlotfit() {
   zjpsi_model.plotOn(mass_frame, Components(zjpsi_m_bg_tau_sig), LineColor(kCyan-2), RooFit::Name("prompt continuum"));
   zjpsi_model.plotOn(mass_frame, Components(zjpsi_m_bg_tau_bg), LineColor(kGreen-2), RooFit::Name("non-prompt continuum"));
   
-  
-  zjpsi_model.plotOn(mass_frame, Name("PlotData"));
   mass_frame->GetXaxis()->SetTitleOffset(.9);
 
-  RooCurve * mPJpsi    = mass_frame->getCurve("prompt j/psi");
-  RooCurve * mNPJpsi   = mass_frame->getCurve("non-prompt j/psi");
+  RooPlot* dummy_frame_zjpsi = onia_mass->frame(Title("dummy frame to extract residuals"), Bins(num_mass_bins));
+  zjpsi_data->plotOn(dummy_frame_zjpsi); 
+  zjpsi_model.plotOn(dummy_frame_zjpsi);
 
-  RooPlot* dummy_frame_jpsi = onia_mass->frame(Title("dummy frame to extract residuals"), Bins(40));
-  zjpsi_data->plotOn(dummy_frame_jpsi); 
-  zjpsi_model.plotOn(dummy_frame_jpsi);
-
-  RooHist* h_residuals_mass_jpsi = dummy_frame_jpsi->pullHist();
+  RooHist* h_residuals_mass_jpsi = dummy_frame_zjpsi->pullHist();
   RooPlot* frame_residuals_mass_jpsi = onia_mass->frame(Title("Residual Distribution #mu^{+}#mu^{-} mass"));
   frame_residuals_mass_jpsi->GetYaxis()->SetTitle("(fit - data)/#sigma");
   frame_residuals_mass_jpsi->GetYaxis()->SetTitleSize(.16);
@@ -372,17 +341,22 @@ void sPlotfit() {
   frame_residuals_mass_jpsi->addPlotable(h_residuals_mass_jpsi, "P");
 
   // Creates and fills canvas with plot and info 
-  TCanvas *canvas1 = new TCanvas("MassFit_", "MassFit_", 900, 900); canvas1->cd();
-#ifdef DrawResiduals
-  TPad *pad1_jpsi = new TPad("pad1_jpsi", "The pad 80% of the height",0.0,0.05,1.0,1.0,21);
-  TPad *pad2_jpsi = new TPad("pad2_jpsi", "The pad 20% of the height",0.0,0.0,1.0,0.1,22);
-  pad1_jpsi->Draw(); pad2_jpsi->Draw();
-  pad1_jpsi->SetFillColor(0); pad2_jpsi->SetFillColor(0);
-  pad2_jpsi->cd();
-  frame_residuals_mass_jpsi->Draw(); f_straighline->Draw("same");
-  pad1_jpsi->cd();
-#endif
+  TCanvas *canvas1 = new TCanvas("ZJPsi_MassFit_", "ZJPsi_MassFit_", 900, 900);
+  canvas1->cd();
+  if(draw_residuals) {
+    TPad *pad1_jpsi = new TPad("pad1_jpsi", "The pad 80% of the height",0.0,0.05,1.0,1.0,21);
+    TPad *pad2_jpsi = new TPad("pad2_jpsi", "The pad 20% of the height",0.0,0.0,1.0,0.1,22);
+    pad1_jpsi->Draw(); 
+    pad2_jpsi->Draw();
+    pad1_jpsi->SetFillColor(0); 
+    pad2_jpsi->SetFillColor(0);
+    pad2_jpsi->cd();
+    frame_residuals_mass_jpsi->Draw(); 
+    f_straighline->Draw("same");
+    pad1_jpsi->cd();
+  }
   mass_frame->Draw();
+
   splot_tex_pt.DrawLatex(2.87, 30, "#bf{#it{CMS}} Preliminary");
   splot_tex_pt.DrawLatex(2.87, 25, "#sqrt{#it{s}}=8 TeV, 19.7 fb^{-1}");
  
@@ -402,24 +376,19 @@ void sPlotfit() {
 
   //----------- Tau Fit ---------------
   //Plots data on to frame
-  int timeBins = 20;
-  RooPlot* lifetime_frame = onia_tau->frame(Bins(timeBins));
-  zjpsi_data->plotOn(lifetime_frame, Name("Plotzjpsi_data"));
+  RooPlot* time_frame = onia_tau->frame(Bins(num_time_bins));
+  zjpsi_data->plotOn(time_frame, Name("zjpsi_time_data"));
 
   //Plots full model, prompt and non-prompt models to frame
-  zjpsi_model.plotOn(lifetime_frame, LineColor(kRed-2), RooFit::Name("total"));
-  zjpsi_model.plotOn(lifetime_frame, Components(zjpsi_m_sig_tau_sig), LineColor(kBlue-2), RooFit::Name("prompt j/psi"));
-  zjpsi_model.plotOn(lifetime_frame, Components(zjpsi_m_sig_tau_bg), LineColor(kMagenta-2), RooFit::Name("non-prompt j/psi"));
-  zjpsi_model.plotOn(lifetime_frame, Components(zjpsi_m_bg_tau_sig), LineColor(kCyan-2), RooFit::Name("prompt continuum"));
-  zjpsi_model.plotOn(lifetime_frame, Components(zjpsi_m_bg_tau_bg), LineColor(kGreen-2), RooFit::Name("non-prompt continuum"));
+  zjpsi_model.plotOn(time_frame, LineColor(kRed-2), RooFit::Name("total"));
+  zjpsi_model.plotOn(time_frame, Components(zjpsi_m_sig_tau_sig), LineColor(kBlue-2), RooFit::Name("prompt j/psi"));
+  zjpsi_model.plotOn(time_frame, Components(zjpsi_m_sig_tau_bg), LineColor(kMagenta-2), RooFit::Name("non-prompt j/psi"));
+  zjpsi_model.plotOn(time_frame, Components(zjpsi_m_bg_tau_sig), LineColor(kCyan-2), RooFit::Name("prompt continuum"));
+  zjpsi_model.plotOn(time_frame, Components(zjpsi_m_bg_tau_bg), LineColor(kGreen-2), RooFit::Name("non-prompt continuum"));
 
-  zjpsi_model.plotOn(lifetime_frame, Name("Plotzjpsi_data"));
-  lifetime_frame->GetXaxis()->SetTitleOffset(.9);
+  time_frame->GetXaxis()->SetTitleOffset(.9);
 
-  RooCurve * tPJpsi    = lifetime_frame->getCurve("prompt j/psi");
-  RooCurve * tNPJpsi   = lifetime_frame->getCurve("non-prompt j/psi");
-
-  RooPlot* dummy_tframe_jpsi = onia_tau->frame(Title("dummy frame to extract residuals"), Bins(20));
+  RooPlot* dummy_tframe_jpsi = onia_tau->frame(Title("dummy frame to extract residuals"), Bins(num_time_bins));
   zjpsi_data->plotOn(dummy_tframe_jpsi); 
   zjpsi_model.plotOn(dummy_tframe_jpsi);
 
@@ -431,32 +400,37 @@ void sPlotfit() {
   frame_residuals_time_jpsi->addPlotable(h_residuals_time_jpsi, "P");
 
   // Creates and fills canvas with plot and info 
-  TCanvas *canvas2 = new TCanvas("TimeFit_", "TimeFit_", 900, 900); canvas2->cd();
-#ifdef DrawResiduals
-  TPad *tpad1_jpsi = new TPad("tpad1_jpsi", "The pad 80% of the height",0.0,0.05,1.0,1.0,21); tpad1_jpsi->SetLogy(1);
-  TPad *tpad2_jpsi = new TPad("tpad2_jpsi", "The pad 20% of the height",0.0,0.0,1.0,0.1,22);
-  tpad1_jpsi->Draw(); tpad2_jpsi->Draw();
-  tpad1_jpsi->SetFillColor(0); tpad2_jpsi->SetFillColor(0);
-  tpad2_jpsi->cd();
-  frame_residuals_time_jpsi->Draw(); f_straighline->Draw("same");
-  tpad1_jpsi->cd();
-#endif
-  lifetime_frame->Draw();
+  TCanvas *canvas2 = new TCanvas("ZJpsi_TimeFit_", "ZJpsi_TimeFit_", 900, 900);
+  canvas2->cd();
+  if(draw_residuals) {
+    TPad *tpad1_jpsi = new TPad("tpad1_jpsi", "The pad 80% of the height",0.0,0.05,1.0,1.0,21); tpad1_jpsi->SetLogy(1);
+    TPad *tpad2_jpsi = new TPad("tpad2_jpsi", "The pad 20% of the height",0.0,0.0,1.0,0.1,22);
+    tpad1_jpsi->Draw();
+    tpad2_jpsi->Draw();
+    tpad1_jpsi->SetFillColor(0);
+    tpad2_jpsi->SetFillColor(0);
+    tpad2_jpsi->cd();
+    frame_residuals_time_jpsi->Draw();
+    f_straighline->Draw("same");
+    tpad1_jpsi->cd();
+  }
+  time_frame->Draw();
+
   splot_tex_pt.DrawLatex(2, 115, "#bf{#it{CMS}} Preliminary");
   splot_tex_pt.DrawLatex(2, 80, "#sqrt{#it{s}}=8 TeV, 19.7 fb^{-1}");
  
   Double_t xl1=.65, yl1=0.55, xl2=xl1+.2, yl2=yl1+.225;
   TLegend *leg = new TLegend(xl1,yl1,xl2,yl2);
   leg->SetFillColor(kWhite);
-  leg->AddEntry(lifetime_frame->findObject("total"),"total","l");
-  leg->AddEntry(lifetime_frame->findObject("prompt j/psi"),"prompt j/psi","l");
-  leg->AddEntry(lifetime_frame->findObject("non-prompt j/psi"),"non-prompt j/psi","l");
-  leg->AddEntry(lifetime_frame->findObject("prompt continuum"),"prompt continuum","l");
-  leg->AddEntry(lifetime_frame->findObject("non-prompt continuum"),"non-prompt continuum","l");
+  leg->AddEntry(time_frame->findObject("total"),"total","l");
+  leg->AddEntry(time_frame->findObject("prompt j/psi"),"prompt j/psi","l");
+  leg->AddEntry(time_frame->findObject("non-prompt j/psi"),"non-prompt j/psi","l");
+  leg->AddEntry(time_frame->findObject("prompt continuum"),"prompt continuum","l");
+  leg->AddEntry(time_frame->findObject("non-prompt continuum"),"non-prompt continuum","l");
   leg->SetShadowColor(0);
   leg->Draw();
-  //lifetime_frame->SetTitle("J/#psi Mass [GeV]");
-  lifetime_frame->SetTitle("Z + J/#psi");
+  //time_frame->SetTitle("J/#psi Mass [GeV]");
+  time_frame->SetTitle("Z + J/#psi");
   canvas2->SetLogy(1);
 
 //// *******************************************************
@@ -467,113 +441,121 @@ void sPlotfit() {
 
   RooWorkspace* ws = new RooWorkspace("myWS");
   ws->import(zjpsi_model);
-  ws->import(*zjpsi_data, Rename("sPlotzjpsi_data"));
+  ws->import(*zjpsi_data, Rename("sPlot_zjpsi_data"));
   
   RooAbsPdf* sPlotmodel = ws->pdf("zjpsi_model");
-  RooRealVar* SignalPromptYield = ws->var("Nzjpsi_m_sig_tau_sig");
-  RooRealVar* SignalNonPromptYield = ws->var("Nzjpsi_m_sig_tau_bg");
-  RooRealVar* BckgPromptYield = ws->var("Nzjpsi_m_bg_tau_sig");
-  RooRealVar* BckgNonPromptYield = ws->var("Nzjpsi_m_bg_tau_bg");
+  RooRealVar* sig_prompt_yield = ws->var("Nzjpsi_m_sig_tau_sig");
+  RooRealVar* sig_nonprompt_yield = ws->var("Nzjpsi_m_sig_tau_bg");
+  RooRealVar* bkg_prompt_yield = ws->var("Nzjpsi_m_bg_tau_sig");
+  RooRealVar* bkg_nonprompt_yield = ws->var("Nzjpsi_m_bg_tau_bg");
   
-  SignalPromptYield->setConstant();
-  SignalNonPromptYield->setConstant();
-  BckgPromptYield->setConstant();
-  BckgNonPromptYield->setConstant();
+  sig_prompt_yield->setConstant();
+  sig_nonprompt_yield->setConstant();
+  bkg_prompt_yield->setConstant();
+  bkg_nonprompt_yield->setConstant();
   
-  RooStats::SPlot* szjpsi_data = new RooStats::SPlot("szjpsi_data","An SPlot", *zjpsi_data, sPlotmodel, RooArgList(*SignalPromptYield, *SignalNonPromptYield, *BckgPromptYield, *BckgNonPromptYield));
+  RooStats::SPlot* sPlot_zjpsi_data = new RooStats::SPlot("sPlot_zjpsi_data","An SPlot", *zjpsi_data, sPlotmodel, RooArgList(*sig_prompt_yield, *sig_nonprompt_yield, *bkg_prompt_yield, *bkg_nonprompt_yield));
   
   RooDataSet * zjpsi_data_prompt_weighted     = new RooDataSet(zjpsi_data->GetName(), zjpsi_data->GetTitle(), zjpsi_data, *zjpsi_data->get(), 0, "Nzjpsi_m_sig_tau_sig_sw");
-  RooDataSet * zjpsi_data_non_prompt_weighted = new RooDataSet(zjpsi_data->GetName(), zjpsi_data->GetTitle(), zjpsi_data, *zjpsi_data->get(), 0, "Nzjpsi_m_sig_tau_bg_sw");
+  RooDataSet * zjpsi_data_nonprompt_weighted = new RooDataSet(zjpsi_data->GetName(), zjpsi_data->GetTitle(), zjpsi_data, *zjpsi_data->get(), 0, "Nzjpsi_m_sig_tau_bg_sw");
   
-  TCut SelecteZee   = "is_z_to_electrons==1";
-  TCut SelecteZmumu = "is_z_to_muons==1";
+  TCut select_z_to_electrons  = "is_z_to_electrons==1";
+  TCut select_z_to_muons  = "is_z_to_muons==1";
   
-  RooDataSet * zjpsi_data_prompt_Z_ee_weighted       = (RooDataSet*)zjpsi_data_prompt_weighted->reduce(SelecteZee);
-  RooDataSet * zjpsi_data_non_prompt_Z_ee_weighted   = (RooDataSet*)zjpsi_data_non_prompt_weighted->reduce(SelecteZee);
-  RooDataSet * zjpsi_data_prompt_Z_mumu_weighted     = (RooDataSet*)zjpsi_data_prompt_weighted->reduce(SelecteZmumu);
-  RooDataSet * zjpsi_data_non_prompt_Z_mumu_weighted = (RooDataSet*)zjpsi_data_non_prompt_weighted->reduce(SelecteZmumu);
+  RooDataSet * zjpsi_data_prompt_Z_ee_weighted       = (RooDataSet*)zjpsi_data_prompt_weighted->reduce(select_z_to_electrons);
+  RooDataSet * zjpsi_data_nonprompt_Z_ee_weighted   = (RooDataSet*)zjpsi_data_nonprompt_weighted->reduce(select_z_to_electrons);
+  RooDataSet * zjpsi_data_prompt_Z_mumu_weighted     = (RooDataSet*)zjpsi_data_prompt_weighted->reduce(select_z_to_muons);
+  RooDataSet * zjpsi_data_nonprompt_Z_mumu_weighted = (RooDataSet*)zjpsi_data_nonprompt_weighted->reduce(select_z_to_muons);
   
-  int ZBins = 10;
-  TCanvas* czjpsi_data_Z = new TCanvas("czjpsi_data_Z","sPlot Z", 1200, 1200); czjpsi_data_Z->Divide(2,2);
-  RooPlot* frame_Z_ee_prompt = z_mass->frame(Bins(ZBins)); 
+  int num_z_mass_bins = 10;
+  TCanvas* czjpsi_data_Z = new TCanvas("czjpsi_data_Z","sPlot Z", 1200, 1200); 
+  czjpsi_data_Z->Divide(2,2);
+  RooPlot* frame_Z_ee_prompt = z_mass->frame(Bins(num_z_mass_bins)); 
   zjpsi_data_prompt_Z_ee_weighted->plotOn(frame_Z_ee_prompt);
   czjpsi_data_Z->cd(1); 
   frame_Z_ee_prompt->SetTitle("Z->ee + Prompt J/#psi");
   frame_Z_ee_prompt->Draw();
   
-  RooPlot* frame_Z_ee_non_prompt = z_mass->frame(Bins(ZBins));
-  zjpsi_data_non_prompt_Z_ee_weighted->plotOn(frame_Z_ee_non_prompt);
+  RooPlot* frame_Z_ee_nonprompt = z_mass->frame(Bins(num_z_mass_bins));
+  zjpsi_data_nonprompt_Z_ee_weighted->plotOn(frame_Z_ee_nonprompt);
   czjpsi_data_Z->cd(2); 
-  frame_Z_ee_non_prompt->SetTitle("Z->ee + Nonprompt J/#psi");
-  frame_Z_ee_non_prompt->Draw();
+  frame_Z_ee_nonprompt->SetTitle("Z->ee + Nonprompt J/#psi");
+  frame_Z_ee_nonprompt->Draw();
   
-  RooPlot* frame_Z_mumu_prompt = z_mass->frame(Bins(ZBins)); 
+  RooPlot* frame_Z_mumu_prompt = z_mass->frame(Bins(num_z_mass_bins)); 
   zjpsi_data_prompt_Z_mumu_weighted->plotOn(frame_Z_mumu_prompt);
   czjpsi_data_Z->cd(3); 
   frame_Z_mumu_prompt->SetTitle("Z->#mu#mu + Prompt J/#psi");
   frame_Z_mumu_prompt->Draw();
   
-  RooPlot* frame_Z_mumu_non_prompt = z_mass->frame(Bins(ZBins)); 
-  zjpsi_data_non_prompt_Z_mumu_weighted->plotOn(frame_Z_mumu_non_prompt);
+  RooPlot* frame_Z_mumu_nonprompt = z_mass->frame(Bins(num_z_mass_bins)); 
+  zjpsi_data_nonprompt_Z_mumu_weighted->plotOn(frame_Z_mumu_nonprompt);
   czjpsi_data_Z->cd(4); 
-  frame_Z_mumu_non_prompt->SetTitle("Z->#mu#mu + Nonprompt J/#psi");
-  frame_Z_mumu_non_prompt->Draw();
+  frame_Z_mumu_nonprompt->SetTitle("Z->#mu#mu + Nonprompt J/#psi");
+  frame_Z_mumu_nonprompt->Draw();
   
   // ************************
   // ************************
   // Start the x-sec plotting
   // ************************
   // ************************
-  const RooArgSet* obs = zjpsi_data->get();
+  const RooArgSet* obs_zjpsi = zjpsi_data->get();
   // inclusive
-  RooRealVar* wtPROMPT = new RooRealVar("wtPROMPT" ,"wtPROMPT"  , -1000, 1000);
-  RooRealVar* wtnonPROMPT = new RooRealVar("wtnonPROMPT" ,"wtnonPROMPT"  , -1000, 1000);
-  RooDataSet *zjpsi_datatmpPROMPT   = new RooDataSet("zjpsi_datatmpPROMPT", "zjpsi_datatmpPROMPT", RooArgSet(*wtPROMPT));
-  RooDataSet *zjpsi_datatmpnonPROMPT   = new RooDataSet("zjpsi_datatmpnonPROMPT", "zjpsi_datatmpnonPROMPT", RooArgSet(*wtnonPROMPT));
+  RooRealVar* prompt_weight = new RooRealVar("prompt_weight" ,"prompt_weight"  , -1000, 1000);
+  RooRealVar* nonprompt_weight = new RooRealVar("nonprompt_weight" ,"nonprompt_weight"  , -1000, 1000);
+  //unclear what zjpsi_data_prompt_tmp is ??
+  RooDataSet *zjpsi_data_prompt_tmp   = new RooDataSet("zjpsi_data_prompt_tmp", "zjpsi_data_prompt_tmp", RooArgSet(*prompt_weight));
+  RooDataSet *zjpsi_data_nonprompt_tmp   = new RooDataSet("zjpsi_data_nonprompt_tmp", "zjpsi_data_nonprompt_tmp", RooArgSet(*nonprompt_weight));
 
   // fiducial
-  RooRealVar* wtPROMPT_fid    = new RooRealVar("wtPROMPT_fid" ,"wtPROMPT_fid"  , -1000, 1000);
-  RooRealVar* wtnonPROMPT_fid = new RooRealVar("wtnonPROMPT_fid" ,"wtnonPROMPT_fid"  , -1000, 1000);
-  RooDataSet *zjpsi_datatmpPROMPT_fid    = new RooDataSet("zjpsi_datatmpPROMPT_fid", "zjpsi_datatmpPROMPT_fid", RooArgSet(*wtPROMPT_fid));
-  RooDataSet *zjpsi_datatmpnonPROMPT_fid = new RooDataSet("zjpsi_datatmpnonPROMPT_fid", "zjpsi_datatmpnonPROMPT_fid", RooArgSet(*wtnonPROMPT_fid));
+  RooRealVar* prompt_weight_fid    = new RooRealVar("prompt_weight_fid" ,"prompt_weight_fid"  , -1000, 1000);
+  RooRealVar* nonprompt_weight_fid = new RooRealVar("nonprompt_weight_fid" ,"nonprompt_weight_fid"  , -1000, 1000);
+  //unclear what these datasets are, should have a better name
+  //TODO
+  RooDataSet *zjpsi_data_prompt_tmp_fid    = new RooDataSet("zjpsi_data_prompt_tmp_fid", "zjpsi_data_prompt_tmp_fid", RooArgSet(*prompt_weight_fid));
+  RooDataSet *zjpsi_data_nonprompt_tmp_fid = new RooDataSet("zjpsi_data_nonprompt_tmp_fid", "zjpsi_data_nonprompt_tmp_fid", RooArgSet(*nonprompt_weight_fid));
 
-  for(Int_t i=0; i < zjpsi_data->numEntries(); i++) {
-    obs = zjpsi_data->get(i);
-#ifdef Corrections
-    RooRealVar* effrow1 = (RooRealVar*) obs->find("reco_muon0_weight");
-    RooRealVar* effrow2 = (RooRealVar*) obs->find("reco_muon1_weight");
-    RooRealVar* accrow = (RooRealVar*) obs->find("unpolarised");
-#else 
-    RooRealVar* effrow1 = new RooRealVar("effrow1", "effrow1", 1.);
-    RooRealVar* effrow2 = new RooRealVar("effrow2", "effrow2", 1.);
-    RooRealVar* accrow = new RooRealVar("accrow", "accrow", 1.);
-#endif
-// fiducial calculations
-    double wtvalPROMPT_fid    = szjpsi_data->GetSWeight(i,"Nzjpsi_m_sig_tau_sig_sw")/(effrow1->getVal()*effrow2->getVal());
-    double wtvalnonPROMPT_fid = szjpsi_data->GetSWeight(i,"Nzjpsi_m_sig_tau_bg_sw")/(effrow1->getVal()*effrow2->getVal());
-    wtPROMPT_fid->setVal(wtvalPROMPT_fid);
-    wtnonPROMPT_fid->setVal(wtvalnonPROMPT_fid);
-    zjpsi_datatmpPROMPT_fid->add(RooArgList(*wtPROMPT_fid));
-    zjpsi_datatmpnonPROMPT_fid->add(RooArgList(*wtnonPROMPT_fid));
+  for(Int_t i=0; i < zjpsi_data->numEntries(); ++i) {
+    obs_zjpsi = zjpsi_data->get(i);
+    if(use_polarisation_weights) {
+      //TODO verify that this is done correctly
+      //unclear what effrow1 and accrow are, or how they are calculated
+      //these varialbes should be renamed to more reflect what they are
+      RooRealVar* effrow1 = (RooRealVar*) obs_zjpsi->find("reco_muon0_weight");
+      RooRealVar* effrow2 = (RooRealVar*) obs_zjpsi->find("reco_muon1_weight");
+      RooRealVar* accrow = (RooRealVar*) obs_zjpsi->find("unpolarised");
+    }
+    else {
+      RooRealVar* effrow1 = new RooRealVar("effrow1", "effrow1", 1.);
+      RooRealVar* effrow2 = new RooRealVar("effrow2", "effrow2", 1.);
+      RooRealVar* accrow = new RooRealVar("accrow", "accrow", 1.);
+    }
+    // fiducial calculations
+    double weighted_prompt_fid_value    = sPlot_zjpsi_data->GetSWeight(i,"Nzjpsi_m_sig_tau_sig_sw")/(effrow1->getVal()*effrow2->getVal());
+    double weighted_nonprompt_fid_value = sPlot_zjpsi_data->GetSWeight(i,"Nzjpsi_m_sig_tau_bg_sw")/(effrow1->getVal()*effrow2->getVal());
+    prompt_weight_fid->setVal(weighted_prompt_fid_value);
+    nonprompt_weight_fid->setVal(weighted_nonprompt_fid_value);
+    zjpsi_data_prompt_tmp_fid->add(RooArgList(*prompt_weight_fid));
+    zjpsi_data_nonprompt_tmp_fid->add(RooArgList(*nonprompt_weight_fid));
 
-// inclusive calculations
-    double wtvalPROMPT    = szjpsi_data->GetSWeight(i,"Nzjpsi_m_sig_tau_sig_sw")*accrow->getVal()/(effrow1->getVal()*effrow2->getVal());
-    double wtvalnonPROMPT = szjpsi_data->GetSWeight(i,"Nzjpsi_m_sig_tau_bg_sw")*accrow->getVal()/(effrow1->getVal()*effrow2->getVal());
-    wtPROMPT->setVal(wtvalPROMPT);
-    wtnonPROMPT->setVal(wtvalnonPROMPT);
-    zjpsi_datatmpPROMPT->add(RooArgList(*wtPROMPT));
-    zjpsi_datatmpnonPROMPT->add(RooArgList(*wtnonPROMPT));
+    // inclusive calculations
+    double weighted_prompt_value    = sPlot_zjpsi_data->GetSWeight(i,"Nzjpsi_m_sig_tau_sig_sw")*accrow->getVal()/(effrow1->getVal()*effrow2->getVal());
+    double weighted_nonprompt_value = sPlot_zjpsi_data->GetSWeight(i,"Nzjpsi_m_sig_tau_bg_sw")*accrow->getVal()/(effrow1->getVal()*effrow2->getVal());
+    prompt_weight->setVal(weighted_prompt_value);
+    nonprompt_weight->setVal(weighted_nonprompt_value);
+    zjpsi_data_prompt_tmp->add(RooArgList(*prompt_weight));
+    zjpsi_data_nonprompt_tmp->add(RooArgList(*nonprompt_weight));
   }
   
-  zjpsi_data->merge(zjpsi_datatmpPROMPT); 
-  zjpsi_data->merge(zjpsi_datatmpnonPROMPT); 
-  RooDataSet * zjpsi_data_weightedPROMPT    = new RooDataSet(zjpsi_data->GetName(), zjpsi_data->GetTitle(), zjpsi_data, *zjpsi_data->get(), 0, wtPROMPT->GetName());  
-  RooDataSet * zjpsi_data_weightednonPROMPT = new RooDataSet(zjpsi_data->GetName(), zjpsi_data->GetTitle(), zjpsi_data, *zjpsi_data->get(), 0, wtnonPROMPT->GetName());  
+  zjpsi_data->merge(zjpsi_data_prompt_tmp); 
+  zjpsi_data->merge(zjpsi_data_nonprompt_tmp); 
+  RooDataSet * zjpsi_data_weighted_prompt    = new RooDataSet(zjpsi_data->GetName(), zjpsi_data->GetTitle(), zjpsi_data, *zjpsi_data->get(), 0, prompt_weight->GetName());  
+  RooDataSet * zjpsi_data_weighted_nonprompt = new RooDataSet(zjpsi_data->GetName(), zjpsi_data->GetTitle(), zjpsi_data, *zjpsi_data->get(), 0, nonprompt_weight->GetName());  
 
-  zjpsi_data_fid->merge(zjpsi_datatmpPROMPT_fid); 
-  zjpsi_data_fid->merge(zjpsi_datatmpnonPROMPT_fid); 
-  RooDataSet * zjpsi_data_weightedPROMPT_fid    = new RooDataSet(zjpsi_data_fid->GetName(), zjpsi_data_fid->GetTitle(), zjpsi_data_fid, *zjpsi_data_fid->get(), 0, wtPROMPT_fid->GetName());  
-  RooDataSet * zjpsi_data_weightednonPROMPT_fid = new RooDataSet(zjpsi_data_fid->GetName(), zjpsi_data_fid->GetTitle(), zjpsi_data_fid, *zjpsi_data_fid->get(), 0, wtnonPROMPT_fid->GetName());  
+  zjpsi_data_fid->merge(zjpsi_data_prompt_tmp_fid); 
+  zjpsi_data_fid->merge(zjpsi_data_nonprompt_tmp_fid); 
+  RooDataSet * zjpsi_data_weighted_prompt_fid    = new RooDataSet(zjpsi_data_fid->GetName(), zjpsi_data_fid->GetTitle(), zjpsi_data_fid, *zjpsi_data_fid->get(), 0, prompt_weight_fid->GetName());  
+  RooDataSet * zjpsi_data_weighted_nonprompt_fid = new RooDataSet(zjpsi_data_fid->GetName(), zjpsi_data_fid->GetTitle(), zjpsi_data_fid, *zjpsi_data_fid->get(), 0, nonprompt_weight_fid->GetName());  
 
   RooBinning bins(6, 100) ;
   bins.addUniform(1, 6, 8.5);
@@ -582,52 +564,58 @@ void sPlotfit() {
   bins.addUniform(1, 18, 30);
   bins.addUniform(1, 30, 100);
 
-  RooDataHist tmpHistPROMPT   ("tmpHistPROMPT"   , "tmpHistPROMPT", *onia_pt, *zjpsi_data_weightedPROMPT);
-  RooDataHist tmpHistnonPROMPT("tmpHistnonPROMPT", "tmpHistnonPROMPT", *onia_pt, *zjpsi_data_weightednonPROMPT);
+  RooDataHist zjpsi_prompt_hist   ("zjpsi_prompt_hist"   , "zjpsi_prompt_hist", *onia_pt, *zjpsi_data_weighted_prompt);
+  RooDataHist zjpsi_nonprompt_hist("zjpsi_nonprompt_hist", "zjpsi_nonprompt_hist", *onia_pt, *zjpsi_data_weighted_nonprompt);
 
-  RooDataHist tmpHistPROMPT_fid   ("tmpHistPROMPT_fid"   , "tmpHistPROMPT_fid", *onia_pt, *zjpsi_data_weightedPROMPT_fid);
-  RooDataHist tmpHistnonPROMPT_fid("tmpHistnonPROMPT_fid", "tmpHistnonPROMPT_fid", *onia_pt, *zjpsi_data_weightednonPROMPT_fid);
+  RooDataHist zjpsi_prompt_hist_fid   ("zjpsi_prompt_hist_fid"   , "zjpsi_prompt_hist_fid", *onia_pt, *zjpsi_data_weighted_prompt_fid);
+  RooDataHist zjpsi_nonprompt_hist_fid("zjpsi_nonprompt_hist_fid", "zjpsi_nonprompt_hist_fid", *onia_pt, *zjpsi_data_weighted_nonprompt_fid);
 
-#ifdef crosssection 
-  // %%%%%%%%%%%%%%%%%%%%%
-  // Jared need input here
-  // %%%%%%%%%%%%%%%%%%%%%
-  double inclusive_z_to_muons_events     = 8.5E06;
-  double inclusive_z_to_electrons_events = 5.0E06;
-#else
-  double inclusive_z_to_muons_events     = 1.;
-  double inclusive_z_to_electrons_events = 1.;
-#endif
+  if (create_cs_plots) {
+    // %%%%%%%%%%%%%%%%%%%%%
+    // Jared need input here
+    // %%%%%%%%%%%%%%%%%%%%%
+    double inclusive_z_to_muons_events     = 8.5E06;
+    double inclusive_z_to_electrons_events = 5.0E06;
+  }
+  else {
+    double inclusive_z_to_muons_events     = 1.;
+    double inclusive_z_to_electrons_events = 1.;
+  }
+  double inclusive_z_to_leptons_events;
+  inclusive_z_to_leptons_events = inclusive_z_to_muons_events + inclusive_z_to_electrons_events;
 
   TCanvas* c_jpsi_diff_xsec = new TCanvas("c_jpsi_diff_xsec","J/#psi p_{T} sPlot weighted", 1200, 600); c_jpsi_diff_xsec->Divide(2,1);
   // plot the prompt part
   c_jpsi_diff_xsec->cd(1);
   onia_pt->setBinning(bins);
-  TH1* hhPROMPTATLAS = tmpHistPROMPT.createHistogram("hhPROMPTATLAS", *onia_pt);
-  hhPROMPTATLAS->SetBinContent(2, 10.8E-7); hhPROMPTATLAS->SetBinError(2, TMath::Sqrt(5.6*5.6    +1.9*1.9    )*1E-7);
-  hhPROMPTATLAS->SetBinContent(3,  5.6E-7); hhPROMPTATLAS->SetBinError(3, TMath::Sqrt(1.9*1.9    +0.8*0.8    )*1E-7);
-  hhPROMPTATLAS->SetBinContent(4,  1.9E-7); hhPROMPTATLAS->SetBinError(4, TMath::Sqrt(1.1*1.1    +0.1*0.1    )*1E-7);
-  hhPROMPTATLAS->SetBinContent(5, 0.87E-7); hhPROMPTATLAS->SetBinError(5, TMath::Sqrt(0.37*0.37  +0.12*0.12  )*1E-7);
-  hhPROMPTATLAS->SetBinContent(6, 0.09E-7); hhPROMPTATLAS->SetBinError(6, TMath::Sqrt(0.037*0.037+0.012*0.012)*1E-7);
-  hhPROMPTATLAS->SetMarkerStyle(24);
+  TH1* h_zjpsi_atlas_prompt = zjpsi_prompt_hist.createHistogram("h_zjpsi_atlas_prompt", *onia_pt);
+  h_zjpsi_atlas_prompt->SetBinContent(2, 10.8E-7); h_zjpsi_atlas_prompt->SetBinError(2, TMath::Sqrt(5.6*5.6    +1.9*1.9    )*1E-7);
+  h_zjpsi_atlas_prompt->SetBinContent(3,  5.6E-7); h_zjpsi_atlas_prompt->SetBinError(3, TMath::Sqrt(1.9*1.9    +0.8*0.8    )*1E-7);
+  h_zjpsi_atlas_prompt->SetBinContent(4,  1.9E-7); h_zjpsi_atlas_prompt->SetBinError(4, TMath::Sqrt(1.1*1.1    +0.1*0.1    )*1E-7);
+  h_zjpsi_atlas_prompt->SetBinContent(5, 0.87E-7); h_zjpsi_atlas_prompt->SetBinError(5, TMath::Sqrt(0.37*0.37  +0.12*0.12  )*1E-7);
+  h_zjpsi_atlas_prompt->SetBinContent(6, 0.09E-7); h_zjpsi_atlas_prompt->SetBinError(6, TMath::Sqrt(0.037*0.037+0.012*0.012)*1E-7);
+  h_zjpsi_atlas_prompt->SetMarkerStyle(24);
 
-  TH1* hhPROMPT  = tmpHistPROMPT.createHistogram("hhPROMPT", *onia_pt);
-  TH1* hhPROMPT_fid  = tmpHistPROMPT_fid.createHistogram("hhPROMPT_fid", *onia_pt); 
-  TH1* hh2PROMPT = tmpHistPROMPT.createHistogram("hh2PROMPT", *onia_pt);
-  hh2PROMPT->SetXTitle("#it{p}_{T}^{J/#psi} [GeV]");
-  hh2PROMPT->SetYTitle("#it{B}(J/#psi#rightarrow#mu#mu) #times #frac{1}{#sigma(Z)} #frac{d#sigma(Z+J/#psi)}{d#it{p}_{T}} [1/GeV]");
-  hhPROMPT->SetLineWidth(2);
+  TH1* h_zjpsi_prompt  = zjpsi_prompt_hist.createHistogram("h_zjpsi_prompt", *onia_pt);
+  TH1* h_zjpsi_prompt_fid  = zjpsi_prompt_hist_fid.createHistogram("h_zjpsi_prompt_fid", *onia_pt); 
+  //TODO fix this, make it clearer what it is
+  //h_zjpsi_prompt_cs = hh2PROMPT? no idea what this is or why it is here??
+  TH1* h_zjpsi_prompt_cs = zjpsi_prompt_hist.createHistogram("h_zjpsi_prompt_cs", *onia_pt);
+  h_zjpsi_prompt_cs->SetXTitle("#it{p}_{T}^{J/#psi} [GeV]");
+  h_zjpsi_prompt_cs->SetYTitle("#it{B}(J/#psi#rightarrow#mu#mu) #times #frac{1}{#sigma(Z)} #frac{d#sigma(Z+J/#psi)}{d#it{p}_{T}} [1/GeV]");
+  h_zjpsi_prompt->SetLineWidth(2);
   for (int i=1; i<7; i++) {
-    hh2PROMPT->SetBinContent(i, hhPROMPT->GetBinContent(i)/hhPROMPT->GetBinWidth(i)/(inclusive_z_to_muons_events+inclusive_z_to_electrons_events));
-    hh2PROMPT->SetBinError(i, hhPROMPT->GetBinError(i)/hhPROMPT->GetBinWidth(i)/(inclusive_z_to_muons_events+inclusive_z_to_electrons_events));
+    h_zjpsi_prompt_cs->SetBinContent(i, h_zjpsi_prompt->GetBinContent(i)/h_zjpsi_prompt->GetBinWidth(i)/(inclusive_z_to_leptons_events));
+    h_zjpsi_prompt_cs->SetBinError(i, h_zjpsi_prompt->GetBinError(i)/h_zjpsi_prompt->GetBinWidth(i)/(inclusive_z_to_leptons_events));
   }
-  hh2PROMPT->Draw("E1");
-  hhPROMPTATLAS->Draw("E1same");
+  h_zjpsi_prompt_cs->Draw("E1");
+  h_zjpsi_atlas_prompt->Draw("E1same");
 
-#ifdef crosssection
-  hh2PROMPT->GetYaxis()->SetRangeUser(1E-11, 1E-5);
-#endif
-  hh2PROMPT->GetXaxis()->SetRangeUser(8.5, 120);
+  if (create_cs_plots) {
+    h_zjpsi_prompt_cs->GetYaxis()->SetRangeUser(1E-11, 1E-5);
+  }
+  //TODO should it be 120?
+  h_zjpsi_prompt_cs->GetXaxis()->SetRangeUser(8.5, 120);
   splot_tex_pt.DrawLatex(15, 3E-6, "#bf{#it{CMS}} Preliminary, #sqrt{#it{s}}=8 TeV, 19.7 fb^{-1}");
   splot_tex_pt.DrawLatex(15, 1E-6 , "#it{pp} #rightarrow prompt #it{J/#psi+Z} : #it{pp} #rightarrow #it{Z}");
 
@@ -635,30 +623,31 @@ void sPlotfit() {
   c_jpsi_diff_xsec->cd(1)->SetLogx(1);
   // plot the non-prompt part
   c_jpsi_diff_xsec->cd(2);
-  TH1* hhnonPROMPTATLAS = tmpHistnonPROMPT.createHistogram("hhnonPROMPTATLAS", *onia_pt);
-  hhnonPROMPTATLAS->SetBinContent(2,   5.1E-7); hhnonPROMPTATLAS->SetBinError(2, TMath::Sqrt(4.2*4.2    +0.9*0.9    )*1E-7);
-  hhnonPROMPTATLAS->SetBinContent(3,   9.2E-7); hhnonPROMPTATLAS->SetBinError(3, TMath::Sqrt(2.5*2.5    +1.2*1.2    )*1E-7);
-  hhnonPROMPTATLAS->SetBinContent(4,   3.3E-7); hhnonPROMPTATLAS->SetBinError(4, TMath::Sqrt(1.2*1.2    +0.4*0.4    )*1E-7);
-  hhnonPROMPTATLAS->SetBinContent(5,  3.04E-7); hhnonPROMPTATLAS->SetBinError(5, TMath::Sqrt(0.59*0.59  +0.04*0.04  )*1E-7);
-  hhnonPROMPTATLAS->SetBinContent(6, 0.115E-7); hhnonPROMPTATLAS->SetBinError(6, TMath::Sqrt(0.039*0.039+0.002*0.002)*1E-7);
-  hhnonPROMPTATLAS->SetMarkerStyle(24);
+  TH1* h_zjpsi_atlas_nonprompt = zjpsi_nonprompt_hist.createHistogram("h_zjpsi_atlas_nonprompt", *onia_pt);
+  h_zjpsi_atlas_nonprompt->SetBinContent(2,   5.1E-7); h_zjpsi_atlas_nonprompt->SetBinError(2, TMath::Sqrt(4.2*4.2    +0.9*0.9    )*1E-7);
+  h_zjpsi_atlas_nonprompt->SetBinContent(3,   9.2E-7); h_zjpsi_atlas_nonprompt->SetBinError(3, TMath::Sqrt(2.5*2.5    +1.2*1.2    )*1E-7);
+  h_zjpsi_atlas_nonprompt->SetBinContent(4,   3.3E-7); h_zjpsi_atlas_nonprompt->SetBinError(4, TMath::Sqrt(1.2*1.2    +0.4*0.4    )*1E-7);
+  h_zjpsi_atlas_nonprompt->SetBinContent(5,  3.04E-7); h_zjpsi_atlas_nonprompt->SetBinError(5, TMath::Sqrt(0.59*0.59  +0.04*0.04  )*1E-7);
+  h_zjpsi_atlas_nonprompt->SetBinContent(6, 0.115E-7); h_zjpsi_atlas_nonprompt->SetBinError(6, TMath::Sqrt(0.039*0.039+0.002*0.002)*1E-7);
+  h_zjpsi_atlas_nonprompt->SetMarkerStyle(24);
 
-  TH1* hhnonPROMPT  = tmpHistnonPROMPT.createHistogram("hhnonPROMPT", *onia_pt);
-  TH1* hhnonPROMPT_fid  = tmpHistnonPROMPT_fid.createHistogram("hhnonPROMPT_fid", *onia_pt);
-  TH1* hh2nonPROMPT = tmpHistnonPROMPT.createHistogram("hh2nonPROMPT", *onia_pt);
-  hh2nonPROMPT->SetXTitle("#it{p}_{T}^{J/#psi} [GeV]");
-  hh2nonPROMPT->SetYTitle("#it{B}(J/#psi#rightarrow#mu#mu) #times #frac{1}{#sigma(Z)} #frac{d#sigma(Z+J/#psi)}{d#it{p}_{T}} [1/GeV]");
-  hhnonPROMPT->SetLineWidth(2);
+  TH1* h_zjpsi_nonprompt  = zjpsi_nonprompt_hist.createHistogram("h_zjpsi_nonprompt", *onia_pt);
+  TH1* h_zjpsi_nonprompt_fid  = zjpsi_nonprompt_hist_fid.createHistogram("h_zjpsi_nonprompt_fid", *onia_pt);
+  TH1* h_zjpsi_nonprompt_cs = zjpsi_nonprompt_hist.createHistogram("h_zjpsi_nonprompt_cs", *onia_pt);
+  h_zjpsi_nonprompt_cs->SetXTitle("#it{p}_{T}^{J/#psi} [GeV]");
+  h_zjpsi_nonprompt_cs->SetYTitle("#it{B}(J/#psi#rightarrow#mu#mu) #times #frac{1}{#sigma(Z)} #frac{d#sigma(Z+J/#psi)}{d#it{p}_{T}} [1/GeV]");
+  h_zjpsi_nonprompt->SetLineWidth(2);
   for (int i=2; i<7; i++) {
-    hh2nonPROMPT->SetBinContent(i, hhnonPROMPT->GetBinContent(i)/hhnonPROMPT->GetBinWidth(i)/(inclusive_z_to_muons_events+inclusive_z_to_electrons_events));
-    hh2nonPROMPT->SetBinError(i, hhnonPROMPT->GetBinError(i)/hhnonPROMPT->GetBinWidth(i)/(inclusive_z_to_muons_events+inclusive_z_to_electrons_events));
+    h_zjpsi_nonprompt_cs->SetBinContent(i, h_zjpsi_nonprompt->GetBinContent(i)/h_zjpsi_nonprompt->GetBinWidth(i)/(inclusive_z_to_leptons_events));
+    h_zjpsi_nonprompt_cs->SetBinError(i, h_zjpsi_nonprompt->GetBinError(i)/h_zjpsi_nonprompt->GetBinWidth(i)/(inclusive_z_to_leptons_events));
   }
-  hh2nonPROMPT->Draw("E1");
-  hhnonPROMPTATLAS->Draw("E1same");
-#ifdef crosssection
-  hh2nonPROMPT->GetYaxis()->SetRangeUser(1E-11, 1E-5);
-#endif
-  hh2nonPROMPT->GetXaxis()->SetRangeUser(8.5, 120);
+  h_zjpsi_nonprompt_cs->Draw("E1");
+  h_zjpsi_atlas_nonprompt->Draw("E1same");
+  if (create_cs_plots) {
+    h_zjpsi_nonprompt_cs->GetYaxis()->SetRangeUser(1E-11, 1E-5);
+  }
+  //TODO should it be 120?
+  h_zjpsi_nonprompt_cs->GetXaxis()->SetRangeUser(8.5, 120);
   splot_tex_pt.DrawLatex(15, 3E-6, "#bf{#it{CMS}} Preliminary, #sqrt{#it{s}}=8 TeV, 19.7 fb^{-1}");
   splot_tex_pt.DrawLatex(15, 1E-6 , "#it{pp} #rightarrow non-prompt #it{J/#psi+Z} : #it{pp} #rightarrow #it{Z}");
   c_jpsi_diff_xsec->cd(2)->SetLogy(1);
@@ -667,45 +656,49 @@ void sPlotfit() {
   // create total cross-section plots
   // inclusive cross-section
   double inclusive_cross_section_prompt=0., inclusive_cross_section_prompt_err=0.;
-  double inclusive_cross_section_non_prompt=0., inclusive_cross_section_non_prompt_err=0.;
+  double inclusive_cross_section_nonprompt=0., inclusive_cross_section_nonprompt_err=0.;
   double fiducial_cross_section_prompt=0., fiducial_cross_section_prompt_err=0.;
-  double fiducial_cross_section_non_prompt=0., fiducial_cross_section_non_prompt_err=0.;
-  for (int i=2; i<7; i++) {
-    inclusive_cross_section_prompt         += hhPROMPT->GetBinContent(i);
-    inclusive_cross_section_prompt_err     += TMath::Power(hhPROMPT->GetBinError(i),2);
-    inclusive_cross_section_non_prompt     += hhnonPROMPT->GetBinContent(i);
-    inclusive_cross_section_non_prompt_err += TMath::Power(hhnonPROMPT->GetBinError(i),2);
-    fiducial_cross_section_prompt          += hhPROMPT_fid->GetBinContent(i);
-    fiducial_cross_section_prompt_err      += TMath::Power(hhPROMPT_fid->GetBinError(i),2);
-    fiducial_cross_section_non_prompt      += hhnonPROMPT_fid->GetBinContent(i);
-    fiducial_cross_section_non_prompt_err  += TMath::Power(hhnonPROMPT_fid->GetBinError(i),2);
+  double fiducial_cross_section_nonprompt=0., fiducial_cross_section_nonprompt_err=0.;
+  for (int i=2; i<7; ++i) {
+    inclusive_cross_section_prompt         += h_zjpsi_prompt->GetBinContent(i);
+    inclusive_cross_section_prompt_err     += TMath::Power(h_zjpsi_prompt->GetBinError(i),2);
+    inclusive_cross_section_nonprompt     += h_zjpsi_nonprompt->GetBinContent(i);
+    inclusive_cross_section_nonprompt_err += TMath::Power(h_zjpsi_nonprompt->GetBinError(i),2);
+    fiducial_cross_section_prompt          += h_zjpsi_prompt_fid->GetBinContent(i);
+    fiducial_cross_section_prompt_err      += TMath::Power(h_zjpsi_prompt_fid->GetBinError(i),2);
+    fiducial_cross_section_nonprompt      += h_zjpsi_nonprompt_fid->GetBinContent(i);
+    fiducial_cross_section_nonprompt_err  += TMath::Power(h_zjpsi_nonprompt_fid->GetBinError(i),2);
   }
 
-  inclusive_cross_section_prompt = inclusive_cross_section_prompt/(inclusive_z_to_muons_events+inclusive_z_to_electrons_events);
-  inclusive_cross_section_non_prompt = inclusive_cross_section_non_prompt/(inclusive_z_to_muons_events+inclusive_z_to_electrons_events);
-  inclusive_cross_section_prompt_err = TMath::Sqrt(inclusive_cross_section_prompt_err)/(inclusive_z_to_muons_events+inclusive_z_to_electrons_events);
-  inclusive_cross_section_non_prompt_err = TMath::Sqrt(inclusive_cross_section_non_prompt_err)/(inclusive_z_to_muons_events+inclusive_z_to_electrons_events);
+  inclusive_cross_section_prompt = inclusive_cross_section_prompt/(inclusive_z_to_leptons_events);
+  inclusive_cross_section_nonprompt = inclusive_cross_section_nonprompt/(inclusive_z_to_leptons_events);
+  //TODO why take the sqrt of the error here??
+  inclusive_cross_section_prompt_err = TMath::Sqrt(inclusive_cross_section_prompt_err)/(inclusive_z_to_leptons_events);
+  inclusive_cross_section_nonprompt_err = TMath::Sqrt(inclusive_cross_section_nonprompt_err)/(inclusive_z_to_leptons_events);
 
-  fiducial_cross_section_prompt         = fiducial_cross_section_prompt/(inclusive_z_to_muons_events+inclusive_z_to_electrons_events);
-  fiducial_cross_section_non_prompt     = fiducial_cross_section_non_prompt/(inclusive_z_to_muons_events+inclusive_z_to_electrons_events);
-  fiducial_cross_section_prompt_err     = TMath::Sqrt(fiducial_cross_section_prompt_err)/(inclusive_z_to_muons_events+inclusive_z_to_electrons_events);
-  fiducial_cross_section_non_prompt_err = TMath::Sqrt(fiducial_cross_section_non_prompt_err)/(inclusive_z_to_muons_events+inclusive_z_to_electrons_events);
+  fiducial_cross_section_prompt         = fiducial_cross_section_prompt/(inclusive_z_to_leptons_events);
+  fiducial_cross_section_nonprompt     = fiducial_cross_section_nonprompt/(inclusive_z_to_leptons_events);
+  //TODO why take the sqrt of the error here??
+  fiducial_cross_section_prompt_err     = TMath::Sqrt(fiducial_cross_section_prompt_err)/(inclusive_z_to_leptons_events);
+  fiducial_cross_section_nonprompt_err = TMath::Sqrt(fiducial_cross_section_nonprompt_err)/(inclusive_z_to_leptons_events);
 
   TH1F *h_total_cross_section_prompt     = new TH1F("h_total_cross_section_prompt", "h_total_cross_section_prompt", 3, 0, 3.);
   h_total_cross_section_prompt->GetYaxis()->SetRangeUser(0, 20E-6);
   h_total_cross_section_prompt->SetYTitle("#it{B}(J/#psi#rightarrow#mu#mu) #times #frac{#sigma(Z+J/#psi)}{#sigma(Z)} [1/GeV]");
-  TH1F *h_total_cross_section_non_prompt = new TH1F("h_total_cross_section_non_prompt", "h_total_cross_section_non_prompt", 3, 0, 3.);
-  h_total_cross_section_non_prompt->GetYaxis()->SetRangeUser(0, 20E-6);
-  h_total_cross_section_non_prompt->SetYTitle("#it{B}(J/#psi#rightarrow#mu#mu) #times #frac{#sigma(Z+J/#psi)}{#sigma(Z)} [1/GeV]");
+  TH1F *h_total_cross_section_nonprompt = new TH1F("h_total_cross_section_nonprompt", "h_total_cross_section_nonprompt", 3, 0, 3.);
+  h_total_cross_section_nonprompt->GetYaxis()->SetRangeUser(0, 20E-6);
+  h_total_cross_section_nonprompt->SetYTitle("#it{B}(J/#psi#rightarrow#mu#mu) #times #frac{#sigma(Z+J/#psi)}{#sigma(Z)} [1/GeV]");
 
   TH1F *h_total_cross_section_prompt_ATLAS     = new TH1F("h_total_cross_section_prompt_ATLAS", "h_total_cross_section_prompt_ATLAS", 3, 0, 3.);
   h_total_cross_section_prompt_ATLAS->SetMarkerStyle(24);
-  h_total_cross_section_prompt_ATLAS->SetBinContent(1, 36.8E-7); h_total_cross_section_prompt_ATLAS->SetBinError(1, TMath::Sqrt(6.7*6.7+2.5*2.5)*1E-7);
-  h_total_cross_section_prompt_ATLAS->SetBinContent(2, 63E-7); h_total_cross_section_prompt_ATLAS->SetBinError(2, TMath::Sqrt(13*13+5*5)*1E-7);
-  TH1F *h_total_cross_section_non_prompt_ATLAS = new TH1F("h_total_cross_section_non_prompt_ATLAS", "h_total_cross_section_non_prompt_ATLAS", 3, 0, 3.);
-  h_total_cross_section_non_prompt_ATLAS->SetMarkerStyle(24);
-  h_total_cross_section_non_prompt_ATLAS->SetBinContent(1, 65.8E-7); h_total_cross_section_non_prompt_ATLAS->SetBinError(1, TMath::Sqrt(9.2*9.2+4.2*4.2)*1E-7);
-  h_total_cross_section_non_prompt_ATLAS->SetBinContent(2, 102E-7); h_total_cross_section_non_prompt_ATLAS->SetBinError(2, TMath::Sqrt(15*15+5*5)*1E-7);
+  h_total_cross_section_prompt_ATLAS->SetBinContent(1, 36.8E-7); 
+  h_total_cross_section_prompt_ATLAS->SetBinError(1, TMath::Sqrt(6.7*6.7+2.5*2.5)*1E-7);
+  h_total_cross_section_prompt_ATLAS->SetBinContent(2, 63E-7); 
+  h_total_cross_section_prompt_ATLAS->SetBinError(2, TMath::Sqrt(13*13+5*5)*1E-7);
+  TH1F *h_total_cross_section_nonprompt_ATLAS = new TH1F("h_total_cross_section_nonprompt_ATLAS", "h_total_cross_section_nonprompt_ATLAS", 3, 0, 3.);
+  h_total_cross_section_nonprompt_ATLAS->SetMarkerStyle(24);
+  h_total_cross_section_nonprompt_ATLAS->SetBinContent(1, 65.8E-7); h_total_cross_section_nonprompt_ATLAS->SetBinError(1, TMath::Sqrt(9.2*9.2+4.2*4.2)*1E-7);
+  h_total_cross_section_nonprompt_ATLAS->SetBinContent(2, 102E-7); h_total_cross_section_nonprompt_ATLAS->SetBinError(2, TMath::Sqrt(15*15+5*5)*1E-7);
 
   h_total_cross_section_prompt->SetBinContent(1, fiducial_cross_section_prompt);
   h_total_cross_section_prompt->SetBinError(1, fiducial_cross_section_prompt_err);
@@ -715,18 +708,22 @@ void sPlotfit() {
   h_total_cross_section_prompt->GetXaxis()->SetBinLabel(2, "Inclusive");
   h_total_cross_section_prompt->GetXaxis()->SetBinLabel(3, "DPS-subtracted");
 
-  h_total_cross_section_non_prompt->SetBinContent(1, fiducial_cross_section_non_prompt);
-  h_total_cross_section_non_prompt->SetBinError(1, fiducial_cross_section_non_prompt_err);
-  h_total_cross_section_non_prompt->SetBinContent(2, inclusive_cross_section_non_prompt);
-  h_total_cross_section_non_prompt->SetBinError(2, inclusive_cross_section_non_prompt_err);
-  h_total_cross_section_non_prompt->GetXaxis()->SetBinLabel(1, "Fiducial");
-  h_total_cross_section_non_prompt->GetXaxis()->SetBinLabel(2, "Inclusive");
-  h_total_cross_section_non_prompt->GetXaxis()->SetBinLabel(3, "DPS-subtracted");
+  h_total_cross_section_nonprompt->SetBinContent(1, fiducial_cross_section_nonprompt);
+  h_total_cross_section_nonprompt->SetBinError(1, fiducial_cross_section_nonprompt_err);
+  h_total_cross_section_nonprompt->SetBinContent(2, inclusive_cross_section_nonprompt);
+  h_total_cross_section_nonprompt->SetBinError(2, inclusive_cross_section_nonprompt_err);
+  h_total_cross_section_nonprompt->GetXaxis()->SetBinLabel(1, "Fiducial");
+  h_total_cross_section_nonprompt->GetXaxis()->SetBinLabel(2, "Inclusive");
+  h_total_cross_section_nonprompt->GetXaxis()->SetBinLabel(3, "DPS-subtracted");
 
   // plotting cross-sections
 
-  TCanvas *c_total_cross_section = new TCanvas("c_total_cross_section", "c_total_cross_section", 1200, 600); c_total_cross_section->Divide(2,1);
-  c_total_cross_section->cd(1); h_total_cross_section_prompt->Draw("e1"); h_total_cross_section_prompt_ATLAS->Draw("e1same"); 
+  TCanvas *c_total_cross_section = new TCanvas("c_total_cross_section", "c_total_cross_section", 1200, 600);
+  c_total_cross_section->Divide(2,1);
+  c_total_cross_section->cd(1);
+  h_total_cross_section_prompt->Draw("e1");
+  h_total_cross_section_prompt_ATLAS->Draw("e1same");
+
   TLatex *   tex1 = new TLatex(.2,18E-6,"#bf{#it{CMS}}  Preliminary, #sqrt{#it{s}}=8 TeV, 19.7 fb^{-1}");
   tex1->SetTextFont(42);
   tex1->SetTextSize(0.04);
@@ -743,7 +740,7 @@ void sPlotfit() {
   tex3->SetLineWidth(2);
   tex3->Draw();
 
-  c_total_cross_section->cd(2); h_total_cross_section_non_prompt->Draw("e1"); h_total_cross_section_non_prompt_ATLAS->Draw("e1same");
+  c_total_cross_section->cd(2); h_total_cross_section_nonprompt->Draw("e1"); h_total_cross_section_nonprompt_ATLAS->Draw("e1same");
   TLatex *   tex4 = new TLatex(.2,18E-6,"#bf{#it{CMS}}  Preliminary, #sqrt{#it{s}}=8 TeV, 19.7 fb^{-1}");
   tex4->SetTextFont(42);               
   tex4->SetTextSize(0.04);             
@@ -759,5 +756,4 @@ void sPlotfit() {
   tex6->SetTextSize(0.04);
   tex6->SetLineWidth(2);
   tex6->Draw();
-
 }

@@ -1,7 +1,6 @@
 #include <vector>
 #include <iostream>
 #include <string>
-using namespace std;
 #include "TH1.h"
 #include "TH2.h"
 #include "TF1.h"
@@ -26,6 +25,8 @@ using namespace std;
 
 #define muons
 #define SaveNtuple
+
+using namespace std;
 
 TFile *root_file;
 #include "zfinder_tree.C"
