@@ -1,32 +1,35 @@
 #ifndef __CINT__
 #include "RooGlobalFunc.h"
 #endif
-#include "TMath.h"
-#include "RooBinning.h"
-#include "RooWorkspace.h"
-#include "TCanvas.h"
-#include "TLegend.h"
-#include "RooRealVar.h"
-#include "RooDataSet.h"
-#include "RooFitResult.h"
-#include "RooDataHist.h"
-#include "RooGaussian.h"
-#include "TLatex.h"
-#include "RooExponential.h"
-#include "RooAddPdf.h"
-#include "RooProdPdf.h"
-#include "RooExtendPdf.h"
-#include "RooPlot.h"
-#include "RooHist.h"
-#include "TCut.h"
-#include "TTree.h"
-#include "TFile.h"
-#include "TF1.h"
-#include "RooCBShape.h"
-#include "RooGaussModel.h"
-#include "RooDecay.h"
-#include "RooMCStudy.h"
-#include "RooStats/SPlot.h"
+#include <TROOT.h>
+#include <TStyle.h>
+#include <TMath.h>
+#include <RooBinning.h>
+#include <RooWorkspace.h>
+#include <TCanvas.h>
+#include <TLegend.h>
+#include <RooRealVar.h>
+#include <RooDataSet.h>
+#include <RooFitResult.h>
+#include <RooDataHist.h>
+#include <RooGaussian.h>
+#include <TLatex.h>
+#include <RooExponential.h>
+#include <RooAddPdf.h>
+#include <RooProdPdf.h>
+#include <RooExtendPdf.h>
+#include <RooPlot.h>
+#include <RooHist.h>
+#include <TCut.h>
+#include <TTree.h>
+#include <TH1.h>
+#include <TFile.h>
+#include <TF1.h>
+#include <RooCBShape.h>
+#include <RooGaussModel.h>
+#include <RooDecay.h>
+#include <RooMCStudy.h>
+#include <RooStats/SPlot.h>
 
 using namespace RooFit ;
 using namespace RooStats ;
@@ -90,13 +93,14 @@ void sPlotfit() {
   zjpsi_argset.add(*reco_muon0_weight); zjpsi_argset.add(*reco_muon1_weight);
 
   //Data Set
-  TFile *zjpsi_ntuple = new TFile("../SkimNtuple/ZJpsi.root");
+  //TFile *zjpsi_ntuple = new TFile("../SkimNtuple/ZJpsi.root");
+  TFile *zjpsi_ntuple = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/SkimNtuple/ZJpsi.root");
   TTree* zjpsi_tree = (TTree*) zjpsi_ntuple->Get("AUX");
   RooDataSet *zjpsi_data     = new RooDataSet("zjpsi_data", "zjpsi_data", zjpsi_tree, zjpsi_argset);
   RooDataSet *zjpsi_data_fid = new RooDataSet("zjpsi_data_fid", "zjpsi_data_fid", zjpsi_tree, zjpsi_argset);
 
-  TFile *jpsi_ntuple = new TFile("../SkimNtuple/ZJpsi.root");
-  TFile *ntuple = new TFile("../SkimNtuple/jpsimumu.root");
+  TFile *jpsi_ntuple = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/SkimNtuple/ZJpsi.root");
+  TFile *ntuple = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/SkimNtuple/jpsimumu.root");
 
   TTree* tree = (TTree*) ntuple->Get("AUX");
   RooDataSet *data = new RooDataSet("data", "data", tree, jpsi_argset);
@@ -517,18 +521,24 @@ void sPlotfit() {
 
   for(Int_t i=0; i < zjpsi_data->numEntries(); ++i) {
     obs_zjpsi = zjpsi_data->get(i);
+    RooRealVar* effrow1 = new RooRealVar("effrow1", "effrow1", 1.);
+    RooRealVar* effrow2 = new RooRealVar("effrow2", "effrow2", 1.);
+    RooRealVar* accrow = new RooRealVar("accrow", "accrow", 1.);
     if(use_polarisation_weights) {
       //TODO verify that this is done correctly
       //unclear what effrow1 and accrow are, or how they are calculated
       //these varialbes should be renamed to more reflect what they are
-      RooRealVar* effrow1 = (RooRealVar*) obs_zjpsi->find("reco_muon0_weight");
-      RooRealVar* effrow2 = (RooRealVar*) obs_zjpsi->find("reco_muon1_weight");
-      RooRealVar* accrow = (RooRealVar*) obs_zjpsi->find("unpolarised");
+      //RooRealVar* effrow1 = (RooRealVar*) obs_zjpsi->find("reco_muon0_weight");
+      //RooRealVar* effrow2 = (RooRealVar*) obs_zjpsi->find("reco_muon1_weight");
+      //RooRealVar* accrow = (RooRealVar*) obs_zjpsi->find("unpolarised");
+      effrow1 = (RooRealVar*) obs_zjpsi->find("reco_muon0_weight");
+      effrow2 = (RooRealVar*) obs_zjpsi->find("reco_muon1_weight");
+      accrow = (RooRealVar*) obs_zjpsi->find("unpolarised");
     }
     else {
-      RooRealVar* effrow1 = new RooRealVar("effrow1", "effrow1", 1.);
-      RooRealVar* effrow2 = new RooRealVar("effrow2", "effrow2", 1.);
-      RooRealVar* accrow = new RooRealVar("accrow", "accrow", 1.);
+      //RooRealVar* effrow1 = new RooRealVar("effrow1", "effrow1", 1.);
+      //RooRealVar* effrow2 = new RooRealVar("effrow2", "effrow2", 1.);
+      //RooRealVar* accrow = new RooRealVar("accrow", "accrow", 1.);
     }
     // fiducial calculations
     double weighted_prompt_fid_value    = sPlot_zjpsi_data->GetSWeight(i,"Nzjpsi_m_sig_tau_sig_sw")/(effrow1->getVal()*effrow2->getVal());
@@ -570,18 +580,20 @@ void sPlotfit() {
   RooDataHist zjpsi_prompt_hist_fid   ("zjpsi_prompt_hist_fid"   , "zjpsi_prompt_hist_fid", *onia_pt, *zjpsi_data_weighted_prompt_fid);
   RooDataHist zjpsi_nonprompt_hist_fid("zjpsi_nonprompt_hist_fid", "zjpsi_nonprompt_hist_fid", *onia_pt, *zjpsi_data_weighted_nonprompt_fid);
 
+  double inclusive_z_to_muons_events;
+  double inclusive_z_to_electrons_events;
+  double inclusive_z_to_leptons_events;
   if (create_cs_plots) {
     // %%%%%%%%%%%%%%%%%%%%%
     // Jared need input here
     // %%%%%%%%%%%%%%%%%%%%%
-    double inclusive_z_to_muons_events     = 8.5E06;
-    double inclusive_z_to_electrons_events = 5.0E06;
+    inclusive_z_to_muons_events     = 8.5E06;
+    inclusive_z_to_electrons_events = 5.0E06;
   }
   else {
-    double inclusive_z_to_muons_events     = 1.;
-    double inclusive_z_to_electrons_events = 1.;
+    inclusive_z_to_muons_events     = 0.5;
+    inclusive_z_to_electrons_events = 0.5;
   }
-  double inclusive_z_to_leptons_events;
   inclusive_z_to_leptons_events = inclusive_z_to_muons_events + inclusive_z_to_electrons_events;
 
   TCanvas* c_jpsi_diff_xsec = new TCanvas("c_jpsi_diff_xsec","J/#psi p_{T} sPlot weighted", 1200, 600); c_jpsi_diff_xsec->Divide(2,1);
