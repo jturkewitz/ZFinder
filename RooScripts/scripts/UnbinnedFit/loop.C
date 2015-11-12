@@ -33,7 +33,6 @@
 #include "ZFinder_Jpsi_Tree.C"
 ZFinder_Jpsi_Tree *jpsi;
 
-//bool use_z_to_muons = true;
 bool use_z_to_muons = false;
 bool use_z_to_electrons = false;
 
@@ -54,14 +53,14 @@ void Run() {
   //SetAtlasStyle();
 
   if(use_z_to_muons) {
-    //TFile *root_file = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/ntuples_looser/jpsiTest440_doublemuon_trigger_matching.root","READ");
-    //jpsi = new ZFinder_Muons_Tree((TTree*)root_file->Get("zfinder_tree"));
+    TFile *root_file = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/ntuples_looser/jpsiTest440_doublemuon_trigger_matching.root","READ");
+    jpsi = new ZFinder_Muons_Tree((TTree*)root_file->Get("zfinder_tree"));
     
     //jpsi = new zfinder_tree((TTree*)root_file->Get("zfinder_tree"));
   }
   else if(use_z_to_electrons) {
-    //TFile *root_file = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/ntuples_looser/jpsiTest441_doubleelectron_trigger_matching.root","READ");
-    //ZFinder_Electrons_Tree *jpsi = new ZFinder_Electrons_Tree((TTree*)root_file->Get("zfinder_tree"));
+    TFile *root_file = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/ntuples_looser/jpsiTest441_doubleelectron_trigger_matching.root","READ");
+    ZFinder_Electrons_Tree *jpsi = new ZFinder_Electrons_Tree((TTree*)root_file->Get("zfinder_tree"));
   }
   else {
     TFile *root_file = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/ntuples_looser/jpsiTest451_MuOniaPartial2012B_dimuon8_eta24_ptsub25.root","READ");
@@ -78,7 +77,13 @@ void Run() {
   cout << "Entries: " << jpsi_entries << endl;
 
   // Load file with acceptance weights
+  // TODO fix this!
   // TODO this needs to be changed for CMS analysis
+
+  TFile cms_acc_eff = ("acc_eff_map.root");
+  TH2* h_acc_eff_cms = (TH2*)cms_acc_eff.Get("jpsi_pt_vs_rap");
+
+
   //TFile mainfile_acc( "../AcceptanceMaps/acceptancejpsi_RapMax2.1_PtMax100_RapBins100_PtBins400_Sampling10k.root" );
   TFile mainfile_acc( "acceptancejpsi_RapMax2.1_PtMax100_RapBins100_PtBins400_Sampling10k.root" );
   TH2* h_weights_acc1 = (TH2*)mainfile_acc.Get("flat");
@@ -86,6 +91,8 @@ void Run() {
   TH2* h_weights_acc3 = (TH2*)mainfile_acc.Get("trp0");
   TH2* h_weights_acc4 = (TH2*)mainfile_acc.Get("trpp");
   TH2* h_weights_acc5 = (TH2*)mainfile_acc.Get("trpm");
+
+  
 
   // Load file with reconstruction weights
   // TODO this needs to be changed for CMS analysis?? - not sure
@@ -222,16 +229,32 @@ void Run() {
     }
 
     // find acceptance weights
-    int binx, biny;
-    binx = h_weights_acc1->GetXaxis()->FindBin(onia_rap);
-    biny = h_weights_acc1->GetYaxis()->FindBin(onia_pt);
-    double weight = 1./h_weights_acc1->GetBinContent(binx, biny);
+    int binx_cms, biny_cms;
+    binx_cms = h_acc_eff_cms->GetXaxis()->FindBin(onia_rap);
+    biny_cms = h_acc_eff_cms->GetYaxis()->FindBin(onia_pt);
+
+    weight = 1./h_acc_eff_cms->GetBinContent(binx_cms, biny_cms);
     if (weight>-100 && weight<100.) {
       unpolarised = weight;
     }
     else {
+      cout << "weight not within [-100,100] " << weight << endl;
       unpolarised = 1.;
     }
+
+    // find acceptance weights
+    //int binx, biny;
+    //binx = h_weights_acc1->GetXaxis()->FindBin(onia_rap);
+    //biny = h_weights_acc1->GetYaxis()->FindBin(onia_pt);
+    //
+    //double weight = 1./h_weights_acc1->GetBinContent(binx, biny);
+    //if (weight>-100 && weight<100.) {
+    //  unpolarised = weight;
+    //}
+    //else {
+    //  //cout << weight << endl;
+    //  unpolarised = 1.;
+    //}
 
     binx = h_weights_acc2->GetXaxis()->FindBin(onia_rap);
     biny = h_weights_acc2->GetYaxis()->FindBin(onia_pt);
@@ -303,7 +326,7 @@ void Run() {
       }
     } 
     else {
-      reco_muon0_weight =1.;
+      reco_muon0_weight = 1.;
     }
 
     if (TMath::Abs(onia_mu1_eta)<2.1 && onia_mu1_pt<20.) {

@@ -30,6 +30,7 @@
 #include <RooDecay.h>
 #include <RooMCStudy.h>
 #include <RooStats/SPlot.h>
+#include <RooNumIntConfig.h>
 
 using namespace RooFit ;
 using namespace RooStats ;
@@ -40,8 +41,9 @@ using namespace RooStats ;
 //In general, better to make these command line options then defines
 //same goes for hardcoding file_names, should be a command line option
 
-bool draw_residuals = true;
+bool draw_residuals = false;
 bool use_polarisation_weights = true;
+//bool use_polarisation_weights = false;
 bool create_cs_plots = true;
 bool do_pull_calculation = false;
 
@@ -54,6 +56,16 @@ void sPlotfit() {
   RooMsgService::instance().setGlobalKillBelow(RooFit::WARNING) ;
   gErrorIgnoreLevel = kWarning;
 
+  //RooMsgService::instance().setGlobalKillBelow(RooFit::ERROR) ;
+  //gErrorIgnoreLevel = kError;
+
+  //Increase default precision of numeric integration
+  // as this exercise has high sensitivity to numeric integration precision
+  //RooAbsPdf::defaultIntegratorConfig()->setEpsRel(1e-8) ;
+  //RooAbsPdf::defaultIntegratorConfig()->setEpsAbs(1e-8) ;
+  RooAbsPdf::defaultIntegratorConfig()->setEpsRel(1e-12) ;
+  RooAbsPdf::defaultIntegratorConfig()->setEpsAbs(1e-12) ;
+
   TLatex splot_tex_pt;
   splot_tex_pt.SetTextSize(0.04);
   splot_tex_pt.SetTextFont(42);
@@ -61,9 +73,9 @@ void sPlotfit() {
   TF1 *f_straighline = new TF1("f_straighline", "0", -100, 1000);
   f_straighline->SetLineColor(kBlack);
 
-  RooRealVar *onia_mass = new RooRealVar("onia_mass", "J/#psi#rightarrow#mu#mu [GeV]", 2.85, 3.35, "GeV");
-  RooRealVar *onia_tau  = new RooRealVar("onia_tau", "J/#psi#rightarrow#mu#mu pseudo-proper time [ps]", -5., 10, "ps");
-  RooRealVar *z_mass    = new RooRealVar("z_mass", "Z#rightarrow#mu#mu [GeV]", 66., 116., "GeV");
+  RooRealVar *onia_mass = new RooRealVar("onia_mass", "J/#psi#rightarrow#mu#mu [GeV]", 2.85, 3.35);
+  RooRealVar *onia_tau  = new RooRealVar("onia_tau", "J/#psi#rightarrow#mu#mu pseudo-proper time [ps]", -2., 5);
+  RooRealVar *z_mass    = new RooRealVar("z_mass", "Z Mass [GeV]", 60., 120.);
   RooRealVar *is_z_to_electrons    = new RooRealVar("is_z_to_electrons", "is_z_to_electrons", 0, 1);
   RooRealVar *is_z_to_muons  = new RooRealVar("is_z_to_muons", "is_z_to_muons", 0, 1);
 
@@ -74,11 +86,11 @@ void sPlotfit() {
   RooRealVar *onia_mu0_eta = new RooRealVar("onia_mu0_eta",  "onia_mu0_eta",-3, 3);
   RooRealVar *onia_mu1_eta = new RooRealVar("onia_mu1_eta",  "onia_mu1_eta",-3, 3);
 
-  RooRealVar *unpolarised  = new RooRealVar("unpolarised" , "unpolarised" ,  -1000000000000000000000., 100000000000000000.);
-  RooRealVar *longitudinal = new RooRealVar("longitudinal", "longitudinal",  -1000000000000000000000., 100000000000000000.);
-  RooRealVar *transverse   = new RooRealVar("transverse"  , "transverse"  ,  -1000000000000000000000., 100000000000000000.);
-  RooRealVar *transverse_pos  = new RooRealVar("transverse_pos" , "transverse_pos" ,  -1000000000000000000000., 100000000000000000.);
-  RooRealVar *transverse_neg  = new RooRealVar("transverse_neg" , "transverse_neg" ,  -1000000000000000000000., 100000000000000000.);
+  RooRealVar *unpolarised  = new RooRealVar("unpolarised" , "unpolarised" ,  -10000000000000., 1000000000.);
+  RooRealVar *longitudinal = new RooRealVar("longitudinal", "longitudinal",  -10000000000000., 1000000000.);
+  RooRealVar *transverse   = new RooRealVar("transverse"  , "transverse"  ,  -10000000000000., 1000000000.);
+  RooRealVar *transverse_pos  = new RooRealVar("transverse_pos" , "transverse_pos" ,  -10000000000000., 1000000000.);
+  RooRealVar *transverse_neg  = new RooRealVar("transverse_neg" , "transverse_neg" ,  -10000000000000., 1000000000.);
 
   RooRealVar *reco_muon0_weight = new RooRealVar("reco_muon0_weight", "reco_muon0_weight", -10, 10);
   RooRealVar *reco_muon1_weight = new RooRealVar("reco_muon1_weight", "reco_muon1_weight", -10, 10);
@@ -87,23 +99,28 @@ void sPlotfit() {
   RooArgSet zjpsi_argset(*onia_mass, *onia_tau, *is_z_to_electrons, *is_z_to_muons, *z_mass, *onia_pt, *onia_rap);
   zjpsi_argset.add(*onia_mu0_pt); zjpsi_argset.add(*onia_mu1_pt);
   zjpsi_argset.add(*onia_mu0_eta); zjpsi_argset.add(*onia_mu1_eta);
-  zjpsi_argset.add(*unpolarised); zjpsi_argset.add(*longitudinal);
-  zjpsi_argset.add(*transverse); zjpsi_argset.add(*transverse_pos);
+  zjpsi_argset.add(*unpolarised); 
+  zjpsi_argset.add(*longitudinal);
+  zjpsi_argset.add(*transverse); 
+  zjpsi_argset.add(*transverse_pos);
   zjpsi_argset.add(*transverse_neg);
-  zjpsi_argset.add(*reco_muon0_weight); zjpsi_argset.add(*reco_muon1_weight);
+  zjpsi_argset.add(*reco_muon0_weight);
+  zjpsi_argset.add(*reco_muon1_weight);
 
   //Data Set
   //TFile *zjpsi_ntuple = new TFile("../SkimNtuple/ZJpsi.root");
-  TFile *zjpsi_ntuple = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/SkimNtuple/ZJpsi.root");
+  //TFile *zjpsi_ntuple = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/SkimNtuple/ZJpsi.root");
+  TFile *zjpsi_ntuple = new TFile("ZJpsi.root");
   TTree* zjpsi_tree = (TTree*) zjpsi_ntuple->Get("AUX");
   RooDataSet *zjpsi_data     = new RooDataSet("zjpsi_data", "zjpsi_data", zjpsi_tree, zjpsi_argset);
   RooDataSet *zjpsi_data_fid = new RooDataSet("zjpsi_data_fid", "zjpsi_data_fid", zjpsi_tree, zjpsi_argset);
 
-  TFile *jpsi_ntuple = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/SkimNtuple/ZJpsi.root");
-  TFile *ntuple = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/SkimNtuple/jpsimumu.root");
+  //TFile *zjpsi_ntuple = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/SkimNtuple/ZJpsi.root");
+  //TFile *ntuple = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/SkimNtuple/jpsimumu.root");
+  TFile *jpsi_ntuple = new TFile("Inclusive_Jpsi.root");
 
-  TTree* tree = (TTree*) ntuple->Get("AUX");
-  RooDataSet *data = new RooDataSet("data", "data", tree, jpsi_argset);
+  TTree* jpsi_tree = (TTree*) jpsi_ntuple->Get("AUX");
+  RooDataSet *jpsi_data = new RooDataSet("jpsi_data", "jpsi_data", jpsi_tree, jpsi_argset);
 
   //      TCut SelectionCut = "onia_mass>2.6 && onia_mass<3.6";
   //  RooDataSet *newdata = (RooDataSet*)data->reduce(SelectionCut);
@@ -127,8 +144,6 @@ void sPlotfit() {
 
   RooRealVar jpsi_frac_prompt_sharp("jpsi_frac_prompt_sharp", "jpsi_frac_prompt_sharp" , 8.15248e-01, 8.15248e-01-6.70723e-02, 8.15248e-01+6.70723e-02);
   RooAddPdf jpsi_oniatau_gauss_sum_fitpdf("jpsi_oniatau_gauss_sum_fitpdf", "jpsi_oniatau_gauss_sum_fitpdf", RooArgList(jpsi_prompt_gauss,jpsi_prompt_gauss_2), RooArgList(jpsi_frac_prompt_sharp));
-
-  RooRealVar jpsi_prompt_fraction("jpsi_prompt_fraction", "jpsi_prompt_fraction" , 0.01 , 0.0, 1);
 
   RooRealVar jpsi_sigma("jpsi_sigma", "jpsi_sigma", 2.75528e-02, 0.0002, 0.1);
 //  RooRealVar jpsi_sigma("jpsi_sigma", "jpsi_sigma", 2.75528e-02, 2.75528e-02-1.22859e-03, 2.75528e-02+1.22859e-03);
@@ -167,28 +182,165 @@ void sPlotfit() {
   RooExtendPdf ejpsi_m_bg_tau_sig ("ejpsi_m_bg_tau_sig",  "ejpsi_m_bg_tau_sig",  jpsi_m_bg_tau_sig , Njpsi_m_bg_tau_sig );
 
   //  RooAddPdf model("model", "model", RooArgSet(jpsi_m_sig_tau_sig, jpsi_m_sig_tau_bg, jpsi_m_bg_tau_sig, jpsi_m_bg_tau_bg ), RooArgList(jpsi_m_sig_tau_sig_frac, jpsi_m_sig_tau_bg_frac, jpsi_m_bg_tau_sig_frac), kTRUE);
-  RooAddPdf model("model", "model", RooArgList(ejpsi_m_sig_tau_sig, ejpsi_m_sig_tau_bg, ejpsi_m_bg_tau_sig, ejpsi_m_bg_tau_bg));
+  RooAddPdf jpsi_model("jpsi_model", "jpsi_model", RooArgList(ejpsi_m_sig_tau_sig, ejpsi_m_sig_tau_bg, ejpsi_m_bg_tau_sig, ejpsi_m_bg_tau_bg));
 
   //does not work right now
-  RooFitResult *fr_inclusive = model.fitTo(*data, NumCPU(4, kTRUE), Save());
+  RooFitResult *fr_inclusive = jpsi_model.fitTo(*jpsi_data, NumCPU(4, kTRUE), Verbose(false), PrintLevel(-1), Save());
+  fr_inclusive->Print();
 
   int num_mass_bins = 40;
   int num_time_bins = 40;
 
   RooPlot* dummy_m = onia_mass->frame(Bins(num_mass_bins));
-  data->plotOn(dummy_m);
-  model.plotOn(dummy_m);
+  jpsi_data->plotOn(dummy_m);
+  jpsi_model.plotOn(dummy_m);
 
-  RooPlot* dummy_t = onia_tau->frame(Bins(num_time_bins));
-  data->plotOn(dummy_t);
-  model.plotOn(dummy_t);
+  //Plot inclusive j/psi mass frame
+  RooPlot* inclusive_jpsi_mass_frame = onia_mass->frame(Bins(num_mass_bins));
+  jpsi_data->plotOn(inclusive_jpsi_mass_frame, Name("jpsi_mass_data"));
+
+  //Plots full model, prompt and non-prompt models to frame
+  jpsi_model.plotOn(inclusive_jpsi_mass_frame, LineColor(kRed-2), RooFit::Name("total"));
+  jpsi_model.plotOn(inclusive_jpsi_mass_frame, Components(jpsi_m_sig_tau_sig), LineColor(kBlue-2), RooFit::Name("prompt j/psi"));
+  jpsi_model.plotOn(inclusive_jpsi_mass_frame, Components(jpsi_m_sig_tau_bg), LineColor(kMagenta-2), RooFit::Name("non-prompt j/psi"));
+  jpsi_model.plotOn(inclusive_jpsi_mass_frame, Components(jpsi_m_bg_tau_sig), LineColor(kCyan-2), RooFit::Name("prompt continuum"));
+  jpsi_model.plotOn(inclusive_jpsi_mass_frame, Components(jpsi_m_bg_tau_bg), LineColor(kGreen-2), RooFit::Name("non-prompt continuum"));
+  
+  inclusive_jpsi_mass_frame->GetXaxis()->SetTitleOffset(.9);
+
+  RooPlot* dummy_frame_jpsi = onia_mass->frame(Title("dummy frame to extract residuals"), Bins(num_mass_bins));
+  jpsi_data->plotOn(dummy_frame_jpsi); 
+  jpsi_model.plotOn(dummy_frame_jpsi);
+
+  RooHist* h_residuals_mass_jpsi = dummy_frame_jpsi->pullHist();
+  RooPlot* frame_residuals_mass_jpsi = onia_mass->frame(Title("Residual Distribution #mu^{+}#mu^{-} mass"));
+  frame_residuals_mass_jpsi->GetYaxis()->SetTitle("(fit - data)/#sigma");
+  frame_residuals_mass_jpsi->GetYaxis()->SetTitleSize(.16);
+  frame_residuals_mass_jpsi->GetYaxis()->SetTitleOffset(.2);
+  frame_residuals_mass_jpsi->addPlotable(h_residuals_mass_jpsi, "P");
+
+  // Creates and fills canvas with plot and info 
+  TCanvas *canvas1_jpsi = new TCanvas("jpsi_MassFit_", "jpsi_MassFit_", 900, 900);
+  canvas1_jpsi->cd();
+  if(draw_residuals) {
+    TPad *pad1_jpsi = new TPad("pad1_jpsi", "The pad 80% of the height",0.0,0.05,1.0,1.0,21);
+    TPad *pad2_jpsi = new TPad("pad2_jpsi", "The pad 20% of the height",0.0,0.0,1.0,0.1,22);
+    pad1_jpsi->Draw(); 
+    pad2_jpsi->Draw();
+    pad1_jpsi->SetFillColor(0); 
+    pad2_jpsi->SetFillColor(0);
+    pad2_jpsi->cd();
+    frame_residuals_mass_jpsi->Draw(); 
+    f_straighline->Draw("same");
+    pad1_jpsi->cd();
+    inclusive_jpsi_mass_frame->Draw();
+  }
+  if (!draw_residuals) {
+    canvas1_jpsi->Close();
+  }
+
+  //splot_tex_pt.DrawLatex(2.87, 30, "#bf{#it{CMS}} Preliminary");
+  //splot_tex_pt.DrawLatex(2.87, 25, "#sqrt{#it{s}}=8 TeV, 19.7 fb^{-1}");
+ 
+  //inclusive_jpsi_mass_frame->SetTitle("J/#psi Mass [GeV]");
+
+  Double_t xl1_l3=.60, yl1_l3=0.55, xl2_l3=xl1_l3+.3, yl2_l3=yl1_l3+.325;
+  TLegend *leg3 = new TLegend(xl1_l3,yl1_l3,xl2_l3,yl2_l3);
+  leg3->SetFillColor(kWhite);
+  leg3->AddEntry(inclusive_jpsi_mass_frame->findObject("total"),"total","l");
+  leg3->AddEntry(inclusive_jpsi_mass_frame->findObject("prompt j/psi"),"prompt j/psi","l");
+  leg3->AddEntry(inclusive_jpsi_mass_frame->findObject("non-prompt j/psi"),"non-prompt j/psi","l");
+  leg3->AddEntry(inclusive_jpsi_mass_frame->findObject("prompt continuum"),"prompt continuum","l");
+  leg3->AddEntry(inclusive_jpsi_mass_frame->findObject("non-prompt continuum"),"non-prompt continuum","l");
+  leg3->SetShadowColor(0);
+  leg3->Draw();
+  inclusive_jpsi_mass_frame->SetTitle("Inclusive J/#psi Mass");
+  //
+
+  //----------- Inclusive Jpsi Tau Fit ---------------
+  //Plots data on to frame
+  RooPlot* inclusive_jpsi_time_frame = onia_tau->frame(Bins(num_time_bins));
+  jpsi_data->plotOn(inclusive_jpsi_time_frame, Name("jpsi_time_data"));
+
+  //Plots full model, prompt and non-prompt models to frame
+  jpsi_model.plotOn(inclusive_jpsi_time_frame, LineColor(kRed-2), RooFit::Name("total"));
+  jpsi_model.plotOn(inclusive_jpsi_time_frame, Components(jpsi_m_sig_tau_sig), LineColor(kBlue-2), RooFit::Name("prompt j/psi"));
+  jpsi_model.plotOn(inclusive_jpsi_time_frame, Components(jpsi_m_sig_tau_bg), LineColor(kMagenta-2), RooFit::Name("non-prompt j/psi"));
+  jpsi_model.plotOn(inclusive_jpsi_time_frame, Components(jpsi_m_bg_tau_sig), LineColor(kCyan-2), RooFit::Name("prompt continuum"));
+  jpsi_model.plotOn(inclusive_jpsi_time_frame, Components(jpsi_m_bg_tau_bg), LineColor(kGreen-2), RooFit::Name("non-prompt continuum"));
+
+  inclusive_jpsi_time_frame->GetXaxis()->SetTitleOffset(.9);
+
+  RooPlot* dummy_tframe_jpsi = onia_tau->frame(Title("dummy frame to extract residuals"), Bins(num_time_bins));
+  jpsi_data->plotOn(dummy_tframe_jpsi); 
+  jpsi_model.plotOn(dummy_tframe_jpsi);
+
+  RooHist* h_residuals_time_jpsi = dummy_tframe_jpsi->pullHist();
+  RooPlot* frame_residuals_time_jpsi = onia_tau->frame(Title("Residual Distribution #mu^{+}#mu^{-} time"));
+  frame_residuals_time_jpsi->GetYaxis()->SetTitle("(fit - data)/#sigma");
+  frame_residuals_time_jpsi->GetYaxis()->SetTitleSize(.16);
+  frame_residuals_time_jpsi->GetYaxis()->SetTitleOffset(.2);
+  frame_residuals_time_jpsi->addPlotable(h_residuals_time_jpsi, "P");
+
+  // Creates and fills canvas with plot and info 
+  TCanvas *canvas2_jpsi = new TCanvas("jpsi_TimeFit_", "jpsi_TimeFit_", 900, 900);
+  canvas2_jpsi->cd();
+  if(draw_residuals) {
+    TPad *tpad1_jpsi = new TPad("tpad1_jpsi", "The pad 80% of the height",0.0,0.05,1.0,1.0,21); tpad1_jpsi->SetLogy(1);
+    TPad *tpad2_jpsi = new TPad("tpad2_jpsi", "The pad 20% of the height",0.0,0.0,1.0,0.1,22);
+    tpad1_jpsi->Draw();
+    tpad2_jpsi->Draw();
+    tpad1_jpsi->SetFillColor(0);
+    tpad2_jpsi->SetFillColor(0);
+    tpad2_jpsi->cd();
+    frame_residuals_time_jpsi->Draw();
+    f_straighline->Draw("same");
+    tpad1_jpsi->cd();
+    inclusive_jpsi_time_frame->Draw();
+  }
+  if (!draw_residuals) {
+    canvas2_jpsi->Close();
+  }
+
+  //splot_tex_pt.DrawLatex(2, 115, "#bf{#it{CMS}} Preliminary");
+  //splot_tex_pt.DrawLatex(2, 80, "#sqrt{#it{s}}=8 TeV, 19.7 fb^{-1}");
+ 
+  Double_t xl1_l4=.65, yl1_l4=0.55, xl2_l4=xl1_l4+.2, yl2_l4=yl1_l4+.225;
+  TLegend *leg4 = new TLegend(xl1_l4,yl1_l4,xl2_l4,yl2_l4);
+  leg4->SetFillColor(kWhite);
+  leg4->AddEntry(inclusive_jpsi_time_frame->findObject("total"),"total","l");
+  leg4->AddEntry(inclusive_jpsi_time_frame->findObject("prompt j/psi"),"prompt j/psi","l");
+  leg4->AddEntry(inclusive_jpsi_time_frame->findObject("non-prompt j/psi"),"non-prompt j/psi","l");
+  leg4->AddEntry(inclusive_jpsi_time_frame->findObject("prompt continuum"),"prompt continuum","l");
+  leg4->AddEntry(inclusive_jpsi_time_frame->findObject("non-prompt continuum"),"non-prompt continuum","l");
+  leg4->SetShadowColor(0);
+  leg4->Draw();
+  //inclusive_jpsi_time_frame->SetTitle("J/#psi Mass [GeV]");
+  inclusive_jpsi_time_frame->SetTitle("Inclusive J/#psi Lifetime");
+  canvas2_jpsi->SetLogy(1);
+  //
+
+
+  //RooPlot* dummy_t = onia_tau->frame(Bins(num_time_bins));
+  //jpsi_data->plotOn(dummy_t);
+  //jpsi_model.plotOn(dummy_t);
 
   TCanvas *c_dummy = new TCanvas("c_dummy", "c_dummy", 1200, 600); c_dummy->Divide(2,1);
-  c_dummy->cd(1); 
-  dummy_m->Draw();
+  c_dummy->cd(1);
+  //c_dummy->cd(1)->SetLogy(1);
+  inclusive_jpsi_mass_frame->Draw();
+  leg3->Draw();
   c_dummy->cd(2); 
-  dummy_t->Draw(); 
+  inclusive_jpsi_time_frame->Draw(); 
+  leg4->Draw();
   c_dummy->cd(2)->SetLogy(1);
+
+  //TCanvas *c_dummy = new TCanvas("c_dummy", "c_dummy", 1200, 600); c_dummy->Divide(2,1);
+  //c_dummy->cd(1); 
+  //dummy_m->Draw();
+  //c_dummy->cd(2); 
+  //dummy_t->Draw(); 
+  //c_dummy->cd(2)->SetLogy(1);
 
   //Then would do:
 
@@ -231,36 +383,69 @@ void sPlotfit() {
 
   // ZJpsi Unbinned fit start here
 
+  //RooRealVar zjpsi_gaussmean("zjpsi_gaussmean", "Mean of the smearing zjpsi Gaussian", zjpsi_gaussmean_value);
+  //RooRealVar zjpsi_gausssigma("zjpsi_gausssigma", "Width of the smearing zjpsi Gaussian", zjpsi_gausssigma_value);
+  //RooGaussModel zjpsi_smear_gauss_model("zjpsi_smear_gauss", "Gaussian used to smear the zjpsi Exponential Decay", *onia_tau, zjpsi_gaussmean, zjpsi_gausssigma);
+  //RooRealVar zjpsi_decay_time("zjpsi_decay_time", "zjpsi_Tau", zjpsi_decay_time_value, zjpsi_decay_time_value-zjpsi_decay_time_value_err, zjpsi_decay_time_value+zjpsi_decay_time_value_err);
+  //RooDecay zjpsi_decay_exp("zjpsi_decay_exp", "zjpsi_Exponential Decay", *onia_tau,zjpsi_decay_time,zjpsi_smear_gauss_model,RooDecay::SingleSided);
+
+  //RooRealVar zjpsi_gauss_prompt_mean("zjpsi_gauss_prompt_mean", "Mean of the Prompt zjpsi_Gaussian", zjpsi_gauss_prompt_mean_value, zjpsi_gauss_prompt_mean_value-zjpsi_gauss_prompt_mean_value_err, zjpsi_gauss_prompt_mean_value+zjpsi_gauss_prompt_mean_value_err);
+  //RooRealVar zjpsi_gauss_prompt_sigma("zjpsi_gauss_prompt_sigma", "Width of the Prompt zjpsi_Gaussian", zjpsi_gauss_prompt_sigma_value, zjpsi_gauss_prompt_sigma_value-zjpsi_gauss_prompt_sigma_value_err, zjpsi_gauss_prompt_sigma_value+zjpsi_gauss_prompt_sigma_value_err);
+  //RooGaussian zjpsi_prompt_gauss("zjpsi_prompt_gauss", "Gaussian of the Prompt zjpsi_Peak", *onia_tau, zjpsi_gauss_prompt_mean, zjpsi_gauss_prompt_sigma);
+
+  //RooRealVar zjpsi_gauss_prompt_sigma_2("zjpsi_gauss_prompt_sigma_2", "Width of the Prompt zjpsi_Gaussian_2", zjpsi_gauss_prompt_sigma_2_value, zjpsi_gauss_prompt_sigma_2_value-zjpsi_gauss_prompt_sigma_2_value_err, zjpsi_gauss_prompt_sigma_2_value+zjpsi_gauss_prompt_sigma_2_value_err);
+  //RooGaussian zjpsi_prompt_gauss_2("zjpsi_prompt_gauss_2", "Gaussian_2 of the Prompt zjpsi_Peak", *onia_tau, zjpsi_gauss_prompt_mean, zjpsi_gauss_prompt_sigma_2);
+
+  //RooRealVar zjpsi_frac_prompt_sharp("zjpsi_frac_prompt_sharp", "zjpsi_frac_prompt_sharp" , zjpsi_frac_prompt_sharp_value, zjpsi_frac_prompt_sharp_value-zjpsi_frac_prompt_sharp_value_err, zjpsi_frac_prompt_sharp_value+zjpsi_frac_prompt_sharp_value_err);
+  //RooAddPdf onia_tau_gauss_sum_fitpdf("onia_tau_gauss_sum_fitpdf", "onia_tau_gauss_sum_fitpdf", RooArgList(zjpsi_prompt_gauss,zjpsi_prompt_gauss_2), RooArgList(zjpsi_frac_prompt_sharp));
+
+  //RooRealVar zjpsi_sigma("zjpsi_sigma", "zjpsi_sigma", zjpsi_sigma_value, zjpsi_sigma_value-zjpsi_sigma_value_err, zjpsi_sigma_value+zjpsi_sigma_value_err);
+  //RooRealVar zjpsi_alpha("zjpsi_alpha", "zjpsi_alpha", zjpsi_alpha_value, zjpsi_alpha_value-zjpsi_alpha_value_err, zjpsi_alpha_value+zjpsi_alpha_value_err);
+  //RooRealVar zjpsi_n("zjpsi_n", "zjpsi_n", zjpsi_n_value, zjpsi_n_value-zjpsi_n_value_err, zjpsi_n_value+zjpsi_n_value_err);
+  //RooRealVar zjpsi_dimuon_mean("zjpsi_dimuon_mean", "zjpsi_dimuon_mean", zjpsi_dimuon_mean_value, zjpsi_dimuon_mean_value-zjpsi_dimuon_mean_value_err, zjpsi_dimuon_mean_value+zjpsi_dimuon_mean_value_err);
+  //RooCBShape zjpsi_crystal_ball ("zjpsi_crystal_ball", "zjpsi_crystal_ball", *onia_mass, zjpsi_dimuon_mean, zjpsi_sigma, zjpsi_alpha, zjpsi_n );
+  //RooRealVar zjpsi_dimuon_sigma("zjpsi_dimuon_sigma", "zjpsi_dimuon_sigma", zjpsi_dimuon_sigma_value, zjpsi_dimuon_sigma_value-zjpsi_dimuon_sigma_value_err, zjpsi_dimuon_sigma_value+zjpsi_dimuon_sigma_value_err);
+  //RooGaussian zjpsi_dimuon_gauss ("zjpsi_dimuon_gauss", "zjpsi_dimuon_gauss", *onia_mass, zjpsi_dimuon_mean, zjpsi_dimuon_sigma);
+  //RooRealVar zjpsi_frac_cball("zjpsi_frac_cball", "zjpsi_frac_cball" , zjpsi_frac_cball_value, zjpsi_frac_cball_value-zjpsi_frac_cball_value_err, zjpsi_frac_cball_value+zjpsi_frac_cball_value_err);
+  //RooAddPdf zjpsi_mass_signal("zjpsi_mass_signal", "zjpsi_mass_signal", RooArgList(zjpsi_crystal_ball, zjpsi_dimuon_gauss), RooArgList(zjpsi_frac_cball));
+
+  //RooRealVar zjpsi_dimuon_slope("zjpsi_dimuon_slope", "zjpsi_dimuon_slope", zjpsi_dimuon_slope_value, zjpsi_dimuon_slope_value-zjpsi_dimuon_slope_value_err, zjpsi_dimuon_slope_value+zjpsi_dimuon_slope_value_err);
+  //RooExponential zjpsi_dimuon_bg_exponential("zjpsi_dimuon_bg_exponential", "zjpsi_dimuon_bg_exponential", *onia_mass, zjpsi_dimuon_slope);
+
+  //RooRealVar zjpsi_np_dimuon_slope("zjpsi_np_dimuon_slope", "zjpsi_np_dimuon_slope", zjpsi_np_dimuon_slope_value, zjpsi_np_dimuon_slope_value-zjpsi_np_dimuon_slope_value_err, zjpsi_np_dimuon_slope_value+zjpsi_np_dimuon_slope_value_err);
+  //RooExponential zjpsi_np_dimuon_bg_exponential("zjpsi_np_dimuon_bg_exponential", "zjpsi_np_dimuon_bg_exponential", *onia_mass, zjpsi_np_dimuon_slope);
+
+  //TODO testing effect of not letting parameters vary ambivalent, want to see if the nan errors disappear
   RooRealVar zjpsi_gaussmean("zjpsi_gaussmean", "Mean of the smearing zjpsi Gaussian", zjpsi_gaussmean_value);
   RooRealVar zjpsi_gausssigma("zjpsi_gausssigma", "Width of the smearing zjpsi Gaussian", zjpsi_gausssigma_value);
   RooGaussModel zjpsi_smear_gauss_model("zjpsi_smear_gauss", "Gaussian used to smear the zjpsi Exponential Decay", *onia_tau, zjpsi_gaussmean, zjpsi_gausssigma);
-  RooRealVar zjpsi_decay_time("zjpsi_decay_time", "zjpsi_Tau", zjpsi_decay_time_value, zjpsi_decay_time_value-zjpsi_decay_time_value_err, zjpsi_decay_time_value+zjpsi_decay_time_value_err);
+  RooRealVar zjpsi_decay_time("zjpsi_decay_time", "zjpsi_Tau", zjpsi_decay_time_value);
   RooDecay zjpsi_decay_exp("zjpsi_decay_exp", "zjpsi_Exponential Decay", *onia_tau,zjpsi_decay_time,zjpsi_smear_gauss_model,RooDecay::SingleSided);
 
-  RooRealVar zjpsi_gauss_prompt_mean("zjpsi_gauss_prompt_mean", "Mean of the Prompt zjpsi_Gaussian", zjpsi_gauss_prompt_mean_value, zjpsi_gauss_prompt_mean_value-zjpsi_gauss_prompt_mean_value_err, zjpsi_gauss_prompt_mean_value+zjpsi_gauss_prompt_mean_value_err);
-  RooRealVar zjpsi_gauss_prompt_sigma("zjpsi_gauss_prompt_sigma", "Width of the Prompt zjpsi_Gaussian", zjpsi_gauss_prompt_sigma_value, zjpsi_gauss_prompt_sigma_value-zjpsi_gauss_prompt_sigma_value_err, zjpsi_gauss_prompt_sigma_value+zjpsi_gauss_prompt_sigma_value_err);
+  RooRealVar zjpsi_gauss_prompt_mean("zjpsi_gauss_prompt_mean", "Mean of the Prompt zjpsi_Gaussian", zjpsi_gauss_prompt_mean_value);
+  RooRealVar zjpsi_gauss_prompt_sigma("zjpsi_gauss_prompt_sigma", "Width of the Prompt zjpsi_Gaussian", zjpsi_gauss_prompt_sigma_value);
   RooGaussian zjpsi_prompt_gauss("zjpsi_prompt_gauss", "Gaussian of the Prompt zjpsi_Peak", *onia_tau, zjpsi_gauss_prompt_mean, zjpsi_gauss_prompt_sigma);
 
-  RooRealVar zjpsi_gauss_prompt_sigma_2("zjpsi_gauss_prompt_sigma_2", "Width of the Prompt zjpsi_Gaussian_2", zjpsi_gauss_prompt_sigma_2_value, zjpsi_gauss_prompt_sigma_2_value-zjpsi_gauss_prompt_sigma_2_value_err, zjpsi_gauss_prompt_sigma_2_value+zjpsi_gauss_prompt_sigma_2_value_err);
+  RooRealVar zjpsi_gauss_prompt_sigma_2("zjpsi_gauss_prompt_sigma_2", "Width of the Prompt zjpsi_Gaussian_2", zjpsi_gauss_prompt_sigma_2_value);
   RooGaussian zjpsi_prompt_gauss_2("zjpsi_prompt_gauss_2", "Gaussian_2 of the Prompt zjpsi_Peak", *onia_tau, zjpsi_gauss_prompt_mean, zjpsi_gauss_prompt_sigma_2);
 
-  RooRealVar zjpsi_frac_prompt_sharp("zjpsi_frac_prompt_sharp", "zjpsi_frac_prompt_sharp" , zjpsi_frac_prompt_sharp_value, zjpsi_frac_prompt_sharp_value-zjpsi_frac_prompt_sharp_value_err, zjpsi_frac_prompt_sharp_value+zjpsi_frac_prompt_sharp_value_err);
+  RooRealVar zjpsi_frac_prompt_sharp("zjpsi_frac_prompt_sharp", "zjpsi_frac_prompt_sharp" , zjpsi_frac_prompt_sharp_value);
   RooAddPdf onia_tau_gauss_sum_fitpdf("onia_tau_gauss_sum_fitpdf", "onia_tau_gauss_sum_fitpdf", RooArgList(zjpsi_prompt_gauss,zjpsi_prompt_gauss_2), RooArgList(zjpsi_frac_prompt_sharp));
 
-  RooRealVar zjpsi_sigma("zjpsi_sigma", "zjpsi_sigma", zjpsi_sigma_value, zjpsi_sigma_value-zjpsi_sigma_value_err, zjpsi_sigma_value+zjpsi_sigma_value_err);
-  RooRealVar zjpsi_alpha("zjpsi_alpha", "zjpsi_alpha", zjpsi_alpha_value, zjpsi_alpha_value-zjpsi_alpha_value_err, zjpsi_alpha_value+zjpsi_alpha_value_err);
-  RooRealVar zjpsi_n("zjpsi_n", "zjpsi_n", zjpsi_n_value, zjpsi_n_value-zjpsi_n_value_err, zjpsi_n_value+zjpsi_n_value_err);
-  RooRealVar zjpsi_dimuon_mean("zjpsi_dimuon_mean", "zjpsi_dimuon_mean", zjpsi_dimuon_mean_value, zjpsi_dimuon_mean_value-zjpsi_dimuon_mean_value_err, zjpsi_dimuon_mean_value+zjpsi_dimuon_mean_value_err);
+  RooRealVar zjpsi_sigma("zjpsi_sigma", "zjpsi_sigma", zjpsi_sigma_value);
+  RooRealVar zjpsi_alpha("zjpsi_alpha", "zjpsi_alpha", zjpsi_alpha_value);
+  RooRealVar zjpsi_n("zjpsi_n", "zjpsi_n", zjpsi_n_value);
+  RooRealVar zjpsi_dimuon_mean("zjpsi_dimuon_mean", "zjpsi_dimuon_mean", zjpsi_dimuon_mean_value);
   RooCBShape zjpsi_crystal_ball ("zjpsi_crystal_ball", "zjpsi_crystal_ball", *onia_mass, zjpsi_dimuon_mean, zjpsi_sigma, zjpsi_alpha, zjpsi_n );
-  RooRealVar zjpsi_dimuon_sigma("zjpsi_dimuon_sigma", "zjpsi_dimuon_sigma", zjpsi_dimuon_sigma_value, zjpsi_dimuon_sigma_value-zjpsi_dimuon_sigma_value_err, zjpsi_dimuon_sigma_value+zjpsi_dimuon_sigma_value_err);
+  RooRealVar zjpsi_dimuon_sigma("zjpsi_dimuon_sigma", "zjpsi_dimuon_sigma", zjpsi_dimuon_sigma_value);
   RooGaussian zjpsi_dimuon_gauss ("zjpsi_dimuon_gauss", "zjpsi_dimuon_gauss", *onia_mass, zjpsi_dimuon_mean, zjpsi_dimuon_sigma);
-  RooRealVar zjpsi_frac_cball("zjpsi_frac_cball", "zjpsi_frac_cball" , zjpsi_frac_cball_value, zjpsi_frac_cball_value-zjpsi_frac_cball_value_err, zjpsi_frac_cball_value+zjpsi_frac_cball_value_err);
+  RooRealVar zjpsi_frac_cball("zjpsi_frac_cball", "zjpsi_frac_cball" , zjpsi_frac_cball_value);
   RooAddPdf zjpsi_mass_signal("zjpsi_mass_signal", "zjpsi_mass_signal", RooArgList(zjpsi_crystal_ball, zjpsi_dimuon_gauss), RooArgList(zjpsi_frac_cball));
 
-  RooRealVar zjpsi_dimuon_slope("zjpsi_dimuon_slope", "zjpsi_dimuon_slope", zjpsi_dimuon_slope_value, zjpsi_dimuon_slope_value-zjpsi_dimuon_slope_value_err, zjpsi_dimuon_slope_value+zjpsi_dimuon_slope_value_err);
+  RooRealVar zjpsi_dimuon_slope("zjpsi_dimuon_slope", "zjpsi_dimuon_slope", zjpsi_dimuon_slope_value);
   RooExponential zjpsi_dimuon_bg_exponential("zjpsi_dimuon_bg_exponential", "zjpsi_dimuon_bg_exponential", *onia_mass, zjpsi_dimuon_slope);
 
-  RooRealVar zjpsi_np_dimuon_slope("zjpsi_np_dimuon_slope", "zjpsi_np_dimuon_slope", zjpsi_np_dimuon_slope_value, zjpsi_np_dimuon_slope_value-zjpsi_np_dimuon_slope_value_err, zjpsi_np_dimuon_slope_value+zjpsi_np_dimuon_slope_value_err);
+  RooRealVar zjpsi_np_dimuon_slope("zjpsi_np_dimuon_slope", "zjpsi_np_dimuon_slope", zjpsi_np_dimuon_slope_value);
   RooExponential zjpsi_np_dimuon_bg_exponential("zjpsi_np_dimuon_bg_exponential", "zjpsi_np_dimuon_bg_exponential", *onia_mass, zjpsi_np_dimuon_slope);
 
 //  RooRealVar zjpsi_m_sig_tau_sig_frac("zjpsi_m_sig_tau_sig_frac", "zjpsi_m_sig_tau_sig_frac", 0.2, 0.0, 1.0);
@@ -274,10 +459,10 @@ void sPlotfit() {
   RooProdPdf zjpsi_m_bg_tau_sig ("zjpsi_m_bg_tau_sig",  "zjpsi_m_bg_tau_sig",  RooArgList(zjpsi_dimuon_bg_exponential, onia_tau_gauss_sum_fitpdf ));
 
   // yields
-  RooRealVar Nzjpsi_m_sig_tau_sig("Nzjpsi_m_sig_tau_sig", "Nzjpsi_m_sig_tau_sig",10, 0, 200);
-  RooRealVar Nzjpsi_m_sig_tau_bg ("Nzjpsi_m_sig_tau_bg",  "Nzjpsi_m_sig_tau_bg", 10, 0, 200);
-  RooRealVar Nzjpsi_m_bg_tau_bg  ("Nzjpsi_m_bg_tau_bg",   "Nzjpsi_m_bg_tau_bg",  10, 0, 200);
-  RooRealVar Nzjpsi_m_bg_tau_sig ("Nzjpsi_m_bg_tau_sig",  "Nzjpsi_m_bg_tau_sig", 10, 0, 200);
+  RooRealVar Nzjpsi_m_sig_tau_sig("Nzjpsi_m_sig_tau_sig", "Nzjpsi_m_sig_tau_sig", 10, 0, 200);
+  RooRealVar Nzjpsi_m_sig_tau_bg ("Nzjpsi_m_sig_tau_bg",  "Nzjpsi_m_sig_tau_bg",  10, 0, 200);
+  RooRealVar Nzjpsi_m_bg_tau_bg  ("Nzjpsi_m_bg_tau_bg",   "Nzjpsi_m_bg_tau_bg",   10, 0, 200);
+  RooRealVar Nzjpsi_m_bg_tau_sig ("Nzjpsi_m_bg_tau_sig",  "Nzjpsi_m_bg_tau_sig",  10, 0, 200);
 
   // extended PDFs
   RooExtendPdf ezjpsi_m_sig_tau_sig("ezjpsi_m_sig_tau_sig", "ezjpsi_m_sig_tau_sig", zjpsi_m_sig_tau_sig, Nzjpsi_m_sig_tau_sig); 
@@ -287,7 +472,8 @@ void sPlotfit() {
 
   RooAddPdf zjpsi_model("zjpsi_model", "zjpsi_model", RooArgList(ezjpsi_m_sig_tau_sig, ezjpsi_m_sig_tau_bg, ezjpsi_m_bg_tau_sig, ezjpsi_m_bg_tau_bg));
 
-  RooFitResult *fr = zjpsi_model.fitTo(*zjpsi_data, NumCPU(4, kTRUE), Save());
+  RooFitResult *fr = zjpsi_model.fitTo(*zjpsi_data, NumCPU(4, kTRUE), Verbose(false), PrintLevel(-1), Save());
+  fr->Print();
 
   if (do_pull_calculation) {
     int num_toys = 1000;
@@ -337,12 +523,12 @@ void sPlotfit() {
   zjpsi_data->plotOn(dummy_frame_zjpsi); 
   zjpsi_model.plotOn(dummy_frame_zjpsi);
 
-  RooHist* h_residuals_mass_jpsi = dummy_frame_zjpsi->pullHist();
-  RooPlot* frame_residuals_mass_jpsi = onia_mass->frame(Title("Residual Distribution #mu^{+}#mu^{-} mass"));
-  frame_residuals_mass_jpsi->GetYaxis()->SetTitle("(fit - data)/#sigma");
-  frame_residuals_mass_jpsi->GetYaxis()->SetTitleSize(.16);
-  frame_residuals_mass_jpsi->GetYaxis()->SetTitleOffset(.2);
-  frame_residuals_mass_jpsi->addPlotable(h_residuals_mass_jpsi, "P");
+  RooHist* h_residuals_mass_zjpsi = dummy_frame_zjpsi->pullHist();
+  RooPlot* frame_residuals_mass_zjpsi = onia_mass->frame(Title("Residual Distribution #mu^{+}#mu^{-} mass"));
+  frame_residuals_mass_zjpsi->GetYaxis()->SetTitle("(fit - data)/#sigma");
+  frame_residuals_mass_zjpsi->GetYaxis()->SetTitleSize(.16);
+  frame_residuals_mass_zjpsi->GetYaxis()->SetTitleOffset(.2);
+  frame_residuals_mass_zjpsi->addPlotable(h_residuals_mass_zjpsi, "P");
 
   // Creates and fills canvas with plot and info 
   TCanvas *canvas1 = new TCanvas("ZJPsi_MassFit_", "ZJPsi_MassFit_", 900, 900);
@@ -355,14 +541,17 @@ void sPlotfit() {
     pad1_jpsi->SetFillColor(0); 
     pad2_jpsi->SetFillColor(0);
     pad2_jpsi->cd();
-    frame_residuals_mass_jpsi->Draw(); 
+    frame_residuals_mass_zjpsi->Draw(); 
     f_straighline->Draw("same");
     pad1_jpsi->cd();
+    mass_frame->Draw();
   }
-  mass_frame->Draw();
+  if (!draw_residuals) {
+    canvas1->Close();
+  }
 
-  splot_tex_pt.DrawLatex(2.87, 30, "#bf{#it{CMS}} Preliminary");
-  splot_tex_pt.DrawLatex(2.87, 25, "#sqrt{#it{s}}=8 TeV, 19.7 fb^{-1}");
+  //splot_tex_pt.DrawLatex(2.87, 30, "#bf{#it{CMS}} Preliminary");
+  //splot_tex_pt.DrawLatex(2.87, 25, "#sqrt{#it{s}}=8 TeV, 19.7 fb^{-1}");
  
   //mass_frame->SetTitle("J/#psi Mass [GeV]");
 
@@ -376,7 +565,7 @@ void sPlotfit() {
   leg2->AddEntry(mass_frame->findObject("non-prompt continuum"),"non-prompt continuum","l");
   leg2->SetShadowColor(0);
   leg2->Draw();
-  mass_frame->SetTitle("Z + J/#psi");
+  mass_frame->SetTitle("Z + J/#psi Mass");
 
   //----------- Tau Fit ---------------
   //Plots data on to frame
@@ -392,16 +581,16 @@ void sPlotfit() {
 
   time_frame->GetXaxis()->SetTitleOffset(.9);
 
-  RooPlot* dummy_tframe_jpsi = onia_tau->frame(Title("dummy frame to extract residuals"), Bins(num_time_bins));
-  zjpsi_data->plotOn(dummy_tframe_jpsi); 
-  zjpsi_model.plotOn(dummy_tframe_jpsi);
+  RooPlot* dummy_tframe_zjpsi = onia_tau->frame(Title("dummy frame to extract residuals"), Bins(num_time_bins));
+  zjpsi_data->plotOn(dummy_tframe_zjpsi); 
+  zjpsi_model.plotOn(dummy_tframe_zjpsi);
 
-  RooHist* h_residuals_time_jpsi = dummy_tframe_jpsi->pullHist();
-  RooPlot* frame_residuals_time_jpsi = onia_tau->frame(Title("Residual Distribution #mu^{+}#mu^{-} time"));
-  frame_residuals_time_jpsi->GetYaxis()->SetTitle("(fit - data)/#sigma");
-  frame_residuals_time_jpsi->GetYaxis()->SetTitleSize(.16);
-  frame_residuals_time_jpsi->GetYaxis()->SetTitleOffset(.2);
-  frame_residuals_time_jpsi->addPlotable(h_residuals_time_jpsi, "P");
+  RooHist* h_residuals_time_zjpsi = dummy_tframe_zjpsi->pullHist();
+  RooPlot* frame_residuals_time_zjpsi = onia_tau->frame(Title("Residual Distribution #mu^{+}#mu^{-} time"));
+  frame_residuals_time_zjpsi->GetYaxis()->SetTitle("(fit - data)/#sigma");
+  frame_residuals_time_zjpsi->GetYaxis()->SetTitleSize(.16);
+  frame_residuals_time_zjpsi->GetYaxis()->SetTitleOffset(.2);
+  frame_residuals_time_zjpsi->addPlotable(h_residuals_time_zjpsi, "P");
 
   // Creates and fills canvas with plot and info 
   TCanvas *canvas2 = new TCanvas("ZJpsi_TimeFit_", "ZJpsi_TimeFit_", 900, 900);
@@ -414,16 +603,17 @@ void sPlotfit() {
     tpad1_jpsi->SetFillColor(0);
     tpad2_jpsi->SetFillColor(0);
     tpad2_jpsi->cd();
-    frame_residuals_time_jpsi->Draw();
+    frame_residuals_time_zjpsi->Draw();
     f_straighline->Draw("same");
     tpad1_jpsi->cd();
+    time_frame->SetTitle("Z + J/#psi");
+    time_frame->Draw();
   }
-  time_frame->Draw();
 
-  splot_tex_pt.DrawLatex(2, 115, "#bf{#it{CMS}} Preliminary");
-  splot_tex_pt.DrawLatex(2, 80, "#sqrt{#it{s}}=8 TeV, 19.7 fb^{-1}");
+  //splot_tex_pt.DrawLatex(2, 115, "#bf{#it{CMS}} Preliminary");
+  //splot_tex_pt.DrawLatex(2, 80, "#sqrt{#it{s}}=8 TeV, 19.7 fb^{-1}");
  
-  Double_t xl1=.65, yl1=0.55, xl2=xl1+.2, yl2=yl1+.225;
+  Double_t xl1=.60, yl1=0.70, xl2=xl1+.25, yl2=yl1+.225;
   TLegend *leg = new TLegend(xl1,yl1,xl2,yl2);
   leg->SetFillColor(kWhite);
   leg->AddEntry(time_frame->findObject("total"),"total","l");
@@ -434,8 +624,21 @@ void sPlotfit() {
   leg->SetShadowColor(0);
   leg->Draw();
   //time_frame->SetTitle("J/#psi Mass [GeV]");
-  time_frame->SetTitle("Z + J/#psi");
+  time_frame->SetTitle("Z + J/#psi Lifetime");
   canvas2->SetLogy(1);
+  if (!draw_residuals) {
+    canvas2->Close();
+  }
+
+  TCanvas *c_dummy_zjpsi = new TCanvas("c_dummy_zjpsi", "c_dummy_zjpsi", 1200, 600); c_dummy_zjpsi->Divide(2,1);
+  c_dummy_zjpsi->cd(1); 
+  //c_dummy_zjpsi->cd(1)->SetLogy(1); 
+  mass_frame->Draw();
+  leg2->Draw();
+  c_dummy_zjpsi->cd(2); 
+  time_frame->Draw(); 
+  leg->Draw();
+  c_dummy_zjpsi->cd(2)->SetLogy(1);
 
 //// *******************************************************
 //// *******************************************************
@@ -531,8 +734,10 @@ void sPlotfit() {
       //RooRealVar* effrow1 = (RooRealVar*) obs_zjpsi->find("reco_muon0_weight");
       //RooRealVar* effrow2 = (RooRealVar*) obs_zjpsi->find("reco_muon1_weight");
       //RooRealVar* accrow = (RooRealVar*) obs_zjpsi->find("unpolarised");
-      effrow1 = (RooRealVar*) obs_zjpsi->find("reco_muon0_weight");
-      effrow2 = (RooRealVar*) obs_zjpsi->find("reco_muon1_weight");
+      
+      
+      //effrow1 = (RooRealVar*) obs_zjpsi->find("reco_muon0_weight");
+      //effrow2 = (RooRealVar*) obs_zjpsi->find("reco_muon1_weight");
       accrow = (RooRealVar*) obs_zjpsi->find("unpolarised");
     }
     else {
@@ -616,20 +821,31 @@ void sPlotfit() {
   h_zjpsi_prompt_cs->SetXTitle("#it{p}_{T}^{J/#psi} [GeV]");
   h_zjpsi_prompt_cs->SetYTitle("#it{B}(J/#psi#rightarrow#mu#mu) #times #frac{1}{#sigma(Z)} #frac{d#sigma(Z+J/#psi)}{d#it{p}_{T}} [1/GeV]");
   h_zjpsi_prompt->SetLineWidth(2);
+  h_zjpsi_prompt->SetLineColor(kBlue -2);
   for (int i=1; i<7; i++) {
     h_zjpsi_prompt_cs->SetBinContent(i, h_zjpsi_prompt->GetBinContent(i)/h_zjpsi_prompt->GetBinWidth(i)/(inclusive_z_to_leptons_events));
     h_zjpsi_prompt_cs->SetBinError(i, h_zjpsi_prompt->GetBinError(i)/h_zjpsi_prompt->GetBinWidth(i)/(inclusive_z_to_leptons_events));
   }
   h_zjpsi_prompt_cs->Draw("E1");
+
+  h_zjpsi_atlas_prompt->SetLineColor(kRed - 2);
   h_zjpsi_atlas_prompt->Draw("E1same");
+
+  Double_t xl1_l5=.60, yl1_l5=0.70, xl2_l5=xl1_l5+.3, yl2_l5=yl1_l5+.2;
+  TLegend *leg5 = new TLegend(xl1_l5,yl1_l5,xl2_l5,yl2_l5);
+  leg5->SetFillColor(kWhite);
+  leg5->AddEntry(h_zjpsi_prompt_cs,"CMS prompt","l");
+  leg5->AddEntry(h_zjpsi_atlas_prompt,"ATLAS prompt","l");
+  leg5->SetShadowColor(0);
+  leg5->Draw();
 
   if (create_cs_plots) {
     h_zjpsi_prompt_cs->GetYaxis()->SetRangeUser(1E-11, 1E-5);
   }
   //TODO should it be 120?
   h_zjpsi_prompt_cs->GetXaxis()->SetRangeUser(8.5, 120);
-  splot_tex_pt.DrawLatex(15, 3E-6, "#bf{#it{CMS}} Preliminary, #sqrt{#it{s}}=8 TeV, 19.7 fb^{-1}");
-  splot_tex_pt.DrawLatex(15, 1E-6 , "#it{pp} #rightarrow prompt #it{J/#psi+Z} : #it{pp} #rightarrow #it{Z}");
+  //splot_tex_pt.DrawLatex(15, 3E-6, "#bf{#it{CMS}} Preliminary, #sqrt{#it{s}}=8 TeV, 19.7 fb^{-1}");
+  //splot_tex_pt.DrawLatex(15, 1E-6 , "#it{pp} #rightarrow prompt #it{J/#psi+Z} : #it{pp} #rightarrow #it{Z}");
 
   c_jpsi_diff_xsec->cd(1)->SetLogy(1);
   c_jpsi_diff_xsec->cd(1)->SetLogx(1);
@@ -649,19 +865,31 @@ void sPlotfit() {
   h_zjpsi_nonprompt_cs->SetXTitle("#it{p}_{T}^{J/#psi} [GeV]");
   h_zjpsi_nonprompt_cs->SetYTitle("#it{B}(J/#psi#rightarrow#mu#mu) #times #frac{1}{#sigma(Z)} #frac{d#sigma(Z+J/#psi)}{d#it{p}_{T}} [1/GeV]");
   h_zjpsi_nonprompt->SetLineWidth(2);
+  h_zjpsi_nonprompt->SetLineColor(kBlue -2);
   for (int i=2; i<7; i++) {
     h_zjpsi_nonprompt_cs->SetBinContent(i, h_zjpsi_nonprompt->GetBinContent(i)/h_zjpsi_nonprompt->GetBinWidth(i)/(inclusive_z_to_leptons_events));
     h_zjpsi_nonprompt_cs->SetBinError(i, h_zjpsi_nonprompt->GetBinError(i)/h_zjpsi_nonprompt->GetBinWidth(i)/(inclusive_z_to_leptons_events));
   }
   h_zjpsi_nonprompt_cs->Draw("E1");
+
+  h_zjpsi_atlas_nonprompt->SetLineColor(kRed - 2);
   h_zjpsi_atlas_nonprompt->Draw("E1same");
+
+  Double_t xl1_l6=.60, yl1_l6=0.70, xl2_l6=xl1_l6+.3, yl2_l6=yl1_l6+.2;
+  TLegend *leg6 = new TLegend(xl1_l6,yl1_l6,xl2_l6,yl2_l6);
+  leg6->SetFillColor(kWhite);
+  leg6->AddEntry(h_zjpsi_nonprompt_cs,"CMS nonprompt","l");
+  leg6->AddEntry(h_zjpsi_atlas_nonprompt,"ATLAS nonprompt","l");
+  leg6->SetShadowColor(0);
+  leg6->Draw();
+
   if (create_cs_plots) {
     h_zjpsi_nonprompt_cs->GetYaxis()->SetRangeUser(1E-11, 1E-5);
   }
   //TODO should it be 120?
   h_zjpsi_nonprompt_cs->GetXaxis()->SetRangeUser(8.5, 120);
-  splot_tex_pt.DrawLatex(15, 3E-6, "#bf{#it{CMS}} Preliminary, #sqrt{#it{s}}=8 TeV, 19.7 fb^{-1}");
-  splot_tex_pt.DrawLatex(15, 1E-6 , "#it{pp} #rightarrow non-prompt #it{J/#psi+Z} : #it{pp} #rightarrow #it{Z}");
+  //splot_tex_pt.DrawLatex(15, 3E-6, "#bf{#it{CMS}} Preliminary, #sqrt{#it{s}}=8 TeV, 19.7 fb^{-1}");
+  //splot_tex_pt.DrawLatex(15, 1E-6 , "#it{pp} #rightarrow non-prompt #it{J/#psi+Z} : #it{pp} #rightarrow #it{Z}");
   c_jpsi_diff_xsec->cd(2)->SetLogy(1);
   c_jpsi_diff_xsec->cd(2)->SetLogx(1);
 
@@ -680,19 +908,28 @@ void sPlotfit() {
     fiducial_cross_section_prompt_err      += TMath::Power(h_zjpsi_prompt_fid->GetBinError(i),2);
     fiducial_cross_section_nonprompt      += h_zjpsi_nonprompt_fid->GetBinContent(i);
     fiducial_cross_section_nonprompt_err  += TMath::Power(h_zjpsi_nonprompt_fid->GetBinError(i),2);
+    cout << "bin " << i << " prompt weighted events " << inclusive_cross_section_prompt << " +/- " << TMath::Sqrt(inclusive_cross_section_prompt_err) << endl;
+    cout << "bin " << i << " nonprompt weighted events " << inclusive_cross_section_nonprompt << " +/- " << TMath::Sqrt(inclusive_cross_section_nonprompt_err) << endl;
   }
+  cout << "i = 2 => 8.5-10" << endl;
+  cout << "i = 3 => 10-14" << endl;
+  cout << "i = 4 => 14-18" << endl;
+  cout << "i = 5 => 18-30" << endl;
+  cout << "i = 6 => 30-100" << endl;
 
   inclusive_cross_section_prompt = inclusive_cross_section_prompt/(inclusive_z_to_leptons_events);
   inclusive_cross_section_nonprompt = inclusive_cross_section_nonprompt/(inclusive_z_to_leptons_events);
-  //TODO why take the sqrt of the error here??
+  //TODO why square then take the sqrt of the error here?? At the least varialbe name should be renamed
   inclusive_cross_section_prompt_err = TMath::Sqrt(inclusive_cross_section_prompt_err)/(inclusive_z_to_leptons_events);
   inclusive_cross_section_nonprompt_err = TMath::Sqrt(inclusive_cross_section_nonprompt_err)/(inclusive_z_to_leptons_events);
 
   fiducial_cross_section_prompt         = fiducial_cross_section_prompt/(inclusive_z_to_leptons_events);
   fiducial_cross_section_nonprompt     = fiducial_cross_section_nonprompt/(inclusive_z_to_leptons_events);
-  //TODO why take the sqrt of the error here??
+  //TODO why square then take the sqrt of the error here?? At the least varialbe name should be renamed
   fiducial_cross_section_prompt_err     = TMath::Sqrt(fiducial_cross_section_prompt_err)/(inclusive_z_to_leptons_events);
   fiducial_cross_section_nonprompt_err = TMath::Sqrt(fiducial_cross_section_nonprompt_err)/(inclusive_z_to_leptons_events);
+
+  
 
   TH1F *h_total_cross_section_prompt     = new TH1F("h_total_cross_section_prompt", "h_total_cross_section_prompt", 3, 0, 3.);
   h_total_cross_section_prompt->GetYaxis()->SetRangeUser(0, 20E-6);
