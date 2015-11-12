@@ -22,10 +22,19 @@
 #include "TROOT.h"
 #include "TProfile.h"
 //#include "/Applications/root/macros/AtlasStyle.C"
-#include "zfinder_tree.C"
+
+
+//#include "ZFinder_Electrons_Tree.C"
+//ZFinder_Electrons_Tree *jpsi;
+
+//#include "ZFinder_Muons_Tree.C"
+//ZFinder_Muons_Tree *jpsi;
+
+#include "ZFinder_Jpsi_Tree.C"
+ZFinder_Jpsi_Tree *jpsi;
 
 //bool use_z_to_muons = true;
-bool use_z_to_muons = true;
+bool use_z_to_muons = false;
 bool use_z_to_electrons = false;
 
 using namespace std;
@@ -33,7 +42,11 @@ using namespace std;
 //TFile *root_file;
 
 //zfinder_tree *jpsi;
-zfinder_tree *jpsi;
+//for now just accept have ot edit this each time, TODO find better way to do this maybe have to use define, but much clearer code if not necessary
+//also I should use proper class name conventions (no underscores)
+//zfinder_tree *jpsi;
+//ZFinder_Muons_Tree *jpsi;
+
 
 //TODO make the file an input option, much easier to use
 //void run(const char *  file) {
@@ -41,17 +54,18 @@ void Run() {
   //SetAtlasStyle();
 
   if(use_z_to_muons) {
-    TFile *root_file = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/ntuples_looser/jpsiTest440_doublemuon_trigger_matching.root","READ");
-    //zfinder_tree_muons *jpsi = new zfinder_tree_muons((TTree*)root_file->Get("zfinder_tree"));
-    jpsi = new zfinder_tree((TTree*)root_file->Get("zfinder_tree"));
+    //TFile *root_file = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/ntuples_looser/jpsiTest440_doublemuon_trigger_matching.root","READ");
+    //jpsi = new ZFinder_Muons_Tree((TTree*)root_file->Get("zfinder_tree"));
+    
+    //jpsi = new zfinder_tree((TTree*)root_file->Get("zfinder_tree"));
   }
   else if(use_z_to_electrons) {
     //TFile *root_file = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/ntuples_looser/jpsiTest441_doubleelectron_trigger_matching.root","READ");
-    //zfinder_tree_electrons *jpsi = new zfinder_tree_electrons((TTree*)root_file->Get("zfinder_tree"));
+    //ZFinder_Electrons_Tree *jpsi = new ZFinder_Electrons_Tree((TTree*)root_file->Get("zfinder_tree"));
   }
   else {
-    //TFile *root_file = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/ntuples_looser/jpsiTest451_MuOniaPartial2012B_dimuon8_eta24_ptsub25.root","READ");
-    //zfinder_tree_jpsi *jpsi = new zfinder_tree_jpsi((TTree*)root_file->Get("zfinder_tree"));
+    TFile *root_file = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/ntuples_looser/jpsiTest451_MuOniaPartial2012B_dimuon8_eta24_ptsub25.root","READ");
+    ZFinder_Jpsi_Tree *jpsi = new ZFinder_Jpsi_Tree((TTree*)root_file->Get("zfinder_tree"));
   }
 
   double onia_mass, z_mass, onia_tau, onia_pt, onia_rap;
@@ -91,15 +105,19 @@ void Run() {
   //  TGraphAsymmErrors* = (TGraphAsymmErrors*)recofile.Get("DATA_Tight_pt_abseta0.9-1.2");
   //  TGraphAsymmErrors* = (TGraphAsymmErrors*)recofile.Get("DATA_Tight_pt_abseta1.2-2.1");
 
+  //TFile *ntuple;
   if(use_z_to_muons) {
     TFile *ntuple = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/ntuples_looser/ZJpsimumu.root", "RECREATE");
+    ntuple = new TFile("ZJpsimumu.root", "RECREATE");
   }
   else if (use_z_to_electrons) {
     TFile *ntuple = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/ntuples_looser/ZJpsiee.root", "RECREATE");
+    ntuple = new TFile("ZJpsiee.root", "RECREATE");
   }
   else {
     //std::cout << "must use z to muons or electrons" << std::endl;
     TFile *ntuple = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/ntuples_looser/Inclusive_Jpsi.root", "RECREATE");
+    ntuple = new TFile("Inclusive_Jpsi.root", "RECREATE");
   }
   TTree *aux;
   aux = new TTree("AUX", "AUX");
@@ -124,9 +142,14 @@ void Run() {
 
   // find the events with candidates
   for(int iEntry=0; iEntry<(jpsi_entries); iEntry++) {
-    if(iEntry%1000==0)
+    if(iEntry%1000==0) {
       cout << "\r" << (double)iEntry/(double)jpsi_entries*100 << "\% processed" << flush;
-
+    }
+    //limit entries in case of inclusive J/Psi
+    if(iEntry > 20000 && !use_z_to_muons && !use_z_to_electrons) {
+      break;
+    }
+        
     (jpsi->fChain)->GetEntry(iEntry);
 
     onia_mass = jpsi->reco_jpsi_jpsi_m;
@@ -142,94 +165,114 @@ void Run() {
       z_mass = jpsi->reco_z_from_muons_z_m;
       is_z_to_electrons = 0;
       is_z_to_muons= 1;
-      if (jpsi->event_info_found_high_pt_muons_from_z==0)
+      if (jpsi->event_info_found_high_pt_muons_from_z==0) {
         continue;
-      if (jpsi->event_info_found_good_muons_from_z==0)
-        continue;
-      //cout << "here3" << endl;
-      if(iEntry%1000==0) {
-        cout << "here3" << endl;
       }
-      if (jpsi->event_info_found_dimuon_z_compatible_vertex==0)
+      if (jpsi->event_info_found_good_muons_from_z==0) {
         continue;
-      cout << "here4" << endl;
-      if (jpsi->event_info_found_z_to_muons_mass==0)
+      }
+      if (jpsi->event_info_found_dimuon_z_compatible_vertex==0) {
         continue;
-      cout << "here5" << endl;
+      }
+      if (jpsi->event_info_found_z_to_muons_mass==0) {
+        continue;
+      }
     }
     else if (use_z_to_electrons) {
       z_mass = jpsi->reco_z_z_m;
-      cout << "jpsi->event_info " << jpsi->event_info_found_high_pt_muons_from_z << endl;
       is_z_to_electrons = 1;
       is_z_to_muons = 0;
-      if (jpsi->event_info_found_high_pt_electrons_from_z==0)
+      if (jpsi->event_info_found_high_pt_electrons_from_z==0) {
         continue;
-      cout << "here2ee" << endl;
-      if (jpsi->event_info_found_good_electrons_from_z==0)
+      }
+      if (jpsi->event_info_found_good_electrons_from_z==0) {
         continue;
-      if (jpsi->event_info_found_dielectron_z_compatible_vertex==0)
+      }
+      if (jpsi->event_info_found_dielectron_z_compatible_vertex==0) {
         continue;
-      cout << "here4ee" << endl;
-      if (jpsi->event_info_found_z_to_electrons_mass==0)
+      }
+      if (jpsi->event_info_found_z_to_electrons_mass==0) {
         continue;
-      cout << "here5ee" << endl;
+      }
     }
-    if (jpsi->event_info_found_dimuon_jpsi_with_muons_in_eta_window==0)
+    else {
+      z_mass = jpsi->reco_z_from_muons_z_m;
+      is_z_to_electrons = 0;
+      is_z_to_muons = 0;
+    }
+    
+    //now check to see if the event has a dimuon candidate
+    if (jpsi->event_info_found_dimuon_jpsi_with_muons_in_eta_window==0) {
       continue;
-    if (jpsi->event_info_found_dimuon_jpsi_with_high_pt_muons==0)
+    }
+    if (jpsi->event_info_found_dimuon_jpsi_with_high_pt_muons==0) {
       continue;
-    if (jpsi->event_info_found_dimuon_jpsi_with_soft_id_and_high_pt_muons==0)
+    }
+    if (jpsi->event_info_found_dimuon_jpsi_with_soft_id_and_high_pt_muons==0) {
       continue;
-    if (jpsi->event_info_found_dimuon_jpsi_with_good_muons_and_compatible_muon_vertex==0)
+    }
+    if (jpsi->event_info_found_dimuon_jpsi_with_good_muons_and_compatible_muon_vertex==0) {
       continue;
-    if (jpsi->event_info_found_good_dimuon_jpsi_compatible_with_primary_vertex==0)
+    }
+    if (jpsi->event_info_found_good_dimuon_jpsi_compatible_with_primary_vertex==0) {
       continue;
-    if (jpsi->event_info_found_jpsi==0)
+    }
+    if (jpsi->event_info_found_jpsi==0) {
       continue;
+    }
 
     // find acceptance weights
     int binx, biny;
     binx = h_weights_acc1->GetXaxis()->FindBin(onia_rap);
     biny = h_weights_acc1->GetYaxis()->FindBin(onia_pt);
     double weight = 1./h_weights_acc1->GetBinContent(binx, biny);
-    if (weight>-100 && weight<100.)
+    if (weight>-100 && weight<100.) {
       unpolarised = weight;
-    else
+    }
+    else {
       unpolarised = 1.;
+    }
 
     binx = h_weights_acc2->GetXaxis()->FindBin(onia_rap);
     biny = h_weights_acc2->GetYaxis()->FindBin(onia_pt);
     weight = 1./h_weights_acc2->GetBinContent(binx, biny);
-    if (weight>-100 && weight<100.)
+    if (weight>-100 && weight<100.) {
       longitudinal = weight;
-    else
+    }
+    else {
       longitudinal = 1.;
+    }
 
     binx = h_weights_acc3->GetXaxis()->FindBin(onia_rap);
     biny = h_weights_acc3->GetYaxis()->FindBin(onia_pt);
     weight = 1./h_weights_acc3->GetBinContent(binx, biny);
-    if (weight>-100 && weight<100.)
+    if (weight>-100 && weight<100.) {
       transverse = weight;
-    else
+    }
+    else {
       transverse = 1.;
+    }
 
 
     binx = h_weights_acc4->GetXaxis()->FindBin(onia_rap);
     biny = h_weights_acc4->GetYaxis()->FindBin(onia_pt);
     weight = 1./h_weights_acc4->GetBinContent(binx, biny);
-    if (weight>-100 && weight<100.)
+    if (weight>-100 && weight<100.) {
       transverse_pos = weight;
-    else
+    }
+    else {
       transverse_pos = 1.;
-
+    }
 
     binx = h_weights_acc5->GetXaxis()->FindBin(onia_rap);
     biny = h_weights_acc5->GetYaxis()->FindBin(onia_pt);
     weight = 1./h_weights_acc5->GetBinContent(binx, biny);
-    if (weight>-100 && weight<100.)
+    if (weight>-100 && weight<100.) {
       transverse_neg = weight;
-    else
+    }
+    else {
       transverse_neg = 1.;
+    }
 
     double xvalue, yvalue;
 
@@ -238,45 +281,56 @@ void Run() {
       if (TMath::Abs(onia_mu1_eta)<0.9)
         for (int i = 0; i<h_weights_eta1->GetN(); i++) {
           h_weights_eta1->GetPoint(i, xvalue, yvalue);
-          if (onia_mu0_pt > xvalue)
+          if (onia_mu0_pt > xvalue) {
             reco_muon0_weight = yvalue;
+          }
         }
-      if (TMath::Abs(onia_mu0_eta)>0.9 && TMath::Abs(onia_mu0_eta)<1.2)
+      if (TMath::Abs(onia_mu0_eta)>0.9 && TMath::Abs(onia_mu0_eta)<1.2) {
         for (int i = 0; i<h_weights_eta2->GetN(); i++) {
           h_weights_eta2->GetPoint(i, xvalue, yvalue);
-          if (onia_mu0_pt > xvalue)
+          if (onia_mu0_pt > xvalue) {
             reco_muon0_weight = yvalue;
+          }
         }
-      if (TMath::Abs(onia_mu0_eta)>1.2)
+      }
+      if (TMath::Abs(onia_mu0_eta)>1.2) {
         for (int i = 0; i<h_weights_eta3->GetN(); i++) {
           h_weights_eta3->GetPoint(i, xvalue, yvalue);
-          if (onia_mu0_pt > xvalue)
+          if (onia_mu0_pt > xvalue) {
             reco_muon0_weight = yvalue;
+          }
         }
+      }
     } 
-    else { 
+    else {
       reco_muon0_weight =1.;
     }
 
     if (TMath::Abs(onia_mu1_eta)<2.1 && onia_mu1_pt<20.) {
-      if (TMath::Abs(onia_mu1_eta)<0.9)
+      if (TMath::Abs(onia_mu1_eta)<0.9) {
         for (int i = 0; i<h_weights_eta1->GetN(); i++) {
           h_weights_eta1->GetPoint(i, xvalue, yvalue);
-          if (onia_mu1_pt > xvalue)
+          if (onia_mu1_pt > xvalue) {
             reco_muon1_weight = yvalue;
+          }
         }
-      if (TMath::Abs(onia_mu1_eta)>0.9 && TMath::Abs(onia_mu1_eta)<1.2)
+      }
+      if (TMath::Abs(onia_mu1_eta)>0.9 && TMath::Abs(onia_mu1_eta)<1.2) {
         for (int i = 0; i<h_weights_eta2->GetN(); i++) {
           h_weights_eta2->GetPoint(i, xvalue, yvalue);
-          if (onia_mu1_pt > xvalue)
+          if (onia_mu1_pt > xvalue) {
             reco_muon1_weight = yvalue;
+          }
         }
-      if (TMath::Abs(onia_mu1_eta)>1.2)
+      }
+      if (TMath::Abs(onia_mu1_eta)>1.2) {
         for (int i = 0; i<h_weights_eta3->GetN(); i++) {
           h_weights_eta3->GetPoint(i, xvalue, yvalue);
-          if (onia_mu1_pt>xvalue)
+          if (onia_mu1_pt>xvalue) {
             reco_muon1_weight = yvalue;
+          }
         }
+      }
     }
     else {
       reco_muon1_weight = 1.;

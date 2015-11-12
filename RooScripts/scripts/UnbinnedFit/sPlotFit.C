@@ -35,7 +35,7 @@ using namespace RooFit ;
 using namespace RooStats ;
 
 
-const float PDG_JPSI_MASS = 3.096916;
+//const float PDG_JPSI_MASS = 3.096916;
 
 //In general, better to make these command line options then defines
 //same goes for hardcoding file_names, should be a command line option
