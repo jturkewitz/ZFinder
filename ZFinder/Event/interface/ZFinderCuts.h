@@ -31,8 +31,8 @@ namespace zf {
   //TODO TESTING
   //2.1 is 'safer/better' because muon efficiency scale factor only measured up to 2.1,
   //I assume that extending past 2.1 to 2.4 I can use scale factors for 1.5 to 2.1
-  const double MAX_JPSI_MUON_ETA = 2.4; //limited by tag and probe method to measure scale factors
-  const double MAX_JPSI_RAP = 2.4; //
+  const double MAX_JPSI_MUON_ETA = 2.1; //limited by tag and probe method to measure scale factors
+  const double MAX_JPSI_RAP = 2.1; //
   const double MAX_DELTAR_TRUTH_MATCHED_JPSI_MUONS = 0.015;
   const double MIN_DELTAR_DISTINCT_Z_JPSI_MUONS = 0.015;
 }

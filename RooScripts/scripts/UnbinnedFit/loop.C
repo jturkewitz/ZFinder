@@ -24,17 +24,17 @@
 //#include "/Applications/root/macros/AtlasStyle.C"
 
 
-//#include "ZFinder_Electrons_Tree.C"
-//ZFinder_Electrons_Tree *jpsi;
+#include "ZFinder_Electrons_Tree.C"
+ZFinder_Electrons_Tree *jpsi;
 
 //#include "ZFinder_Muons_Tree.C"
 //ZFinder_Muons_Tree *jpsi;
 
-#include "ZFinder_Jpsi_Tree.C"
-ZFinder_Jpsi_Tree *jpsi;
+//#include "ZFinder_Jpsi_Tree.C"
+//ZFinder_Jpsi_Tree *jpsi;
 
 bool use_z_to_muons = false;
-bool use_z_to_electrons = false;
+bool use_z_to_electrons = true;
 
 using namespace std;
 
@@ -53,16 +53,20 @@ void Run() {
   //SetAtlasStyle();
 
   if(use_z_to_muons) {
-    TFile *root_file = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/ntuples_looser/jpsiTest440_doublemuon_trigger_matching.root","READ");
+    //TFile *root_file = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/ntuples_looser/jpsiTest440_doublemuon_trigger_matching.root","READ");
+    TFile *root_file = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/jpsiTest462_DoubleMuon_jpsi2_1_2012.root","READ");
     jpsi = new ZFinder_Muons_Tree((TTree*)root_file->Get("zfinder_tree"));
     
     //jpsi = new zfinder_tree((TTree*)root_file->Get("zfinder_tree"));
   }
   else if(use_z_to_electrons) {
-    TFile *root_file = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/ntuples_looser/jpsiTest441_doubleelectron_trigger_matching.root","READ");
+    //TFile *root_file = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/ntuples_looser/jpsiTest441_doubleelectron_trigger_matching.root","READ");
+    TFile *root_file = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/jpsiTest463_DoubleElectron_jpsi2_1_2012.root","READ");
     ZFinder_Electrons_Tree *jpsi = new ZFinder_Electrons_Tree((TTree*)root_file->Get("zfinder_tree"));
   }
   else {
+    //TFile *root_file = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/ntuples_looser/jpsiTest451_MuOniaPartial2012B_dimuon8_eta24_ptsub25.root","READ");
+    //TODO change this to use same rapidity of J/Psi as Z-> inclusive, time pressed so for now don't rerun this, shouldn't be a big deal as just gets fit parameters but still TODO)
     TFile *root_file = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/ntuples_looser/jpsiTest451_MuOniaPartial2012B_dimuon8_eta24_ptsub25.root","READ");
     ZFinder_Jpsi_Tree *jpsi = new ZFinder_Jpsi_Tree((TTree*)root_file->Get("zfinder_tree"));
   }
@@ -233,7 +237,7 @@ void Run() {
     binx_cms = h_acc_eff_cms->GetXaxis()->FindBin(onia_rap);
     biny_cms = h_acc_eff_cms->GetYaxis()->FindBin(onia_pt);
 
-    weight = 1./h_acc_eff_cms->GetBinContent(binx_cms, biny_cms);
+    float weight = 1./h_acc_eff_cms->GetBinContent(binx_cms, biny_cms);
     if (weight>-100 && weight<100.) {
       unpolarised = weight;
     }
@@ -256,8 +260,8 @@ void Run() {
     //  unpolarised = 1.;
     //}
 
-    binx = h_weights_acc2->GetXaxis()->FindBin(onia_rap);
-    biny = h_weights_acc2->GetYaxis()->FindBin(onia_pt);
+    int binx = h_weights_acc2->GetXaxis()->FindBin(onia_rap);
+    int biny = h_weights_acc2->GetYaxis()->FindBin(onia_pt);
     weight = 1./h_weights_acc2->GetBinContent(binx, biny);
     if (weight>-100 && weight<100.) {
       longitudinal = weight;

@@ -46,6 +46,7 @@ bool use_polarisation_weights = true;
 //bool use_polarisation_weights = false;
 bool create_cs_plots = true;
 bool do_pull_calculation = false;
+bool use_pileup_correction = true;
 
 
 void sPlotfit();
@@ -110,7 +111,14 @@ void sPlotfit() {
   //Data Set
   //TFile *zjpsi_ntuple = new TFile("../SkimNtuple/ZJpsi.root");
   //TFile *zjpsi_ntuple = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/SkimNtuple/ZJpsi.root");
+
+
   TFile *zjpsi_ntuple = new TFile("ZJpsi.root");
+  //TFile *zjpsi_ntuple = new TFile("ZJpsiee.root");
+  //TFile *zjpsi_ntuple = new TFile("ZJpsimumu.root");
+  
+  //TFile *zjpsi_ntuple = new TFile("ZJpsi_pileup.root");
+  
   TTree* zjpsi_tree = (TTree*) zjpsi_ntuple->Get("AUX");
   RooDataSet *zjpsi_data     = new RooDataSet("zjpsi_data", "zjpsi_data", zjpsi_tree, zjpsi_argset);
   RooDataSet *zjpsi_data_fid = new RooDataSet("zjpsi_data_fid", "zjpsi_data_fid", zjpsi_tree, zjpsi_argset);
@@ -792,8 +800,8 @@ void sPlotfit() {
     // %%%%%%%%%%%%%%%%%%%%%
     // Jared need input here
     // %%%%%%%%%%%%%%%%%%%%%
-    inclusive_z_to_muons_events     = 8.5E06;
-    inclusive_z_to_electrons_events = 5.0E06;
+    inclusive_z_to_muons_events     = 7.773024E06;
+    inclusive_z_to_electrons_events = 5.086549E06;
   }
   else {
     inclusive_z_to_muons_events     = 0.5;
@@ -801,7 +809,25 @@ void sPlotfit() {
   }
   inclusive_z_to_leptons_events = inclusive_z_to_muons_events + inclusive_z_to_electrons_events;
 
-  TCanvas* c_jpsi_diff_xsec = new TCanvas("c_jpsi_diff_xsec","J/#psi p_{T} sPlot weighted", 1200, 600); c_jpsi_diff_xsec->Divide(2,1);
+  //pileup events to subtract
+  //also error seems too high
+  //bin 2 prompt weighted 3.56813 +/- 10.9859
+  //bin 2 nonprompt weighted 2.59413 +/- 12.0886
+  //bin 3 prompt weighted 4.67389 +/- 12.3652
+  //bin 3 nonprompt weighted 5.3454 +/- 14.2397
+  //bin 4 prompt weighted 0.794457 +/- 3.6566
+  //bin 4 nonprompt weighted 0.30785 +/- 3.10573
+  //bin 5 prompt weighted -0.0260695 +/- 1.92352
+  //bin 5 nonprompt weighted 1.51939 +/- 4.76576
+  //bin 6 prompt weighted -0.144395 +/- 0.564351
+  //bin 6 nonprompt weighted 0.871015 +/- 3.40017
+  //Negative events make sense? for now just set to 0
+
+  //TODO this should be automated if possible
+  float pileup_inclusive_prompt[5] = {3.56813, 4.67389, 0.794457, 0.0, 0.0};
+  float pileup_inclusive_nonprompt[5] = {2.59413,5.3454,0.30785,1.51939,0.871015};
+
+  TCanvas* c_jpsi_diff_xsec = new TCanvas("c_jpsi_diff_xsec","J/#psi p_{T} sPlot weighted", 1400, 700); c_jpsi_diff_xsec->Divide(2,1);
   // plot the prompt part
   c_jpsi_diff_xsec->cd(1);
   onia_pt->setBinning(bins);
@@ -820,11 +846,19 @@ void sPlotfit() {
   TH1* h_zjpsi_prompt_cs = zjpsi_prompt_hist.createHistogram("h_zjpsi_prompt_cs", *onia_pt);
   h_zjpsi_prompt_cs->SetXTitle("#it{p}_{T}^{J/#psi} [GeV]");
   h_zjpsi_prompt_cs->SetYTitle("#it{B}(J/#psi#rightarrow#mu#mu) #times #frac{1}{#sigma(Z)} #frac{d#sigma(Z+J/#psi)}{d#it{p}_{T}} [1/GeV]");
+  h_zjpsi_prompt_cs->SetLabelSize(0.03);
+  h_zjpsi_prompt_cs->SetTitleSize(0.04);
   h_zjpsi_prompt->SetLineWidth(2);
   h_zjpsi_prompt->SetLineColor(kBlue -2);
-  for (int i=1; i<7; i++) {
-    h_zjpsi_prompt_cs->SetBinContent(i, h_zjpsi_prompt->GetBinContent(i)/h_zjpsi_prompt->GetBinWidth(i)/(inclusive_z_to_leptons_events));
-    h_zjpsi_prompt_cs->SetBinError(i, h_zjpsi_prompt->GetBinError(i)/h_zjpsi_prompt->GetBinWidth(i)/(inclusive_z_to_leptons_events));
+  for (int i=2; i<7; i++) {
+    if (use_pileup_correction) {
+      h_zjpsi_prompt_cs->SetBinContent(i, (h_zjpsi_prompt->GetBinContent(i) - pileup_inclusive_prompt[i])/h_zjpsi_prompt->GetBinWidth(i)/(inclusive_z_to_leptons_events));
+      h_zjpsi_prompt_cs->SetBinError(i, (h_zjpsi_prompt->GetBinError(i) - pileup_inclusive_prompt[i])/h_zjpsi_prompt->GetBinWidth(i)/(inclusive_z_to_leptons_events));
+    }
+    else {
+      h_zjpsi_prompt_cs->SetBinContent(i, h_zjpsi_prompt->GetBinContent(i)/h_zjpsi_prompt->GetBinWidth(i)/(inclusive_z_to_leptons_events));
+      h_zjpsi_prompt_cs->SetBinError(i, h_zjpsi_prompt->GetBinError(i)/h_zjpsi_prompt->GetBinWidth(i)/(inclusive_z_to_leptons_events));
+    }
   }
   h_zjpsi_prompt_cs->Draw("E1");
 
@@ -838,12 +872,11 @@ void sPlotfit() {
   leg5->AddEntry(h_zjpsi_atlas_prompt,"ATLAS prompt","l");
   leg5->SetShadowColor(0);
   leg5->Draw();
-
   if (create_cs_plots) {
     h_zjpsi_prompt_cs->GetYaxis()->SetRangeUser(1E-11, 1E-5);
   }
   //TODO should it be 120?
-  h_zjpsi_prompt_cs->GetXaxis()->SetRangeUser(8.5, 120);
+  h_zjpsi_prompt_cs->GetXaxis()->SetRangeUser(8.5, 100);
   //splot_tex_pt.DrawLatex(15, 3E-6, "#bf{#it{CMS}} Preliminary, #sqrt{#it{s}}=8 TeV, 19.7 fb^{-1}");
   //splot_tex_pt.DrawLatex(15, 1E-6 , "#it{pp} #rightarrow prompt #it{J/#psi+Z} : #it{pp} #rightarrow #it{Z}");
 
@@ -867,8 +900,16 @@ void sPlotfit() {
   h_zjpsi_nonprompt->SetLineWidth(2);
   h_zjpsi_nonprompt->SetLineColor(kBlue -2);
   for (int i=2; i<7; i++) {
-    h_zjpsi_nonprompt_cs->SetBinContent(i, h_zjpsi_nonprompt->GetBinContent(i)/h_zjpsi_nonprompt->GetBinWidth(i)/(inclusive_z_to_leptons_events));
-    h_zjpsi_nonprompt_cs->SetBinError(i, h_zjpsi_nonprompt->GetBinError(i)/h_zjpsi_nonprompt->GetBinWidth(i)/(inclusive_z_to_leptons_events));
+    if (use_pileup_correction) {
+      h_zjpsi_nonprompt_cs->SetBinContent(i, (h_zjpsi_nonprompt->GetBinContent(i) - pileup_inclusive_nonprompt[i])/h_zjpsi_nonprompt->GetBinWidth(i)/(inclusive_z_to_leptons_events));
+      h_zjpsi_nonprompt_cs->SetBinError(i, (h_zjpsi_nonprompt->GetBinError(i) - pileup_inclusive_nonprompt[i])/h_zjpsi_nonprompt->GetBinWidth(i)/(inclusive_z_to_leptons_events));
+    }
+    else {
+      h_zjpsi_nonprompt_cs->SetBinContent(i, h_zjpsi_nonprompt->GetBinContent(i)/h_zjpsi_nonprompt->GetBinWidth(i)/(inclusive_z_to_leptons_events));
+      h_zjpsi_nonprompt_cs->SetBinError(i, h_zjpsi_nonprompt->GetBinError(i)/h_zjpsi_nonprompt->GetBinWidth(i)/(inclusive_z_to_leptons_events));
+    }
+    //h_zjpsi_nonprompt_cs->SetBinContent(i, h_zjpsi_nonprompt->GetBinContent(i)/h_zjpsi_nonprompt->GetBinWidth(i)/(inclusive_z_to_leptons_events));
+    //h_zjpsi_nonprompt_cs->SetBinError(i, h_zjpsi_nonprompt->GetBinError(i)/h_zjpsi_nonprompt->GetBinWidth(i)/(inclusive_z_to_leptons_events));
   }
   h_zjpsi_nonprompt_cs->Draw("E1");
 
@@ -887,11 +928,13 @@ void sPlotfit() {
     h_zjpsi_nonprompt_cs->GetYaxis()->SetRangeUser(1E-11, 1E-5);
   }
   //TODO should it be 120?
-  h_zjpsi_nonprompt_cs->GetXaxis()->SetRangeUser(8.5, 120);
+  h_zjpsi_nonprompt_cs->GetXaxis()->SetRangeUser(8.5, 100);
   //splot_tex_pt.DrawLatex(15, 3E-6, "#bf{#it{CMS}} Preliminary, #sqrt{#it{s}}=8 TeV, 19.7 fb^{-1}");
   //splot_tex_pt.DrawLatex(15, 1E-6 , "#it{pp} #rightarrow non-prompt #it{J/#psi+Z} : #it{pp} #rightarrow #it{Z}");
   c_jpsi_diff_xsec->cd(2)->SetLogy(1);
   c_jpsi_diff_xsec->cd(2)->SetLogx(1);
+  //c_jpsi_diff_xsec->SaveAs("c_jpsi_diff_xsec.C");
+  //c_jpsi_diff_xsec->Print();
 
   // create total cross-section plots
   // inclusive cross-section
@@ -899,6 +942,11 @@ void sPlotfit() {
   double inclusive_cross_section_nonprompt=0., inclusive_cross_section_nonprompt_err=0.;
   double fiducial_cross_section_prompt=0., fiducial_cross_section_prompt_err=0.;
   double fiducial_cross_section_nonprompt=0., fiducial_cross_section_nonprompt_err=0.;
+  
+  float pileup_factor = 0.1161;
+  float pileup_correction = pileup_factor / (1.0 - pileup_factor);
+
+  float bin_size[5] = { 1.5, 4, 4, 12, 70 };
   for (int i=2; i<7; ++i) {
     inclusive_cross_section_prompt         += h_zjpsi_prompt->GetBinContent(i);
     inclusive_cross_section_prompt_err     += TMath::Power(h_zjpsi_prompt->GetBinError(i),2);
@@ -908,14 +956,24 @@ void sPlotfit() {
     fiducial_cross_section_prompt_err      += TMath::Power(h_zjpsi_prompt_fid->GetBinError(i),2);
     fiducial_cross_section_nonprompt      += h_zjpsi_nonprompt_fid->GetBinContent(i);
     fiducial_cross_section_nonprompt_err  += TMath::Power(h_zjpsi_nonprompt_fid->GetBinError(i),2);
-    cout << "bin " << i << " prompt weighted events " << inclusive_cross_section_prompt << " +/- " << TMath::Sqrt(inclusive_cross_section_prompt_err) << endl;
-    cout << "bin " << i << " nonprompt weighted events " << inclusive_cross_section_nonprompt << " +/- " << TMath::Sqrt(inclusive_cross_section_nonprompt_err) << endl;
+
+    //cout << "bin " << i << " prompt weighted events " << inclusive_cross_section_prompt / bin_size[i-2] << " +/- " << TMath::Sqrt(inclusive_cross_section_prompt_err) / bin_size[i-2] << endl;
+    //cout << "bin " << i << " nonprompt weighted events " << inclusive_cross_section_nonprompt / bin_size[i-2] << " +/- " << TMath::Sqrt(inclusive_cross_section_nonprompt_err) / bin_size[i-2] << endl;
+    cout << "bin " << i << " prompt weighted " << h_zjpsi_prompt->GetBinContent(i)  << " +/- " << h_zjpsi_prompt->GetBinError(i) << endl;
+    cout << "bin " << i << " nonprompt weighted " << h_zjpsi_nonprompt->GetBinContent(i) << " +/- " << h_zjpsi_nonprompt->GetBinError(i) << endl;
+  }
+  for (int i=2; i<7; ++i) {
+    cout << "bin " << i << " prompt weighted ratio " << h_zjpsi_prompt->GetBinContent(i) / inclusive_z_to_leptons_events << " +/- " << h_zjpsi_prompt->GetBinError(i) / inclusive_z_to_leptons_events << endl;
+    cout << "bin " << i << " nonprompt weighted ratio " << h_zjpsi_nonprompt->GetBinContent(i) / inclusive_z_to_leptons_events << " +/- " << h_zjpsi_nonprompt->GetBinError(i) / inclusive_z_to_leptons_events << endl;
   }
   cout << "i = 2 => 8.5-10" << endl;
   cout << "i = 3 => 10-14" << endl;
   cout << "i = 4 => 14-18" << endl;
   cout << "i = 5 => 18-30" << endl;
   cout << "i = 6 => 30-100" << endl;
+  cout << "total prompt inclusive: " << inclusive_cross_section_prompt << " +/- " << TMath::Sqrt(inclusive_cross_section_prompt_err) << " ratio " << inclusive_cross_section_prompt / inclusive_z_to_leptons_events
+    <<  " +/- " << TMath::Sqrt(inclusive_cross_section_prompt_err) / inclusive_z_to_leptons_events << endl;
+  cout << "total nonprompt inclusive: " << inclusive_cross_section_nonprompt << " +/- " << TMath::Sqrt(inclusive_cross_section_nonprompt_err) << " ratio " << inclusive_cross_section_nonprompt / inclusive_z_to_leptons_events << " +/- " << TMath::Sqrt(inclusive_cross_section_nonprompt_err) / inclusive_z_to_leptons_events << endl;
 
   inclusive_cross_section_prompt = inclusive_cross_section_prompt/(inclusive_z_to_leptons_events);
   inclusive_cross_section_nonprompt = inclusive_cross_section_nonprompt/(inclusive_z_to_leptons_events);
