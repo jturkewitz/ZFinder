@@ -45,7 +45,8 @@
 using namespace RooFit;
 
 //first bin is overall, next 5 bins are ascending in pT 8.5-10,10-14,14-18,18-30,30-100
-const double ACC_EFF[6] = {0.374168,0.291977,0.41167,0.549881,0.646403,0.755547}; //vertex_comp no primary vert requirement
+//const double ACC_EFF[6] = {0.374168,0.291977,0.41167,0.549881,0.646403,0.755547}; //vertex_comp no primary vert requirement //pythia8 DPS unpol
+const double ACC_EFF[6] = {0.345879,0.264437,0.382286,0.520471,0.620986,0.737232}; //vertex_comp no primary vert requirement //pythia6 unpolarized
 
 const double NUM_ZTOMUMU = 8.481e6;
 const double NUM_ZTOEE = 5.274e6;
@@ -125,7 +126,8 @@ std::vector<double> RooFitCombined(
   dimuon_mass.setRange("signal", dimuon_mass_signal_min, dimuon_mass_signal_max) ;
   dimuon_mass.setRange("all", dimuon_mass_min, dimuon_mass_max) ;
 
-  double tau_xy_min = -0.3;
+  //double tau_xy_min = -0.3;
+  double tau_xy_min = -1.0;
   double tau_xy_max = 5.0;
   RooRealVar tau_xy("tau_xy", "tau_xy" , tau_xy_min, tau_xy_max, "ps");
 

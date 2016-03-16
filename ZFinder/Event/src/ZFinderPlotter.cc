@@ -471,6 +471,14 @@ namespace zf {
       jpsi_pt_vs_rap_->GetXaxis()->SetTitle("jpsi Rapidity");
       jpsi_pt_vs_rap_->GetYaxis()->SetTitle("jpsi Pt");
 
+      double bins_finer[] = {8.5,8.6,8.7,8.8,8.9,9.0,9.2,9.4,9.6,9.8,10,10.5,11.0,11.5,12.0,13.0,14,18,30,100};
+      int bin_finer_number = 19;
+      // jpsi_pt_vs_rap
+      const std::string jpsi_pt_vs_rap_finer_name = "jpsi_pt_vs_rap_finer";
+      jpsi_pt_vs_rap_finer_ = tdir.make<TH2D>(jpsi_pt_vs_rap_finer_name.c_str(), jpsi_pt_vs_rap_finer_name.c_str(), 21, -2.1, 2.1, bin_finer_number, bins_finer);
+      jpsi_pt_vs_rap_finer_->GetXaxis()->SetTitle("jpsi Rapidity");
+      jpsi_pt_vs_rap_finer_->GetYaxis()->SetTitle("jpsi Pt");
+
       const std::string jpsi_pt_vs_rap_fine_name = "jpsi_pt_vs_rap_fine";
       jpsi_pt_vs_rap_fine_ = tdir.make<TH2D>(jpsi_pt_vs_rap_fine_name.c_str(), jpsi_pt_vs_rap_fine_name.c_str(), 21, -2.1, 2.1, 400, 0, 200);
       jpsi_pt_vs_rap_fine_->GetXaxis()->SetTitle("jpsi Rapidity");
@@ -1520,6 +1528,7 @@ namespace zf {
           }
         }
         jpsi_pt_vs_rap_->Fill(zfe.reco_jpsi.y.at(i), zfe.reco_jpsi.pt.at(i) , event_weight);
+        jpsi_pt_vs_rap_finer_->Fill(zfe.reco_jpsi.y.at(i), zfe.reco_jpsi.pt.at(i) , event_weight);
         jpsi_pt_vs_rap_fine_->Fill(zfe.reco_jpsi.y.at(i), zfe.reco_jpsi.pt.at(i) , event_weight);
         jpsi_pt_vs_rap_polarization_long->Fill(zfe.reco_jpsi.y.at(i), zfe.reco_jpsi.pt.at(i) , 
             event_weight * (1.0 - pow(zfe.reco_jpsi.cos_jpsi_mu_plus.at(i), 2.0) ));
@@ -1853,6 +1862,7 @@ namespace zf {
         jpsi_pt_->Fill(zfe.truth_jpsi.pt.at(i), event_weight);
         jpsi_pt_vs_rap_->Fill(zfe.truth_jpsi.y.at(i), zfe.truth_jpsi.pt.at(i) , event_weight);
         jpsi_pt_vs_rap_fine_->Fill(zfe.truth_jpsi.y.at(i), zfe.truth_jpsi.pt.at(i) , event_weight);
+        jpsi_pt_vs_rap_finer_->Fill(zfe.truth_jpsi.y.at(i), zfe.truth_jpsi.pt.at(i) , event_weight);
         jpsi_cos_mu_plus_->Fill(zfe.truth_jpsi.cos_jpsi_mu_plus.at(i), event_weight);
         jpsi_cos_mu_minus_->Fill(zfe.truth_jpsi.cos_jpsi_mu_minus.at(i), event_weight);
 

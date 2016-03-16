@@ -46,12 +46,13 @@ bool use_polarisation_weights = true;
 //bool use_polarisation_weights = false;
 bool create_cs_plots = true;
 bool do_pull_calculation = false;
-bool use_pileup_correction = true;
+//bool use_pileup_correction = false; //subtract events when making ratio if pileup_correction is true
+//bool use_pileup_correction = true;
 
 
-void sPlotfit();
-void sPlotFit() { sPlotfit(); }
-void sPlotfit() {
+//void sPlotfit(std::string file_name, bool use_pileup_correction = false);
+//void sPlotFit(std::string file_name, bool use_pileup_correction = false) { sPlotfit(file_name, use_pileup_correction); }
+void sPlotFit(std::string file_name, bool use_pileup_correction = false) {
   gStyle->SetOptStat(0);
   gStyle->SetOptFit(0);
   RooMsgService::instance().setGlobalKillBelow(RooFit::WARNING) ;
@@ -75,8 +76,12 @@ void sPlotfit() {
   f_straighline->SetLineColor(kBlack);
 
   RooRealVar *onia_mass = new RooRealVar("onia_mass", "J/#psi#rightarrow#mu#mu [GeV]", 2.85, 3.35);
-  RooRealVar *onia_tau  = new RooRealVar("onia_tau", "J/#psi#rightarrow#mu#mu pseudo-proper time [ps]", -2., 5);
-  RooRealVar *z_mass    = new RooRealVar("z_mass", "Z Mass [GeV]", 60., 120.);
+  //RooRealVar *onia_tau  = new RooRealVar("onia_tau", "J/#psi#rightarrow#mu#mu pseudo-proper time [ps]", -2., 5);
+  //RooRealVar *onia_tau  = new RooRealVar("onia_tau", "J/#psi#rightarrow#mu#mu pseudo-proper time [ps]", -0.3, 5);
+  RooRealVar *onia_tau  = new RooRealVar("onia_tau", "J/#psi#rightarrow#mu#mu pseudo-proper time [ps]", -1.0, 5);
+  RooRealVar *z_mass    = new RooRealVar("z_mass", "Z Mass [GeV]", 80., 100.);
+  //RooRealVar *z_mass    = new RooRealVar("z_mass", "Z Mass [GeV]", 40., 300.);
+  //RooRealVar *z_mass    = new RooRealVar("z_mass", "Z Mass [GeV]", 50., 150.);
   RooRealVar *is_z_to_electrons    = new RooRealVar("is_z_to_electrons", "is_z_to_electrons", 0, 1);
   RooRealVar *is_z_to_muons  = new RooRealVar("is_z_to_muons", "is_z_to_muons", 0, 1);
 
@@ -93,10 +98,10 @@ void sPlotfit() {
   RooRealVar *transverse_pos  = new RooRealVar("transverse_pos" , "transverse_pos" ,  -10000000000000., 1000000000.);
   RooRealVar *transverse_neg  = new RooRealVar("transverse_neg" , "transverse_neg" ,  -10000000000000., 1000000000.);
 
-  RooRealVar *reco_muon0_weight = new RooRealVar("reco_muon0_weight", "reco_muon0_weight", -10, 10);
-  RooRealVar *reco_muon1_weight = new RooRealVar("reco_muon1_weight", "reco_muon1_weight", -10, 10);
+  //RooRealVar *reco_muon0_weight = new RooRealVar("reco_muon0_weight", "reco_muon0_weight", -10, 10);
+  //RooRealVar *reco_muon1_weight = new RooRealVar("reco_muon1_weight", "reco_muon1_weight", -10, 10);
 
-  RooArgSet jpsi_argset(*onia_mass, *onia_tau);
+  RooArgSet jpsi_argset(*onia_mass, *onia_tau, *onia_pt);
   RooArgSet zjpsi_argset(*onia_mass, *onia_tau, *is_z_to_electrons, *is_z_to_muons, *z_mass, *onia_pt, *onia_rap);
   zjpsi_argset.add(*onia_mu0_pt); zjpsi_argset.add(*onia_mu1_pt);
   zjpsi_argset.add(*onia_mu0_eta); zjpsi_argset.add(*onia_mu1_eta);
@@ -105,19 +110,22 @@ void sPlotfit() {
   zjpsi_argset.add(*transverse); 
   zjpsi_argset.add(*transverse_pos);
   zjpsi_argset.add(*transverse_neg);
-  zjpsi_argset.add(*reco_muon0_weight);
-  zjpsi_argset.add(*reco_muon1_weight);
+  //zjpsi_argset.add(*reco_muon0_weight);
+  //zjpsi_argset.add(*reco_muon1_weight);
 
   //Data Set
   //TFile *zjpsi_ntuple = new TFile("../SkimNtuple/ZJpsi.root");
   //TFile *zjpsi_ntuple = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/SkimNtuple/ZJpsi.root");
 
 
-  TFile *zjpsi_ntuple = new TFile("ZJpsi.root");
+  TFile *zjpsi_ntuple = new TFile(file_name.c_str());
+  //TFile *zjpsi_ntuple = new TFile("ZJpsi_40_300.root");
+  //TFile *zjpsi_ntuple = new TFile("ZJpsi.root");
   //TFile *zjpsi_ntuple = new TFile("ZJpsiee.root");
   //TFile *zjpsi_ntuple = new TFile("ZJpsimumu.root");
   
   //TFile *zjpsi_ntuple = new TFile("ZJpsi_pileup.root");
+  //TFile *zjpsi_ntuple = new TFile("ZJpsi_sideband.root");
   
   TTree* zjpsi_tree = (TTree*) zjpsi_ntuple->Get("AUX");
   RooDataSet *zjpsi_data     = new RooDataSet("zjpsi_data", "zjpsi_data", zjpsi_tree, zjpsi_argset);
@@ -132,6 +140,15 @@ void sPlotfit() {
 
   //      TCut SelectionCut = "onia_mass>2.6 && onia_mass<3.6";
   //  RooDataSet *newdata = (RooDataSet*)data->reduce(SelectionCut);
+
+  //TCut SelectionCut = "onia_pt>=8.5 && onia_pt < 10.0";
+  //TCut SelectionCut = "onia_pt>=10 && onia_pt < 14.0";
+  //TCut SelectionCut = "onia_pt>=14 && onia_pt < 18.0";
+  //TCut SelectionCut = "onia_pt>=18 && onia_pt < 30.0";
+  //TCut SelectionCut = "onia_pt>=30 && onia_pt < 100.0";
+
+  //RooDataSet *jpsi_data = (RooDataSet*)jpsi_data->reduce(SelectionCut);
+  //RooDataSet *zjpsi_data = (RooDataSet*)zjpsi_data->reduce(SelectionCut);
 
   // *****************************************************************
   //  Jpsi 
@@ -682,14 +699,93 @@ void sPlotfit() {
   RooDataSet * zjpsi_data_prompt_Z_mumu_weighted     = (RooDataSet*)zjpsi_data_prompt_weighted->reduce(select_z_to_muons);
   RooDataSet * zjpsi_data_nonprompt_Z_mumu_weighted = (RooDataSet*)zjpsi_data_nonprompt_weighted->reduce(select_z_to_muons);
   
-  int num_z_mass_bins = 10;
+  //int num_z_mass_bins = 10;
+  int num_z_mass_bins = 80;
   TCanvas* czjpsi_data_Z = new TCanvas("czjpsi_data_Z","sPlot Z", 1200, 1200); 
   czjpsi_data_Z->Divide(2,2);
   RooPlot* frame_Z_ee_prompt = z_mass->frame(Bins(num_z_mass_bins)); 
   zjpsi_data_prompt_Z_ee_weighted->plotOn(frame_Z_ee_prompt);
+
+  int z_mass_min_signal = 80;
+  int z_mass_max_signal = 100;
+  int z_mass_min_low = 40;
+  int z_mass_max_low_ee = 50;
+  int z_mass_max_low_mumu = 45;
+  int z_mass_min_high = 150;
+  int z_mass_max_high = 300;
+  TH1* h_z_ee_prompt_mass = zjpsi_data_prompt_Z_ee_weighted->createHistogram("h_z_ee_prompt", *z_mass);
+  TH1* h_z_ee_nonprompt_mass = zjpsi_data_nonprompt_Z_ee_weighted->createHistogram("h_z_ee_nonprompt", *z_mass);
+  TH1* h_z_mumu_prompt_mass = zjpsi_data_prompt_Z_mumu_weighted->createHistogram("h_z_mumu_prompt", *z_mass);
+  TH1* h_z_mumu_nonprompt_mass = zjpsi_data_nonprompt_Z_mumu_weighted->createHistogram("h_z_mumu_nonprompt", *z_mass);
+
+  TAxis *axis;
+  axis  = h_z_ee_prompt_mass->GetXaxis();
+  int bmin,bmax;
+
+  bmin = axis->FindBin(z_mass_min_signal);
+  bmax = axis->FindBin(z_mass_max_signal);
+  double integral_z_ee_prompt_signal = h_z_ee_prompt_mass->Integral(bmin,bmax - 1);
+  std::cout << "integral z_ee prompt signal " << integral_z_ee_prompt_signal << std::endl;
+
+  bmin = axis->FindBin(z_mass_min_signal);
+  bmax = axis->FindBin(z_mass_max_signal);
+  double integral_z_ee_nonprompt_signal = h_z_ee_nonprompt_mass->Integral(bmin,bmax - 1);
+  std::cout << "integral z_ee nonprompt signal " << integral_z_ee_nonprompt_signal << std::endl;
+
+  bmin = axis->FindBin(z_mass_min_signal);
+  bmax = axis->FindBin(z_mass_max_signal);
+  double integral_z_mumu_prompt_signal = h_z_mumu_prompt_mass->Integral(bmin,bmax - 1);
+  std::cout << "integral z_mumu prompt signal " << integral_z_mumu_prompt_signal << std::endl;
+
+  bmin = axis->FindBin(z_mass_min_signal);
+  bmax = axis->FindBin(z_mass_max_signal);
+  double integral_z_mumu_nonprompt_signal = h_z_mumu_nonprompt_mass->Integral(bmin,bmax - 1);
+  std::cout << "integral z_mumu nonprompt signal " << integral_z_mumu_nonprompt_signal << std::endl;
+
+  bmin = axis->FindBin(z_mass_min_low);
+  bmax = axis->FindBin(z_mass_max_low_ee);
+  double integral_z_ee_prompt_low = h_z_ee_prompt_mass->Integral(bmin,bmax - 1);
+  std::cout << "integral z_ee prompt low " << integral_z_ee_prompt_low << std::endl;
+
+  bmin = axis->FindBin(z_mass_min_high);
+  bmax = axis->FindBin(z_mass_max_high);
+  double integral_z_ee_prompt_high = h_z_ee_prompt_mass->Integral(bmin,bmax - 1);
+  std::cout << "integral z_ee prompt high " << integral_z_ee_prompt_high << std::endl;
+
+  bmin = axis->FindBin(z_mass_min_low);
+  bmax = axis->FindBin(z_mass_max_low_ee);
+  double integral_z_ee_nonprompt_low = h_z_ee_nonprompt_mass->Integral(bmin,bmax - 1);
+  std::cout << "integral z_ee nonprompt low " << integral_z_ee_nonprompt_low << std::endl;
+
+  bmin = axis->FindBin(z_mass_min_high);
+  bmax = axis->FindBin(z_mass_max_high);
+  double integral_z_ee_nonprompt_high = h_z_ee_nonprompt_mass->Integral(bmin,bmax - 1);
+  std::cout << "integral z_ee nonprompt high " << integral_z_ee_nonprompt_high << std::endl;
+
+  bmin = axis->FindBin(z_mass_min_low);
+  bmax = axis->FindBin(z_mass_max_low_mumu);
+  double integral_z_mumu_prompt_low = h_z_mumu_prompt_mass->Integral(bmin,bmax - 1);
+  std::cout << "integral z_mumu prompt low " << integral_z_mumu_prompt_low << std::endl;
+
+  bmin = axis->FindBin(z_mass_min_high);
+  bmax = axis->FindBin(z_mass_max_high);
+  double integral_z_mumu_prompt_high = h_z_mumu_prompt_mass->Integral(bmin,bmax - 1);
+  std::cout << "integral z_mumu prompt high " << integral_z_mumu_prompt_high << std::endl;
+
+  bmin = axis->FindBin(z_mass_min_low);
+  bmax = axis->FindBin(z_mass_max_low_mumu);
+  double integral_z_mumu_nonprompt_low = h_z_mumu_nonprompt_mass->Integral(bmin,bmax - 1);
+  std::cout << "integral z_mumu nonprompt low " << integral_z_mumu_nonprompt_low << std::endl;
+
+  bmin = axis->FindBin(z_mass_min_high);
+  bmax = axis->FindBin(z_mass_max_high);
+  double integral_z_mumu_nonprompt_high = h_z_mumu_nonprompt_mass->Integral(bmin,bmax - 1);
+  std::cout << "integral z_mumu nonprompt high " << integral_z_mumu_nonprompt_high << std::endl;
+
   czjpsi_data_Z->cd(1); 
   frame_Z_ee_prompt->SetTitle("Z->ee + Prompt J/#psi");
   frame_Z_ee_prompt->Draw();
+
   
   RooPlot* frame_Z_ee_nonprompt = z_mass->frame(Bins(num_z_mass_bins));
   zjpsi_data_nonprompt_Z_ee_weighted->plotOn(frame_Z_ee_nonprompt);
@@ -797,11 +893,10 @@ void sPlotfit() {
   double inclusive_z_to_electrons_events;
   double inclusive_z_to_leptons_events;
   if (create_cs_plots) {
-    // %%%%%%%%%%%%%%%%%%%%%
-    // Jared need input here
-    // %%%%%%%%%%%%%%%%%%%%%
-    inclusive_z_to_muons_events     = 7.773024E06;
-    inclusive_z_to_electrons_events = 5.086549E06;
+    //inclusive_z_to_muons_events     = 7.773024E06;
+    //inclusive_z_to_electrons_events = 5.086549E06;
+    inclusive_z_to_muons_events     = 6.93504E06;
+    inclusive_z_to_electrons_events = 4.63707E06;
   }
   else {
     inclusive_z_to_muons_events     = 0.5;
@@ -809,23 +904,25 @@ void sPlotfit() {
   }
   inclusive_z_to_leptons_events = inclusive_z_to_muons_events + inclusive_z_to_electrons_events;
 
-  //pileup events to subtract
-  //also error seems too high
-  //bin 2 prompt weighted 3.56813 +/- 10.9859
-  //bin 2 nonprompt weighted 2.59413 +/- 12.0886
-  //bin 3 prompt weighted 4.67389 +/- 12.3652
-  //bin 3 nonprompt weighted 5.3454 +/- 14.2397
-  //bin 4 prompt weighted 0.794457 +/- 3.6566
-  //bin 4 nonprompt weighted 0.30785 +/- 3.10573
-  //bin 5 prompt weighted -0.0260695 +/- 1.92352
-  //bin 5 nonprompt weighted 1.51939 +/- 4.76576
-  //bin 6 prompt weighted -0.144395 +/- 0.564351
-  //bin 6 nonprompt weighted 0.871015 +/- 3.40017
-  //Negative events make sense? for now just set to 0
+  //Negative events for pileup make sense?
 
   //TODO this should be automated if possible
-  float pileup_inclusive_prompt[5] = {3.56813, 4.67389, 0.794457, 0.0, 0.0};
-  float pileup_inclusive_nonprompt[5] = {2.59413,5.3454,0.30785,1.51939,0.871015};
+  //float pileup_inclusive_prompt[5] = {3.56813, 4.67389, 0.794457, 0.0, 0.0};
+  //float pileup_inclusive_nonprompt[5] = {2.59413,5.3454,0.30785,1.51939,0.871015};
+
+
+  //based on inverting at 3 cm for 0.5 cm I believe
+  //float pileup_inclusive_prompt[5] = {1.60329,1.67072,0.323216,0.12009,0};
+  //float pileup_inclusive_nonprompt[5] = {1.15364,2.51752,0.282309,0.189887,0};
+
+  //for pu0.5, inverted at 0.5 cm
+  float pileup_inclusive_prompt[5] = {2.16664,2.14942,0.331587,-0.0822937,-0.035038};
+  float pileup_inclusive_nonprompt[5] = {1.83111,2.52538,0.594624,1.29732,0.272261};
+
+  //for pu1.0, inverted at 1.0 cm
+  //float pileup_inclusive_prompt[5] = {4.30462,4.68395,0.805219,-0.0910758,-0.0902335};
+  //float pileup_inclusive_nonprompt[5] = {2.89074,4.7174,0.631182,1.95426,0.616307};
+
 
   TCanvas* c_jpsi_diff_xsec = new TCanvas("c_jpsi_diff_xsec","J/#psi p_{T} sPlot weighted", 1400, 700); c_jpsi_diff_xsec->Divide(2,1);
   // plot the prompt part
@@ -852,8 +949,8 @@ void sPlotfit() {
   h_zjpsi_prompt->SetLineColor(kBlue -2);
   for (int i=2; i<7; i++) {
     if (use_pileup_correction) {
-      h_zjpsi_prompt_cs->SetBinContent(i, (h_zjpsi_prompt->GetBinContent(i) - pileup_inclusive_prompt[i])/h_zjpsi_prompt->GetBinWidth(i)/(inclusive_z_to_leptons_events));
-      h_zjpsi_prompt_cs->SetBinError(i, (h_zjpsi_prompt->GetBinError(i) - pileup_inclusive_prompt[i])/h_zjpsi_prompt->GetBinWidth(i)/(inclusive_z_to_leptons_events));
+      h_zjpsi_prompt_cs->SetBinContent(i, (h_zjpsi_prompt->GetBinContent(i) - pileup_inclusive_prompt[i-2])/h_zjpsi_prompt->GetBinWidth(i)/(inclusive_z_to_leptons_events));
+      h_zjpsi_prompt_cs->SetBinError(i, (h_zjpsi_prompt->GetBinError(i) - pileup_inclusive_prompt[i-2])/h_zjpsi_prompt->GetBinWidth(i)/(inclusive_z_to_leptons_events));
     }
     else {
       h_zjpsi_prompt_cs->SetBinContent(i, h_zjpsi_prompt->GetBinContent(i)/h_zjpsi_prompt->GetBinWidth(i)/(inclusive_z_to_leptons_events));
@@ -901,8 +998,8 @@ void sPlotfit() {
   h_zjpsi_nonprompt->SetLineColor(kBlue -2);
   for (int i=2; i<7; i++) {
     if (use_pileup_correction) {
-      h_zjpsi_nonprompt_cs->SetBinContent(i, (h_zjpsi_nonprompt->GetBinContent(i) - pileup_inclusive_nonprompt[i])/h_zjpsi_nonprompt->GetBinWidth(i)/(inclusive_z_to_leptons_events));
-      h_zjpsi_nonprompt_cs->SetBinError(i, (h_zjpsi_nonprompt->GetBinError(i) - pileup_inclusive_nonprompt[i])/h_zjpsi_nonprompt->GetBinWidth(i)/(inclusive_z_to_leptons_events));
+      h_zjpsi_nonprompt_cs->SetBinContent(i, (h_zjpsi_nonprompt->GetBinContent(i) - pileup_inclusive_nonprompt[i-2])/h_zjpsi_nonprompt->GetBinWidth(i)/(inclusive_z_to_leptons_events));
+      h_zjpsi_nonprompt_cs->SetBinError(i, (h_zjpsi_nonprompt->GetBinError(i) - pileup_inclusive_nonprompt[i-2])/h_zjpsi_nonprompt->GetBinWidth(i)/(inclusive_z_to_leptons_events));
     }
     else {
       h_zjpsi_nonprompt_cs->SetBinContent(i, h_zjpsi_nonprompt->GetBinContent(i)/h_zjpsi_nonprompt->GetBinWidth(i)/(inclusive_z_to_leptons_events));
@@ -943,10 +1040,21 @@ void sPlotfit() {
   double fiducial_cross_section_prompt=0., fiducial_cross_section_prompt_err=0.;
   double fiducial_cross_section_nonprompt=0., fiducial_cross_section_nonprompt_err=0.;
   
-  float pileup_factor = 0.1161;
-  float pileup_correction = pileup_factor / (1.0 - pileup_factor);
+  //float pileup_factor = 0.1161;
+  //float pileup_correction = pileup_factor / (1.0 - pileup_factor);
+  //for 0.5 pileup cut
+  float pileup_factor = 0.0580493;
+  //for 1 cm pileup
+  //float pileup_factor = 0.115794;
+
+  //for 0.5 pileup cut, but inverted at 3 cm
+  //float pileup_correction = pileup_factor / (0.662);
+  float pileup_correction = pileup_factor / (1 - pileup_factor);
 
   float bin_size[5] = { 1.5, 4, 4, 12, 70 };
+  
+  float prompt_pileup_values[7];
+  float nonprompt_pileup_values[7];
   for (int i=2; i<7; ++i) {
     inclusive_cross_section_prompt         += h_zjpsi_prompt->GetBinContent(i);
     inclusive_cross_section_prompt_err     += TMath::Power(h_zjpsi_prompt->GetBinError(i),2);
@@ -959,9 +1067,17 @@ void sPlotfit() {
 
     //cout << "bin " << i << " prompt weighted events " << inclusive_cross_section_prompt / bin_size[i-2] << " +/- " << TMath::Sqrt(inclusive_cross_section_prompt_err) / bin_size[i-2] << endl;
     //cout << "bin " << i << " nonprompt weighted events " << inclusive_cross_section_nonprompt / bin_size[i-2] << " +/- " << TMath::Sqrt(inclusive_cross_section_nonprompt_err) / bin_size[i-2] << endl;
+
     cout << "bin " << i << " prompt weighted " << h_zjpsi_prompt->GetBinContent(i)  << " +/- " << h_zjpsi_prompt->GetBinError(i) << endl;
     cout << "bin " << i << " nonprompt weighted " << h_zjpsi_nonprompt->GetBinContent(i) << " +/- " << h_zjpsi_nonprompt->GetBinError(i) << endl;
+    //cout << "bin " << i << " prompt weighted " << h_zjpsi_prompt->GetBinContent(i) * pileup_correction << " +/- " << h_zjpsi_prompt->GetBinError(i) * pileup_correction<< endl;
+    //cout << "bin " << i << " nonprompt weighted " << h_zjpsi_nonprompt->GetBinContent(i)* pileup_correction << " +/- " << h_zjpsi_nonprompt->GetBinError(i) * pileup_correction<< endl;
+    
+    prompt_pileup_values[i] = h_zjpsi_prompt->GetBinContent(i) * pileup_correction;
+    nonprompt_pileup_values[i] = h_zjpsi_nonprompt->GetBinContent(i) * pileup_correction;
   }
+  cout << "prompt corrected pu: " << "{" << prompt_pileup_values[2] << "," << prompt_pileup_values[3] << "," << prompt_pileup_values[4] << "," << prompt_pileup_values[5] << "," << prompt_pileup_values[6] << "}" << endl;
+  cout << "nonprompt corrected pu: " << "{" << nonprompt_pileup_values[2] << "," << nonprompt_pileup_values[3] << "," << nonprompt_pileup_values[4] << "," << nonprompt_pileup_values[5] << "," << nonprompt_pileup_values[6] << "}" << endl;
   for (int i=2; i<7; ++i) {
     cout << "bin " << i << " prompt weighted ratio " << h_zjpsi_prompt->GetBinContent(i) / inclusive_z_to_leptons_events << " +/- " << h_zjpsi_prompt->GetBinError(i) / inclusive_z_to_leptons_events << endl;
     cout << "bin " << i << " nonprompt weighted ratio " << h_zjpsi_nonprompt->GetBinContent(i) / inclusive_z_to_leptons_events << " +/- " << h_zjpsi_nonprompt->GetBinError(i) / inclusive_z_to_leptons_events << endl;

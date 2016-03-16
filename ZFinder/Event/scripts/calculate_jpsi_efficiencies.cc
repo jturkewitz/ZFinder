@@ -11,9 +11,6 @@
 #include <Riostream.h>
 void calculate_jpsi_efficiencies (string file_name )
 {
-  
-  //TODO maybe make the file name an input argument?
-  //TFile *theFile0 = new TFile("/home/user1/turkewitz/Work/CMSSW_5_3_13_ZJPsi/src/test9d10.root");
   TFile *theFile0 = new TFile( file_name.c_str() );
 
   //TODO put this in rootrc
@@ -54,9 +51,16 @@ void calculate_jpsi_efficiencies (string file_name )
   //TH2D *jpsi_pt_vs_rap_mc = (TH2D*) theFile0->Get("ZFinder/MC_All/jpsi_pt_vs_rap_polarization_TPlusZero");
   //TH2D *jpsi_pt_vs_rap_jpsi = (TH2D*) theFile0->Get("ZFinder/Jpsi/jpsi_pt_vs_rap_polarization_TPlusZero");
 
+  TH2D *jpsi_pt_vs_rap_mc = (TH2D*) theFile0->Get("ZFinder/MC_All/jpsi_pt_vs_rap_finer");
+  TH2D *jpsi_pt_vs_rap_jpsi = (TH2D*) theFile0->Get("ZFinder/Dimuon_Jpsi_Vertex_Compatible/jpsi_pt_vs_rap_finer");
 
-  TH2D *jpsi_pt_vs_rap_mc = (TH2D*) theFile0->Get("ZFinder/MC_All/jpsi_pt_vs_rap");
-  TH2D *jpsi_pt_vs_rap_jpsi = (TH2D*) theFile0->Get("ZFinder/Dimuon_Jpsi_Vertex_Compatible/jpsi_pt_vs_rap");
+  //TH2D *jpsi_pt_vs_rap_mc = (TH2D*) theFile0->Get("ZFinder/MC_All/jpsi_pt_vs_rap");
+  //TH2D *jpsi_pt_vs_rap_jpsi = (TH2D*) theFile0->Get("ZFinder/Dimuon_Jpsi_Vertex_Compatible/jpsi_pt_vs_rap");
+
+  //TH2D *jpsi_pt_vs_rap_mc = (TH2D*) theFile0->Get("ZFinder/MC_All/jpsi_pt_vs_rap");
+  //TH2D *jpsi_pt_vs_rap_jpsi = (TH2D*) theFile0->Get("ZFinder/Dimuon_Jpsi_Vertex_Compatible/jpsi_pt_vs_rap");
+
+
   //TH2D *jpsi_pt_vs_rap_mc = (TH2D*) theFile0->Get("ZFinder/MC_All/jpsi_pt_vs_rap_polarization_long");
   //TH2D *jpsi_pt_vs_rap_jpsi = (TH2D*) theFile0->Get("ZFinder/Dimuon_Jpsi_Vertex_Compatible/jpsi_pt_vs_rap_polarization_long");
   //TH2D *jpsi_pt_vs_rap_mc = (TH2D*) theFile0->Get("ZFinder/MC_All/jpsi_pt_vs_rap_polarization_TPlusZero");
@@ -65,8 +69,11 @@ void calculate_jpsi_efficiencies (string file_name )
   //TODO uncomment following two lines as we only use 1 bin of pT
   //jpsi_pt_vs_rap_mc->Rebin2D(21,1);
   //jpsi_pt_vs_rap_jpsi->Rebin2D(21,1);
+  jpsi_pt_vs_rap_mc->Rebin2D(3,1);
+  jpsi_pt_vs_rap_jpsi->Rebin2D(3,1);
   std::cout << jpsi_pt_vs_rap_mc->Integral() << std::endl;
   std::cout << jpsi_pt_vs_rap_jpsi->Integral() << std::endl;
+  std::cout << "eff overall: " << jpsi_pt_vs_rap_jpsi->Integral() / jpsi_pt_vs_rap_mc->Integral() << std::endl;
   jpsi_pt_vs_rap_mc->Sumw2();
   jpsi_pt_vs_rap_jpsi->Sumw2();
   TH2D *acc_eff_map = jpsi_pt_vs_rap_mc->Clone();

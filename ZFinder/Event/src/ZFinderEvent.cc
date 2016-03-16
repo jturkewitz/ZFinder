@@ -193,6 +193,7 @@ namespace zf {
     iEvent.getByLabel(inputtags_.vertex, reco_vertices);
     reco_vert.num = 0;
     bool first_vertex = true;
+    double sum_pt_squared = 0.0;
     reco::Vertex primary_vertex;
     for (unsigned int vertex=0; vertex < reco_vertices->size(); ++vertex) {
       if (    // Criteria copied from twiki (mythical)
@@ -211,12 +212,15 @@ namespace zf {
         if (first_vertex) {
           first_vertex = false;
           primary_vertex = (*reco_vertices)[vertex];
+          sum_pt_squared = sumPtSquared((*reco_vertices)[vertex]);
         }
       }
     }
     reco_vert.primary_x = primary_vertex.position().x();
     reco_vert.primary_y = primary_vertex.position().y();
     reco_vert.primary_z = primary_vertex.position().z();
+    reco_vert.primary_sum_pt_squared = sum_pt_squared;
+    
     reco_vert.primary_vert = primary_vertex;
 
 
@@ -976,10 +980,20 @@ namespace zf {
     //if ( fabs(reco_vert.primary_z - pos_z ) <= MAX_JPSI_VERTEX_Z_DISPLACEMENT ) {
     //from Z boson if it exists, otherwise primary vertex
     if ( fabs( z ) <= MAX_JPSI_VERTEX_Z_DISPLACEMENT ) {
-      reco_jpsi.has_dimuon_vertex_compatible_with_primary_vertex.push_back(true);
+      if(!IS_PILEUP_CUT_INVERTED) {
+        reco_jpsi.has_dimuon_vertex_compatible_with_primary_vertex.push_back(true);
+      }
+      else {
+        reco_jpsi.has_dimuon_vertex_compatible_with_primary_vertex.push_back(false);
+      }
     }
     else {
-      reco_jpsi.has_dimuon_vertex_compatible_with_primary_vertex.push_back(false);
+      if(!IS_PILEUP_CUT_INVERTED) {
+        reco_jpsi.has_dimuon_vertex_compatible_with_primary_vertex.push_back(false);
+      }
+      else {
+        reco_jpsi.has_dimuon_vertex_compatible_with_primary_vertex.push_back(true);
+      }
     }
 
     if ( jpsi_lv.mass() <= MAX_JPSI_MASS && jpsi_lv.mass() >= MIN_JPSI_MASS ) {
@@ -1098,6 +1112,7 @@ namespace zf {
     reco_vert.primary_x = -100;
     reco_vert.primary_y = -100;
     reco_vert.primary_z = -100;
+    reco_vert.primary_sum_pt_squared = 0.0;
     truth_vert.num = -1;
     //truth_vert.x = -1000;
     //truth_vert.y = -1000;

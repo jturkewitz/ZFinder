@@ -1,12 +1,12 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Wed Nov 11 12:41:32 2015 by ROOT version 5.34/32
+// Fri Mar 11 16:51:58 2016 by ROOT version 5.34/32
 // from TTree zfinder_tree/zfinder_tree
-// found on file: /data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/ntuples_looser/jpsiTest441_doubleelectron_trigger_matching.root
+// found on file: /data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/jpsiTest510_Z_40_300_PU0p5_DoubleMuon.root
 //////////////////////////////////////////////////////////
 
-#ifndef zfinder_tree_electrons_h
-#define zfinder_tree_electrons_h
+#ifndef ZFinder_Tree_h
+#define ZFinder_Tree_h
 
 #include <TROOT.h>
 #include <TChain.h>
@@ -16,7 +16,7 @@
 
 // Fixed size dimensions of array or collections stored in the TTree if any.
 
-class zfinder_tree_electrons {
+class ZFinder_Tree {
 public :
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
    Int_t           fCurrent; //!current Tree number in a TChain
@@ -71,6 +71,7 @@ public :
    Double_t        reco_jpsi_jpsi_tau_z;
    Double_t        reco_jpsi_jpsi_distance_xy;
    Double_t        reco_jpsi_jpsi_distance_z;
+   Double_t        reco_jpsi_z_delta_phi;
    Double_t        reco_jpsi_jpsi_eff;
    Double_t        reco_jpsi_jpsi_acc_eff;
    Double_t        reco_jpsi_jpsi_scale_factor;
@@ -133,6 +134,7 @@ public :
    Double_t        truth_jpsi_jpsi_tau_z;
    Double_t        truth_jpsi_jpsi_distance_xy;
    Double_t        truth_jpsi_jpsi_distance_z;
+   Double_t        truth_jpsi_z_delta_phi;
    Double_t        truth_jpsi_jpsi_eff;
    Double_t        truth_jpsi_jpsi_acc_eff;
    Double_t        truth_jpsi_jpsi_scale_factor;
@@ -176,8 +178,8 @@ public :
    TBranch        *b_truth_jpsi;   //!
    TBranch        *b_event_info;   //!
 
-   zfinder_tree_electrons(TTree *tree=0);
-   virtual ~zfinder_tree_electrons();
+   ZFinder_Tree(TTree *tree=0,std::string file_name="0");
+   virtual ~ZFinder_Tree();
    virtual Int_t    Cut(Long64_t entry);
    virtual Int_t    GetEntry(Long64_t entry);
    virtual Long64_t LoadTree(Long64_t entry);
@@ -189,36 +191,60 @@ public :
 
 #endif
 
-#ifdef zfinder_tree_electrons_cxx
-zfinder_tree_electrons::zfinder_tree_electrons(TTree *tree) : fChain(0) 
+#ifdef ZFinder_Tree_cxx
+//ZFinder_Tree::ZFinder_Tree(TTree *tree) : fChain(0) 
+//{
+//// if parameter tree is not specified (or zero), connect the file
+//// used to generate this class and read the Tree.
+//   if (tree == 0) {
+//      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/jpsiTest510_Z_40_300_PU0p5_DoubleMuon.root");
+//      if (!f || !f->IsOpen()) {
+//         f = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/jpsiTest510_Z_40_300_PU0p5_DoubleMuon.root");
+//      }
+//      TDirectory * dir = (TDirectory*)f->Get("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/jpsiTest510_Z_40_300_PU0p5_DoubleMuon.root:/ZFinder");
+//      dir->GetObject("zfinder_tree",tree);
+//
+//   }
+//   Init(tree);
+//}
+ZFinder_Tree::ZFinder_Tree(TTree *tree, std::string file_name) : fChain(0)
 {
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
+
+   std::cout << file_name.c_str() << std::endl;
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/ntuples_looser/jpsiTest441_doubleelectron_trigger_matching.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject(file_name.c_str());
+      //TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/jpsiTest510_Z_40_300_PU0p5_DoubleMuon.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/ntuples_looser/jpsiTest441_doubleelectron_trigger_matching.root");
+         //f = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/jpsiTest510_Z_40_300_PU0p5_DoubleMuon.root");
+         f = new TFile(file_name.c_str());
       }
-      TDirectory * dir = (TDirectory*)f->Get("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/ntuples_looser/jpsiTest441_doubleelectron_trigger_matching.root:/ZFinder");
+      std::string file_name_dir = file_name;
+      file_name_dir.append(":/ZFinder");
+      //std::cout << file_name_dir.c_str() << std::endl;
+      //TDirectory * dir = (TDirectory*)f->Get("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/jpsiTest510_Z_40_300_PU0p5_DoubleMuon.root:/ZFinder");
+      TDirectory * dir = (TDirectory*)f->Get(file_name_dir.c_str());
       dir->GetObject("zfinder_tree",tree);
 
    }
    Init(tree);
 }
 
-zfinder_tree_electrons::~zfinder_tree_electrons()
+
+ZFinder_Tree::~ZFinder_Tree()
 {
    if (!fChain) return;
    delete fChain->GetCurrentFile();
 }
 
-Int_t zfinder_tree_electrons::GetEntry(Long64_t entry)
+Int_t ZFinder_Tree::GetEntry(Long64_t entry)
 {
 // Read contents of entry.
    if (!fChain) return 0;
    return fChain->GetEntry(entry);
 }
-Long64_t zfinder_tree_electrons::LoadTree(Long64_t entry)
+Long64_t ZFinder_Tree::LoadTree(Long64_t entry)
 {
 // Set the environment to read one entry
    if (!fChain) return -5;
@@ -231,7 +257,7 @@ Long64_t zfinder_tree_electrons::LoadTree(Long64_t entry)
    return centry;
 }
 
-void zfinder_tree_electrons::Init(TTree *tree)
+void ZFinder_Tree::Init(TTree *tree)
 {
    // The Init() function is called when the selector needs to initialize
    // a new tree or chain. Typically here the branch addresses and branch
@@ -257,7 +283,7 @@ void zfinder_tree_electrons::Init(TTree *tree)
    Notify();
 }
 
-Bool_t zfinder_tree_electrons::Notify()
+Bool_t ZFinder_Tree::Notify()
 {
    // The Notify() function is called when a new file is opened. This
    // can be either for a new TTree in a TChain or when when a new TTree
@@ -268,18 +294,18 @@ Bool_t zfinder_tree_electrons::Notify()
    return kTRUE;
 }
 
-void zfinder_tree_electrons::Show(Long64_t entry)
+void ZFinder_Tree::Show(Long64_t entry)
 {
 // Print contents of entry.
 // If entry is not specified, print current entry
    if (!fChain) return;
    fChain->Show(entry);
 }
-Int_t zfinder_tree_electrons::Cut(Long64_t entry)
+Int_t ZFinder_Tree::Cut(Long64_t entry)
 {
 // This function may be called from Loop.
 // returns  1 if entry is accepted.
 // returns -1 otherwise.
    return 1;
 }
-#endif // #ifdef zfinder_tree_electrons_cxx
+#endif // #ifdef ZFinder_Tree_cxx

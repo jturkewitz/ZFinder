@@ -79,10 +79,10 @@ int RooFitZMass(
   gErrorIgnoreLevel = kWarning;
 
   //TODO testing
-  //double z_mass_min = 50.0;
-  //double z_mass_max = 150.0;
   double z_mass_min = 60.0;
   double z_mass_max = 120.0;
+  //double z_mass_min = 40.0;
+  //double z_mass_max = 150.0;
   // Set up the variables we're going to read in from the files
   RooRealVar z_mass("z_mass", "z_mass" , z_mass_min, z_mass_max, "GeV");
   RooRealVar zjpsi_mass("zjpsi_mass", "zjpsi_mass" , z_mass_min, z_mass_max, "GeV");
@@ -99,7 +99,9 @@ int RooFitZMass(
   std::string inclusive_zjpsi_hist = "";
   std::string zjpsi_hist_name = "";
   if (USE_Z_TO_EE) {
-    inclusive_z_hist.append( "ZFinder/Z_To_Electrons/z Mass: Coarse" );
+    //inclusive_z_hist.append( "ZFinder/Z_To_Electrons/z Mass: Coarse" );
+    //inclusive_z_hist.append( "ZFinder/Dielectron_Z_Good_Compatible_Vertex/z Mass: Coarse" );
+    inclusive_z_hist.append( "ZFinder/Dielectron_Z_Good_Compatible_Vertex/z Mass: All" );
     z_hist_name.append("ztoee_mass");
     //inclusive_zjpsi_hist.append( "ZFinder/Z_To_Electrons_And_Jpsi/z Mass: Coarse" );
     //zjpsi_hist_name.append("ztoee_jpsi_mass");
@@ -111,7 +113,9 @@ int RooFitZMass(
     zjpsi_hist_name.append("ztoee_jpsi_mass");
   }
   else {
-    inclusive_z_hist.append( "ZFinder/Z_To_Muons/Z From Muons Mass: Coarse" );
+    //inclusive_z_hist.append( "ZFinder/Z_To_Muons/Z From Muons Mass: Coarse" );
+    //inclusive_z_hist.append( "ZFinder/Dimuon_Z_Good_Compatible_Vertex/Z From Muons Mass: Coarse" );
+    inclusive_z_hist.append( "ZFinder/Dimuon_Z_Good_Compatible_Vertex/Z From Muons Mass: All" );
     z_hist_name.append("ztomumu_mass");
     //inclusive_zjpsi_hist.append( "ZFinder/Z_To_Muons_And_Jpsi/Z From Muons Mass: Coarse" );
     //zjpsi_hist_name.append("ztomumu_jpsi_mass");

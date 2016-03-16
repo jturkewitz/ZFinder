@@ -53,6 +53,8 @@ namespace zf {
           jpsi_distance_xy = -1000;
           jpsi_distance_z = -1000;
 
+          z_delta_phi = -1000;
+
           jpsi_eff = -1000;
           jpsi_acc_eff = -1000;
           jpsi_scale_factor = -1000;
@@ -89,6 +91,7 @@ namespace zf {
         double jpsi_distance_xy;
         double jpsi_distance_z;
 
+        double z_delta_phi;
 
         double jpsi_eff;
         double jpsi_acc_eff;

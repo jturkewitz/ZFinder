@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Wed Nov 11 17:33:42 2015 by ROOT version 5.34/32
+// Thu Nov 12 18:09:25 2015 by ROOT version 5.34/32
 // from TTree zfinder_tree/zfinder_tree
-// found on file: /data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/ntuples_looser/jpsiTest440_doublemuon_trigger_matching.root
+// found on file: /data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/jpsiTest462_DoubleMuon_jpsi2_1_2012.root
 //////////////////////////////////////////////////////////
 
 #ifndef ZFinder_Muons_Tree_h
@@ -195,11 +195,11 @@ ZFinder_Muons_Tree::ZFinder_Muons_Tree(TTree *tree) : fChain(0)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/ntuples_looser/jpsiTest440_doublemuon_trigger_matching.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/jpsiTest480_double_mu_sideband_combined.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/ntuples_looser/jpsiTest440_doublemuon_trigger_matching.root");
+         f = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/jpsiTest480_double_mu_sideband_combined.root");
       }
-      TDirectory * dir = (TDirectory*)f->Get("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/ntuples_looser/jpsiTest440_doublemuon_trigger_matching.root:/ZFinder");
+      TDirectory * dir = (TDirectory*)f->Get("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/jpsiTest480_double_mu_sideband_combined.root:/ZFinder");
       dir->GetObject("zfinder_tree",tree);
 
    }

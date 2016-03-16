@@ -25,7 +25,7 @@ namespace zf {
     //const std::string Z_CODE = "z_m/D:z_pt:z_y:z_phi:z_phistar:z_eta:z_vtx_prob:z_vtx_x:z_vtx_y:z_vtx_z:daughter0_pt:daughter1_pt:daughter0_charge/I:daughter1_charge";
     const std::string Z_CODE = "z_m/D:z_pt:z_y:z_phi:z_phistar:z_eta:z_vtx_prob:z_vtx_x:z_vtx_y:z_vtx_z:daughter0_pt:daughter0_eta:daughter0_phi:daughter1_pt:daughter1_eta:daughter1_phi:daughter0_charge/I:daughter1_charge";
     //const std::string Z_CODE_INT = "daughter0_charge/I:daughter1_charge";
-    const std::string JPSI_CODE = "jpsi_m/D:jpsi_pt:jpsi_y:jpsi_phi:jpsi_eta:jpsi_vtx_prob:jpsi_vtx_x:jpsi_vtx_y:jpsi_vtx_z:jpsi_tau_xy:jpsi_tau_z:jpsi_distance_xy:jpsi_distance_z:jpsi_eff:jpsi_acc_eff:jpsi_scale_factor:muon0_pt:muon0_eta:muon0_phi:muon1_pt:muon1_eta:muon1_phi:muon0_charge/I:muon1_charge:has_muons_in_eta_window:has_high_pt_muons";
+    const std::string JPSI_CODE = "jpsi_m/D:jpsi_pt:jpsi_y:jpsi_phi:jpsi_eta:jpsi_vtx_prob:jpsi_vtx_x:jpsi_vtx_y:jpsi_vtx_z:jpsi_tau_xy:jpsi_tau_z:jpsi_distance_xy:jpsi_distance_z:z_delta_phi:jpsi_eff:jpsi_acc_eff:jpsi_scale_factor:muon0_pt:muon0_eta:muon0_phi:muon1_pt:muon1_eta:muon1_phi:muon0_charge/I:muon1_charge:has_muons_in_eta_window:has_high_pt_muons";
     //const std::string CODE = "z_m/D:z_y:z_phistar_born:z_phistar_dressed:z_phistar_naked:z_phistar_sc:z_pt:z_eta:e_pt0:e_pt1:e_eta0:e_eta1:e_phi0:e_phi1:e_rnine0:e_rnine1:n_true_pileup:e_charge0/I:e_charge1:n_verts:t0tight/O:t1tight";
     tree_->Branch("reco_z", &reco_z_, Z_CODE.c_str());
     //tree_->Branch("reco_z", &reco_z_, Z_CODE_INT.c_str());
@@ -147,7 +147,7 @@ namespace zf {
     reco_z_.z_vtx_y = zfe.reco_z.vtx_y;
     reco_z_.z_vtx_z = zfe.reco_z.vtx_z;
 
-    if (zfe.e0 != NULL && zfe.e1 != NULL){
+    if (zfe.e0 != NULL && zfe.e1 != NULL) {
       reco_z_.daughter0_pt = zfe.e0->pt;
       reco_z_.daughter0_eta = zfe.e0->eta;
       reco_z_.daughter0_phi = zfe.e0->phi;
@@ -185,8 +185,11 @@ namespace zf {
     
     
     //if (zfe.found_jpsi) {}
+    int n_jpsi = 0;
+    unsigned int best_jpsi_pos = 0;
     if (true) {
-      int n_jpsi = 0;
+      float best_jpsi_val = 1000000000.0;
+      //use this loop to determine the best J/Psi candidate which passes all cuts
       for (unsigned int i = 0; i < zfe.reco_jpsi.m.size() ; ++i ) {
         //TODO should fold in eta window cut here??
         //TODO should fold in jpsi pT window cut here??
@@ -230,9 +233,24 @@ namespace zf {
           continue;
         }
         n_jpsi++;
+        if (fabs(zfe.reco_jpsi.vtx_prob.at(i)) < best_jpsi_val) {
+          best_jpsi_pos = i;
+        }
+        
         //TODO decide on how to do this for a tree (and histogram method too), for now just take first jpsi
         //this is definitely a kludge, think of proper way to do this
-        if (n_jpsi > 1) {
+        //if (n_jpsi > 1) {
+        //  continue;
+        //}
+      }
+    }
+
+    if (true) {
+      for (unsigned int i = 0; i < zfe.reco_jpsi.m.size() ; ++i ) {
+        if (n_jpsi == 0) {
+          continue;
+        }
+        if (i != best_jpsi_pos) {
           continue;
         }
 
@@ -247,6 +265,8 @@ namespace zf {
 
         reco_jpsi_.jpsi_distance_xy = zfe.reco_jpsi.distance_xy.at(i);
         reco_jpsi_.jpsi_distance_z = zfe.reco_jpsi.distance_z.at(i);
+
+        reco_jpsi_.z_delta_phi = zfe.reco_jpsi.z_delta_phi.at(i);
 
         reco_jpsi_.jpsi_vtx_prob = zfe.reco_jpsi.y.at(i);
         reco_jpsi_.jpsi_vtx_x = zfe.reco_jpsi.vtx_x.at(i);

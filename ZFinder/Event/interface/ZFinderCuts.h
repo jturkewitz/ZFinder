@@ -7,8 +7,10 @@ namespace zf {
   //https://twiki.cern.ch/twiki/bin/viewauth/CMS/EgammaPOG
   const double MIN_JPSI_MASS = 2.85; //GeV
   const double MAX_JPSI_MASS = 3.35; //GeV
-  const double MIN_Z_MASS = 60.0; //GeV
-  const double MAX_Z_MASS = 120.0; //GeV
+  //const double MIN_Z_MASS = 60.0; //GeV
+  //const double MAX_Z_MASS = 120.0; //GeV
+  const double MIN_Z_MASS = 40.0; //GeV
+  const double MAX_Z_MASS = 300.0; //GeV
   //TODO TESTING
   //const double MIN_Z_MASS = 81.1876; //GeV
   //const double MAX_Z_MASS = 101.1876; //GeV
@@ -24,7 +26,9 @@ namespace zf {
   const double MIN_Z_MUON_PT = 20.0; //GeV
   const double MIN_ELECTRON_PT = 20.0; //GeV
   const double MAX_Z_LEPTON_ETA = 2.4; //GeV
-  const double MAX_JPSI_VERTEX_Z_DISPLACEMENT = 1.0 ; //cm
+  //const double MAX_JPSI_VERTEX_Z_DISPLACEMENT = 1.0 ; //cm
+  const double MAX_JPSI_VERTEX_Z_DISPLACEMENT = 0.5 ; //cm
+  const bool IS_PILEUP_CUT_INVERTED = false ; //inverts pileup cut for determining pile-up
   const double MIN_VERTEX_PROB = 0.005; //
   //const double MAX_JPSI_MUON_ETA = 2.1; //limited by tag and probe method to measure scale factors
   //const double MAX_JPSI_RAP = 2.1; //

@@ -97,6 +97,7 @@ namespace zf {
         double primary_x;
         double primary_y;
         double primary_z;
+        double primary_sum_pt_squared;
         reco::Vertex primary_vert;
       } truth_vert, reco_vert;
 

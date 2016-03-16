@@ -25,16 +25,23 @@
 
 
 #include "ZFinder_Electrons_Tree.C"
-ZFinder_Electrons_Tree *jpsi;
 
-//#include "ZFinder_Muons_Tree.C"
+#include "ZFinder_Muons_Tree.C"
+
+#include "ZFinder_Jpsi_Tree.C"
+
+#include "ZFinder_Tree.C"
+
+//ZFinder_Electrons_Tree *jpsi; //just edit the file in this for now?? TODO fix this stuff
+ZFinder_Tree *jpsi; //just edit the file in this for now?? TODO fix this stuff
+
 //ZFinder_Muons_Tree *jpsi;
-
-//#include "ZFinder_Jpsi_Tree.C"
 //ZFinder_Jpsi_Tree *jpsi;
 
-bool use_z_to_muons = false;
-bool use_z_to_electrons = true;
+//bool use_z_to_muons = true;
+////bool use_z_to_muons = false;
+////bool use_z_to_electrons = true;
+//bool use_z_to_electrons = false;
 
 using namespace std;
 
@@ -49,25 +56,32 @@ using namespace std;
 
 //TODO make the file an input option, much easier to use
 //void run(const char *  file) {
-void Run() {
+void Run(std::string file_name, bool use_z_to_muons = false, bool use_z_to_electrons = false) {
   //SetAtlasStyle();
 
   if(use_z_to_muons) {
     //TFile *root_file = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/ntuples_looser/jpsiTest440_doublemuon_trigger_matching.root","READ");
-    TFile *root_file = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/jpsiTest462_DoubleMuon_jpsi2_1_2012.root","READ");
-    jpsi = new ZFinder_Muons_Tree((TTree*)root_file->Get("zfinder_tree"));
+    //TFile *root_file = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/jpsiTest462_DoubleMuon_jpsi2_1_2012.root","READ");
+    //TFile *root_file = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/jpsiTest480_double_mu_sideband_combined.root","READ");
+    TFile *root_file = new TFile(file_name.c_str(),"READ");
+    jpsi = new ZFinder_Tree((TTree*)root_file->Get("zfinder_tree"),file_name.c_str());
     
     //jpsi = new zfinder_tree((TTree*)root_file->Get("zfinder_tree"));
   }
   else if(use_z_to_electrons) {
     //TFile *root_file = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/ntuples_looser/jpsiTest441_doubleelectron_trigger_matching.root","READ");
-    TFile *root_file = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/jpsiTest463_DoubleElectron_jpsi2_1_2012.root","READ");
-    ZFinder_Electrons_Tree *jpsi = new ZFinder_Electrons_Tree((TTree*)root_file->Get("zfinder_tree"));
+    //TFile *root_file = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/jpsiTest463_DoubleElectron_jpsi2_1_2012.root","READ");
+    //TFile *root_file = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/jpsiTest481_double_e_sideband_combined.root","READ");
+    //TFile *root_file = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/jpsiTest507_z_40_300_DoubleElectron.root","READ");
+    //ZFinder_Tree *jpsi = new ZFinder_Tree((TTree*)root_file->Get("zfinder_tree"));
+    TFile *root_file = new TFile(file_name.c_str(),"READ");
+    jpsi = new ZFinder_Tree((TTree*)root_file->Get("zfinder_tree"),file_name.c_str());
   }
   else {
-    //TFile *root_file = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/ntuples_looser/jpsiTest451_MuOniaPartial2012B_dimuon8_eta24_ptsub25.root","READ");
-    //TODO change this to use same rapidity of J/Psi as Z-> inclusive, time pressed so for now don't rerun this, shouldn't be a big deal as just gets fit parameters but still TODO)
     TFile *root_file = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/ntuples_looser/jpsiTest451_MuOniaPartial2012B_dimuon8_eta24_ptsub25.root","READ");
+    //TODO change this to use same rapidity of J/Psi as Z-> inclusive, time pressed so for now don't rerun this, shouldn't be a big deal as just gets fit parameters but still TODO)
+    //TODO fix this
+    //TFile *root_file = new TFile(file_name.c_str(),"READ");
     ZFinder_Jpsi_Tree *jpsi = new ZFinder_Jpsi_Tree((TTree*)root_file->Get("zfinder_tree"));
   }
 
@@ -84,8 +98,10 @@ void Run() {
   // TODO fix this!
   // TODO this needs to be changed for CMS analysis
 
-  TFile cms_acc_eff = ("acc_eff_map.root");
-  TH2* h_acc_eff_cms = (TH2*)cms_acc_eff.Get("jpsi_pt_vs_rap");
+  //TFile cms_acc_eff = ("acc_eff_map.root");
+  //TH2* h_acc_eff_cms = (TH2*)cms_acc_eff.Get("jpsi_pt_vs_rap");
+  TFile cms_acc_eff = ("acc_eff_map_finer.root");
+  TH2* h_acc_eff_cms = (TH2*)cms_acc_eff.Get("jpsi_pt_vs_rap_finer");
 
 
   //TFile mainfile_acc( "../AcceptanceMaps/acceptancejpsi_RapMax2.1_PtMax100_RapBins100_PtBins400_Sampling10k.root" );
@@ -118,11 +134,11 @@ void Run() {
 
   //TFile *ntuple;
   if(use_z_to_muons) {
-    TFile *ntuple = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/ntuples_looser/ZJpsimumu.root", "RECREATE");
+    TFile *ntuple = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/ntuples_looser/ZJpsimumu_sb.root", "RECREATE");
     ntuple = new TFile("ZJpsimumu.root", "RECREATE");
   }
   else if (use_z_to_electrons) {
-    TFile *ntuple = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/ntuples_looser/ZJpsiee.root", "RECREATE");
+    TFile *ntuple = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/ntuples_looser/ZJpsiee_sb.root", "RECREATE");
     ntuple = new TFile("ZJpsiee.root", "RECREATE");
   }
   else {
@@ -157,7 +173,9 @@ void Run() {
       cout << "\r" << (double)iEntry/(double)jpsi_entries*100 << "\% processed" << flush;
     }
     //limit entries in case of inclusive J/Psi
-    if(iEntry > 20000 && !use_z_to_muons && !use_z_to_electrons) {
+    //if(iEntry > 20000 && !use_z_to_muons && !use_z_to_electrons) {
+    //if(iEntry > 200000 && !use_z_to_muons && !use_z_to_electrons) {
+    if(iEntry > 50000 && !use_z_to_muons && !use_z_to_electrons) {
       break;
     }
         
@@ -242,7 +260,7 @@ void Run() {
       unpolarised = weight;
     }
     else {
-      cout << "weight not within [-100,100] " << weight << endl;
+      //cout << "weight not within [-100,100], set weight to 1 " << weight << endl;
       unpolarised = 1.;
     }
 
@@ -305,13 +323,14 @@ void Run() {
 
     // find reco weights
     if (TMath::Abs(onia_mu0_eta)<2.1 && onia_mu0_pt<20.) {
-      if (TMath::Abs(onia_mu1_eta)<0.9)
+      if (TMath::Abs(onia_mu1_eta)<0.9) {
         for (int i = 0; i<h_weights_eta1->GetN(); i++) {
           h_weights_eta1->GetPoint(i, xvalue, yvalue);
           if (onia_mu0_pt > xvalue) {
             reco_muon0_weight = yvalue;
           }
         }
+      }
       if (TMath::Abs(onia_mu0_eta)>0.9 && TMath::Abs(onia_mu0_eta)<1.2) {
         for (int i = 0; i<h_weights_eta2->GetN(); i++) {
           h_weights_eta2->GetPoint(i, xvalue, yvalue);

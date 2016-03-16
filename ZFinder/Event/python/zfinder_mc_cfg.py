@@ -29,7 +29,8 @@ process.options = cms.untracked.PSet(
 
 process.source = cms.Source("PoolSource",
     #fileNames = cms.untracked.vstring( 'file:/hdfs/cms/user/turkewitz/ZPhysics/MC_Generated/JPsi/jpsi_mc_Test43_step3/jpsi_mc_Test43_step3_000-pool.root')
-    fileNames = cms.untracked.vstring( 'file:/data/whybee0a/user/turkewitz_2/test/turkewitz/temp/MC/DYToMuMu_M_20_Tune4C_8TeV_pythia8_step3.root')
+    #fileNames = cms.untracked.vstring( 'file:/data/whybee0a/user/turkewitz_2/test/turkewitz/temp/MC/DYToMuMu_M_20_Tune4C_8TeV_pythia8_step3.root')
+    fileNames = cms.untracked.vstring( 'file:/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/jpsi_mc_pythia8_Test12_step3_hadded.root')
 )
 
 process.TFileService = cms.Service("TFileService",
