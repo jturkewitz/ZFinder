@@ -9,6 +9,7 @@
 #include <TCanvas.h>
 #include "TH1.h"
 #include "TGraph.h"
+#include "TLegend.h"
 
 // RooFit
 #include "RooAddPdf.h"
@@ -81,8 +82,8 @@ int RooFitZMassBackground(
   //RooRealVar z_mass("z_mass", "z_mass" , z_mass_min, z_mass_max, "GeV");
 
   double z_mass_min = 40.0;
-  double z_mass_min_upper = 50.0;
-  //double z_mass_min = 45.0;
+  //double z_mass_min_upper = 50.0;
+  double z_mass_min_upper = 45.0;
   double z_mass_max = 300.0;
   double z_mass_max_lower = 150.0;
   RooRealVar z_mass("z_mass", "z_mass" , z_mass_min, z_mass_max, "GeV");
@@ -296,7 +297,14 @@ int RooFitZMassBackground(
   //bg_exponential_test.plotOn(z_mass_fitframe, LineColor(kGreen-2), NormRange("low,high"));
   //bg_exponential_test.plotOn(z_mass_fitframe, LineColor(kGreen-2), NormRange("high"));
   bg_exponential_test.plotOn(z_mass_fitframe, LineColor(kGreen-2), NormRange("low,high"));
-  bg_exponential.plotOn(z_mass_fitframe, LineColor(kRed-2));
+  bg_exponential.plotOn(z_mass_fitframe, LineColor(kBlue-2), VLines(), Range("signal"), RooFit::Name("signal"));
+  bg_exponential.plotOn(z_mass_fitframe, LineColor(kRed-2), VLines(), RooFit::Name("background"));
+
+  Double_t xl1=.58, yl1=0.55, xl2=xl1+.3, yl2=yl1+.325;
+  TLegend *leg = new TLegend(xl1,yl1,xl2,yl2);
+  leg->SetFillColor(kWhite);
+  leg->AddEntry(z_mass_fitframe->findObject("signal"),"signal region","l");
+  leg->AddEntry(z_mass_fitframe->findObject("background"),"background region","l");
 
   //z_mass_fitpdf.plotOn(z_mass_fitframe, Components(voigtian), LineColor(kGreen-2));
   //z_mass_fitpdf.plotOn(z_mass_fitframe, Components(MyBackgroundPdf), LineColor(kBlue-2));
@@ -306,6 +314,7 @@ int RooFitZMassBackground(
 
   gPad->SetLogy();
   z_mass_fitframe->Draw();
+  leg->Draw();
 
   std::string z_image_name = OUT_DIR;
   z_image_name.append(z_hist_name);

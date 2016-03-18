@@ -25,7 +25,7 @@ namespace zf {
     //const std::string Z_CODE = "z_m/D:z_pt:z_y:z_phi:z_phistar:z_eta:z_vtx_prob:z_vtx_x:z_vtx_y:z_vtx_z:daughter0_pt:daughter1_pt:daughter0_charge/I:daughter1_charge";
     const std::string Z_CODE = "z_m/D:z_pt:z_y:z_phi:z_phistar:z_eta:z_vtx_prob:z_vtx_x:z_vtx_y:z_vtx_z:daughter0_pt:daughter0_eta:daughter0_phi:daughter1_pt:daughter1_eta:daughter1_phi:daughter0_charge/I:daughter1_charge";
     //const std::string Z_CODE_INT = "daughter0_charge/I:daughter1_charge";
-    const std::string JPSI_CODE = "jpsi_m/D:jpsi_pt:jpsi_y:jpsi_phi:jpsi_eta:jpsi_vtx_prob:jpsi_vtx_x:jpsi_vtx_y:jpsi_vtx_z:jpsi_tau_xy:jpsi_tau_z:jpsi_distance_xy:jpsi_distance_z:z_delta_phi:jpsi_eff:jpsi_acc_eff:jpsi_scale_factor:muon0_pt:muon0_eta:muon0_phi:muon1_pt:muon1_eta:muon1_phi:muon0_charge/I:muon1_charge:has_muons_in_eta_window:has_high_pt_muons";
+    const std::string JPSI_CODE = "jpsi_m/D:jpsi_pt:jpsi_y:jpsi_phi:jpsi_eta:jpsi_vtx_prob:jpsi_vtx_x:jpsi_vtx_y:jpsi_vtx_z:jpsi_tau_xy:jpsi_tau_z:jpsi_distance_xy:jpsi_distance_z:z_delta_phi:jpsi_eff:jpsi_acc_eff:jpsi_scale_factor:cos_jpsi_mu_plus:cos_jpsi_mu_minus:muon0_pt:muon0_eta:muon0_phi:muon1_pt:muon1_eta:muon1_phi:muon0_charge/I:muon1_charge:has_muons_in_eta_window:has_high_pt_muons";
     //const std::string CODE = "z_m/D:z_y:z_phistar_born:z_phistar_dressed:z_phistar_naked:z_phistar_sc:z_pt:z_eta:e_pt0:e_pt1:e_eta0:e_eta1:e_phi0:e_phi1:e_rnine0:e_rnine1:n_true_pileup:e_charge0/I:e_charge1:n_verts:t0tight/O:t1tight";
     tree_->Branch("reco_z", &reco_z_, Z_CODE.c_str());
     //tree_->Branch("reco_z", &reco_z_, Z_CODE_INT.c_str());
@@ -46,7 +46,7 @@ namespace zf {
     tree_->Branch("truth_jpsi", &truth_jpsi_, JPSI_CODE.c_str());
     //const std::string EVENT_CODE = "event_number/i:run_number:is_mc/O";
 
-    const std::string EVENT_CODE = "event_weight/D:event_number/I:run_number:n_verts:truth_n_verts:is_mc/O:found_high_pt_muons_from_z:found_good_muons_from_z:found_dimuon_z_compatible_vertex:found_z_to_muons_mass:found_high_pt_electrons_from_z:found_good_electrons_from_z:found_dielectron_z_compatible_vertex:found_z_to_electrons_mass:found_dimuon_jpsi_with_muons_in_eta_window:found_dimuon_jpsi_with_high_pt_muons:found_dimuon_jpsi_with_soft_id_and_high_pt_muons:found_dimuon_jpsi_with_good_muons_and_compatible_muon_vertex:found_good_dimuon_jpsi_compatible_with_primary_vertex:found_jpsi";
+    const std::string EVENT_CODE = "event_weight/D:primary_vert_sum_pt/D:event_number/I:run_number:n_verts:truth_n_verts:is_mc/O:found_high_pt_muons_from_z:found_good_muons_from_z:found_dimuon_z_compatible_vertex:found_z_to_muons_mass:found_high_pt_electrons_from_z:found_good_electrons_from_z:found_dielectron_z_compatible_vertex:found_z_to_electrons_mass:found_dimuon_jpsi_with_muons_in_eta_window:found_dimuon_jpsi_with_high_pt_muons:found_dimuon_jpsi_with_soft_id_and_high_pt_muons:found_dimuon_jpsi_with_good_muons_and_compatible_muon_vertex:found_good_dimuon_jpsi_compatible_with_primary_vertex:found_jpsi";
     tree_->Branch("event_info", &event_, EVENT_CODE.c_str());
 
     //if (IS_MC_) {
@@ -277,6 +277,9 @@ namespace zf {
         reco_jpsi_.jpsi_acc_eff = zfe.reco_jpsi.jpsi_acc_eff.at(i);
         reco_jpsi_.jpsi_scale_factor = zfe.reco_jpsi.jpsi_scale_factor.at(i);
 
+        reco_jpsi_.cos_jpsi_mu_plus = zfe.reco_jpsi.cos_jpsi_mu_plus.at(i);
+        reco_jpsi_.cos_jpsi_mu_minus = zfe.reco_jpsi.cos_jpsi_mu_minus.at(i);
+
         reco_jpsi_.muon0_pt = zfe.reco_jpsi.muon0.at(i).pt();
         reco_jpsi_.muon0_eta = zfe.reco_jpsi.muon0.at(i).eta();
         reco_jpsi_.muon0_phi = zfe.reco_jpsi.muon0.at(i).phi();
@@ -382,6 +385,7 @@ namespace zf {
     // General Event info
 
     event_.event_weight = zfe.event_weight;
+    event_.primary_vert_sum_pt = zfe.reco_vert.primary_sum_pt_squared;
     event_.event_number = zfe.id.event_num;
     event_.run_number = zfe.id.run_num;
 

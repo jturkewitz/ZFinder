@@ -59,6 +59,9 @@ namespace zf {
           jpsi_acc_eff = -1000;
           jpsi_scale_factor = -1000;
 
+          cos_jpsi_mu_plus = -1000;
+          cos_jpsi_mu_minus = -1000;
+
           muon0_pt = -1000;
           muon0_eta = -1000;
           muon0_phi = -1000;
@@ -96,6 +99,9 @@ namespace zf {
         double jpsi_eff;
         double jpsi_acc_eff;
         double jpsi_scale_factor;
+
+        double cos_jpsi_mu_plus;
+        double cos_jpsi_mu_minus;
 
         double muon0_pt;
         double muon0_eta;
@@ -167,6 +173,7 @@ namespace zf {
       struct event_branch {
         void clear_values() {
           event_weight = -1.0;
+          primary_vert_sum_pt = -1.0;
 
           event_number = 0;
           run_number = 0;
@@ -197,6 +204,7 @@ namespace zf {
           clear_values();
         }
         double event_weight;
+        double primary_vert_sum_pt;
 
         unsigned int event_number;
         unsigned int run_number;

@@ -126,8 +126,7 @@ std::vector<double> RooFitCombined(
   dimuon_mass.setRange("signal", dimuon_mass_signal_min, dimuon_mass_signal_max) ;
   dimuon_mass.setRange("all", dimuon_mass_min, dimuon_mass_max) ;
 
-  //double tau_xy_min = -0.3;
-  double tau_xy_min = -1.0;
+  double tau_xy_min = -0.3;
   double tau_xy_max = 5.0;
   RooRealVar tau_xy("tau_xy", "tau_xy" , tau_xy_min, tau_xy_max, "ps");
 
@@ -337,9 +336,13 @@ std::vector<double> RooFitCombined(
   RooRealVar zjpsi_np_dimuon_slope("zjpsi_np_dimuon_slope", "zjpsi_np_dimuon_slope", zjpsi_np_dimuon_slope_value);
   RooExponential zjpsi_np_dimuon_bg_exponential("zjpsi_np_dimuon_bg_exponential", "zjpsi_np_dimuon_bg_exponential", zjpsi_dimuon_mass, zjpsi_np_dimuon_slope);
 
-  RooRealVar zjpsi_m_sig_tau_sig_frac("zjpsi_m_sig_tau_sig_frac", "zjpsi_m_sig_tau_sig_frac", 0.2, 0.0, 1.0);
-  RooRealVar zjpsi_m_sig_tau_bg_frac("zjpsi_m_sig_tau_bg_frac", "zjpsi_m_sig_tau_bg_frac", 0.6, 0.0, 1.0);
-  RooRealVar zjpsi_m_bg_tau_sig_frac("zjpsi_m_bg_tau_sig_frac", "zjpsi_m_bg_tau_sig_frac", 0.15, 0.0, 1.0);
+  //RooRealVar zjpsi_m_sig_tau_sig_frac("zjpsi_m_sig_tau_sig_frac", "zjpsi_m_sig_tau_sig_frac", 0.2, 0.0, 1.0);
+  //RooRealVar zjpsi_m_sig_tau_bg_frac("zjpsi_m_sig_tau_bg_frac", "zjpsi_m_sig_tau_bg_frac", 0.6, 0.0, 1.0);
+  //RooRealVar zjpsi_m_bg_tau_sig_frac("zjpsi_m_bg_tau_sig_frac", "zjpsi_m_bg_tau_sig_frac", 0.15, 0.0, 1.0);
+
+  RooRealVar zjpsi_m_sig_tau_sig_frac("zjpsi_m_sig_tau_sig_frac", "zjpsi_m_sig_tau_sig_frac", 0.1, 0.0, 1.0);
+  RooRealVar zjpsi_m_sig_tau_bg_frac("zjpsi_m_sig_tau_bg_frac", "zjpsi_m_sig_tau_bg_frac", 0.4, 0.0, 1.0);
+  RooRealVar zjpsi_m_bg_tau_sig_frac("zjpsi_m_bg_tau_sig_frac", "zjpsi_m_bg_tau_sig_frac", 0.3, 0.0, 1.0);
 
   RooProdPdf zjpsi_m_sig_tau_sig("zjpsi_m_sig_tau_sig", "zjpsi_m_sig_tau_sig", RooArgList(zjpsi_mass_signal, zjpsi_tau_xy_gauss_sum_fitpdf ));
   RooProdPdf zjpsi_m_sig_tau_bg("zjpsi_m_sig_tau_bg", "zjpsi_m_sig_tau_bg", RooArgList(zjpsi_mass_signal, zjpsi_decay_exp ));

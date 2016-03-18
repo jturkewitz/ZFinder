@@ -32,8 +32,10 @@
 
 #include "ZFinder_Tree.C"
 
+#include "ZFinder_Tree_New.C"
+
 //ZFinder_Electrons_Tree *jpsi; //just edit the file in this for now?? TODO fix this stuff
-ZFinder_Tree *jpsi; //just edit the file in this for now?? TODO fix this stuff
+ZFinder_Tree_New *jpsi; //just edit the file in this for now?? TODO fix this stuff
 
 //ZFinder_Muons_Tree *jpsi;
 //ZFinder_Jpsi_Tree *jpsi;
@@ -64,7 +66,7 @@ void Run(std::string file_name, bool use_z_to_muons = false, bool use_z_to_elect
     //TFile *root_file = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/jpsiTest462_DoubleMuon_jpsi2_1_2012.root","READ");
     //TFile *root_file = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/jpsiTest480_double_mu_sideband_combined.root","READ");
     TFile *root_file = new TFile(file_name.c_str(),"READ");
-    jpsi = new ZFinder_Tree((TTree*)root_file->Get("zfinder_tree"),file_name.c_str());
+    jpsi = new ZFinder_Tree_New((TTree*)root_file->Get("zfinder_tree"),file_name.c_str());
     
     //jpsi = new zfinder_tree((TTree*)root_file->Get("zfinder_tree"));
   }
@@ -75,14 +77,15 @@ void Run(std::string file_name, bool use_z_to_muons = false, bool use_z_to_elect
     //TFile *root_file = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/jpsiTest507_z_40_300_DoubleElectron.root","READ");
     //ZFinder_Tree *jpsi = new ZFinder_Tree((TTree*)root_file->Get("zfinder_tree"));
     TFile *root_file = new TFile(file_name.c_str(),"READ");
-    jpsi = new ZFinder_Tree((TTree*)root_file->Get("zfinder_tree"),file_name.c_str());
+    jpsi = new ZFinder_Tree_New((TTree*)root_file->Get("zfinder_tree"),file_name.c_str());
   }
   else {
-    TFile *root_file = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/ntuples_looser/jpsiTest451_MuOniaPartial2012B_dimuon8_eta24_ptsub25.root","READ");
+    //TFile *root_file = new TFile("/data/whybee0a/user/turkewitz_2/test/turkewitz/TestFiles/ntuples_looser/jpsiTest451_MuOniaPartial2012B_dimuon8_eta24_ptsub25.root","READ");
     //TODO change this to use same rapidity of J/Psi as Z-> inclusive, time pressed so for now don't rerun this, shouldn't be a big deal as just gets fit parameters but still TODO)
     //TODO fix this
-    //TFile *root_file = new TFile(file_name.c_str(),"READ");
-    ZFinder_Jpsi_Tree *jpsi = new ZFinder_Jpsi_Tree((TTree*)root_file->Get("zfinder_tree"));
+    TFile *root_file = new TFile(file_name.c_str(),"READ");
+    //ZFinder_Jpsi_Tree *jpsi = new ZFinder_Tree_New((TTree*)root_file->Get("zfinder_tree"),file_name.c_str());
+    jpsi = new ZFinder_Tree_New((TTree*)root_file->Get("zfinder_tree"),file_name.c_str());
   }
 
   double onia_mass, z_mass, onia_tau, onia_pt, onia_rap;
