@@ -86,6 +86,8 @@ namespace zf {
             TH1D* jpsi_pt_;
             TH2D* jpsi_pt_vs_rap_;
             TH2D* jpsi_pt_vs_rap_finer_;
+            TH2D* jpsi_pt_vs_rap_finer_pos_;
+            TH2D* jpsi_pt_vs_rap_finer_neg_;
             TH2D* jpsi_pt_vs_rap_fine_;
             TH2D* jpsi_pt_vs_rap_polarization_long;
             TH2D* jpsi_pt_vs_rap_polarization_TPlusZero;

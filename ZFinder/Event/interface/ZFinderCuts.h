@@ -28,6 +28,7 @@ namespace zf {
   const double MAX_Z_LEPTON_ETA = 2.4; //GeV
   //const double MAX_JPSI_VERTEX_Z_DISPLACEMENT = 1.0 ; //cm
   const double MAX_JPSI_VERTEX_Z_DISPLACEMENT = 0.5 ; //cm
+  const double MIN_JPSI_VERTEX_Z_DISPLACEMENT = -10.0 ; //cm
   const bool IS_PILEUP_CUT_INVERTED = false ; //inverts pileup cut for determining pile-up
   const double MIN_VERTEX_PROB = 0.005; //
   //const double MAX_JPSI_MUON_ETA = 2.1; //limited by tag and probe method to measure scale factors

@@ -48,7 +48,7 @@ namespace zf {
 
       // z_pt
       const std::string z_pt_name = "z p_{T}";
-      z_pt_ = tdir.make<TH1D>(z_pt_name.c_str(), z_pt_name.c_str(), 200, 0., 200.);
+      z_pt_ = tdir.make<TH1D>(z_pt_name.c_str(), z_pt_name.c_str(), 500, 0., 500.);
       z_pt_->GetXaxis()->SetTitle("p_{T,Z}");
       z_pt_->GetYaxis()->SetTitle("Counts / GeV");
 
@@ -90,7 +90,7 @@ namespace zf {
 
       // z_from_muons_pt
       const std::string z_from_muons_pt_name = "Z From Muons p_{T}";
-      z_from_muons_pt_ = tdir.make<TH1D>(z_from_muons_pt_name.c_str(), z_from_muons_pt_name.c_str(), 200, 0., 200.);
+      z_from_muons_pt_ = tdir.make<TH1D>(z_from_muons_pt_name.c_str(), z_from_muons_pt_name.c_str(), 500, 0., 500.);
       z_from_muons_pt_->GetXaxis()->SetTitle("p_{T,Z}");
       z_from_muons_pt_->GetYaxis()->SetTitle("Counts / GeV");
 
@@ -471,13 +471,23 @@ namespace zf {
       jpsi_pt_vs_rap_->GetXaxis()->SetTitle("jpsi Rapidity");
       jpsi_pt_vs_rap_->GetYaxis()->SetTitle("jpsi Pt");
 
-      double bins_finer[] = {8.5,8.6,8.7,8.8,8.9,9.0,9.2,9.4,9.6,9.8,10,10.5,11.0,11.5,12.0,13.0,14,18,30,100};
-      int bin_finer_number = 19;
+      double bins_finer[] = {8.5,8.6,8.7,8.8,8.9,9.0,9.2,9.4,9.6,9.8,10,10.5,11.0,11.5,12.0,13.0,14,18,24,30,100};
+      int bin_finer_number = 20;
       // jpsi_pt_vs_rap
       const std::string jpsi_pt_vs_rap_finer_name = "jpsi_pt_vs_rap_finer";
       jpsi_pt_vs_rap_finer_ = tdir.make<TH2D>(jpsi_pt_vs_rap_finer_name.c_str(), jpsi_pt_vs_rap_finer_name.c_str(), 21, -2.1, 2.1, bin_finer_number, bins_finer);
       jpsi_pt_vs_rap_finer_->GetXaxis()->SetTitle("jpsi Rapidity");
       jpsi_pt_vs_rap_finer_->GetYaxis()->SetTitle("jpsi Pt");
+
+      const std::string jpsi_pt_vs_rap_finer_pos_name = "jpsi_pt_vs_rap_finer_pos";
+      jpsi_pt_vs_rap_finer_pos_ = tdir.make<TH2D>(jpsi_pt_vs_rap_finer_pos_name.c_str(), jpsi_pt_vs_rap_finer_pos_name.c_str(), 21, -2.1, 2.1, bin_finer_number, bins_finer);
+      jpsi_pt_vs_rap_finer_pos_->GetXaxis()->SetTitle("jpsi Rapidity");
+      jpsi_pt_vs_rap_finer_pos_->GetYaxis()->SetTitle("jpsi Pt");
+
+      const std::string jpsi_pt_vs_rap_finer_neg_name = "jpsi_pt_vs_rap_finer_neg";
+      jpsi_pt_vs_rap_finer_neg_ = tdir.make<TH2D>(jpsi_pt_vs_rap_finer_neg_name.c_str(), jpsi_pt_vs_rap_finer_neg_name.c_str(), 21, -2.1, 2.1, bin_finer_number, bins_finer);
+      jpsi_pt_vs_rap_finer_neg_->GetXaxis()->SetTitle("jpsi Rapidity");
+      jpsi_pt_vs_rap_finer_neg_->GetYaxis()->SetTitle("jpsi Pt");
 
       const std::string jpsi_pt_vs_rap_fine_name = "jpsi_pt_vs_rap_fine";
       jpsi_pt_vs_rap_fine_ = tdir.make<TH2D>(jpsi_pt_vs_rap_fine_name.c_str(), jpsi_pt_vs_rap_fine_name.c_str(), 21, -2.1, 2.1, 400, 0, 200);
@@ -1529,6 +1539,8 @@ namespace zf {
         }
         jpsi_pt_vs_rap_->Fill(zfe.reco_jpsi.y.at(i), zfe.reco_jpsi.pt.at(i) , event_weight);
         jpsi_pt_vs_rap_finer_->Fill(zfe.reco_jpsi.y.at(i), zfe.reco_jpsi.pt.at(i) , event_weight);
+        jpsi_pt_vs_rap_finer_pos_->Fill(zfe.reco_jpsi.y.at(i), zfe.reco_jpsi.pt.at(i) , event_weight * lambda1);
+        jpsi_pt_vs_rap_finer_neg_->Fill(zfe.reco_jpsi.y.at(i), zfe.reco_jpsi.pt.at(i) , event_weight * lambdaNeg1);
         jpsi_pt_vs_rap_fine_->Fill(zfe.reco_jpsi.y.at(i), zfe.reco_jpsi.pt.at(i) , event_weight);
         jpsi_pt_vs_rap_polarization_long->Fill(zfe.reco_jpsi.y.at(i), zfe.reco_jpsi.pt.at(i) , 
             event_weight * (1.0 - pow(zfe.reco_jpsi.cos_jpsi_mu_plus.at(i), 2.0) ));
@@ -1862,9 +1874,15 @@ namespace zf {
         jpsi_pt_->Fill(zfe.truth_jpsi.pt.at(i), event_weight);
         jpsi_pt_vs_rap_->Fill(zfe.truth_jpsi.y.at(i), zfe.truth_jpsi.pt.at(i) , event_weight);
         jpsi_pt_vs_rap_fine_->Fill(zfe.truth_jpsi.y.at(i), zfe.truth_jpsi.pt.at(i) , event_weight);
-        jpsi_pt_vs_rap_finer_->Fill(zfe.truth_jpsi.y.at(i), zfe.truth_jpsi.pt.at(i) , event_weight);
         jpsi_cos_mu_plus_->Fill(zfe.truth_jpsi.cos_jpsi_mu_plus.at(i), event_weight);
         jpsi_cos_mu_minus_->Fill(zfe.truth_jpsi.cos_jpsi_mu_minus.at(i), event_weight);
+
+        double lambdaNeg1 = (1.0 - pow(zfe.truth_jpsi.cos_jpsi_mu_plus.at(i), 2.0) );
+        //divide by 2.0 for lambda positive 1 to keep weight less than 1
+        double lambda1 = (1.0 + pow(zfe.truth_jpsi.cos_jpsi_mu_plus.at(i), 2.0)) / 2.0;
+        jpsi_pt_vs_rap_finer_pos_->Fill(zfe.truth_jpsi.y.at(i), zfe.truth_jpsi.pt.at(i) , event_weight * lambda1);
+        jpsi_pt_vs_rap_finer_neg_->Fill(zfe.truth_jpsi.y.at(i), zfe.truth_jpsi.pt.at(i) , event_weight * lambdaNeg1);
+        jpsi_pt_vs_rap_finer_->Fill(zfe.truth_jpsi.y.at(i), zfe.truth_jpsi.pt.at(i) , event_weight);
 
         jpsi_pt_vs_rap_polarization_long->Fill(zfe.truth_jpsi.y.at(i), zfe.truth_jpsi.pt.at(i) , 
             event_weight * (1.0 - pow(zfe.truth_jpsi.cos_jpsi_mu_plus.at(i), 2.0) ));

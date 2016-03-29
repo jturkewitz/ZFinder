@@ -278,6 +278,7 @@ namespace zf {
         reco_jpsi_.jpsi_scale_factor = zfe.reco_jpsi.jpsi_scale_factor.at(i);
 
         reco_jpsi_.cos_jpsi_mu_plus = zfe.reco_jpsi.cos_jpsi_mu_plus.at(i);
+        //std::cout << zfe.reco_jpsi.cos_jpsi_mu_plus.at(i) << std::endl;
         reco_jpsi_.cos_jpsi_mu_minus = zfe.reco_jpsi.cos_jpsi_mu_minus.at(i);
 
         reco_jpsi_.muon0_pt = zfe.reco_jpsi.muon0.at(i).pt();

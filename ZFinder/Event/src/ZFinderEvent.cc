@@ -979,7 +979,7 @@ namespace zf {
     //TODO primary vertex or vertex from z?
     //if ( fabs(reco_vert.primary_z - pos_z ) <= MAX_JPSI_VERTEX_Z_DISPLACEMENT ) {
     //from Z boson if it exists, otherwise primary vertex
-    if ( fabs( z ) <= MAX_JPSI_VERTEX_Z_DISPLACEMENT ) {
+    if ( fabs( z ) < MAX_JPSI_VERTEX_Z_DISPLACEMENT && (fabs( z ) >= MIN_JPSI_VERTEX_Z_DISPLACEMENT)) {
       if(!IS_PILEUP_CUT_INVERTED) {
         reco_jpsi.has_dimuon_vertex_compatible_with_primary_vertex.push_back(true);
       }

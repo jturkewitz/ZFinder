@@ -90,9 +90,10 @@ void Run(std::string file_name, bool use_z_to_muons = false, bool use_z_to_elect
 
   double onia_mass, z_mass, onia_tau, onia_pt, onia_rap;
   double onia_mu0_pt, onia_mu1_pt, onia_mu0_eta, onia_mu1_eta;
-  double unpolarised, longitudinal, transverse, transverse_pos, transverse_neg; 
+  double unpolarised, lambda_pos, lambda_neg, longitudinal, transverse, transverse_pos, transverse_neg; 
   double is_z_to_electrons, is_z_to_muons;
   double reco_muon0_weight, reco_muon1_weight;
+  double cos_jpsi_mu_plus;
 
   int jpsi_entries = (jpsi->fChain)->GetEntries();
   cout << "Entries: " << jpsi_entries << endl;
@@ -103,8 +104,16 @@ void Run(std::string file_name, bool use_z_to_muons = false, bool use_z_to_elect
 
   //TFile cms_acc_eff = ("acc_eff_map.root");
   //TH2* h_acc_eff_cms = (TH2*)cms_acc_eff.Get("jpsi_pt_vs_rap");
-  TFile cms_acc_eff = ("acc_eff_map_finer.root");
+
+  TFile cms_acc_eff = ("AcceptanceMaps/acc_eff_map_pol_0.root");
   TH2* h_acc_eff_cms = (TH2*)cms_acc_eff.Get("jpsi_pt_vs_rap_finer");
+
+  TFile cms_acc_eff_pos = ("AcceptanceMaps/acc_eff_map_pol_pos.root");
+  TH2* h_acc_eff_cms_pos = (TH2*)cms_acc_eff_pos.Get("jpsi_pt_vs_rap_finer_pos");
+
+  TFile cms_acc_eff_neg = ("AcceptanceMaps/acc_eff_map_pol_neg.root");
+  TH2* h_acc_eff_cms_neg = (TH2*)cms_acc_eff_neg.Get("jpsi_pt_vs_rap_finer_neg");
+
 
 
   //TFile mainfile_acc( "../AcceptanceMaps/acceptancejpsi_RapMax2.1_PtMax100_RapBins100_PtBins400_Sampling10k.root" );
@@ -160,9 +169,12 @@ void Run(std::string file_name, bool use_z_to_muons = false, bool use_z_to_elect
   aux->Branch("onia_mu1_pt", &onia_mu1_pt);
   aux->Branch("onia_mu0_eta",&onia_mu0_eta);
   aux->Branch("onia_mu1_eta",&onia_mu1_eta);
+  aux->Branch("cos_jpsi_mu_plus", &cos_jpsi_mu_plus);
   aux->Branch("is_z_to_electrons", &is_z_to_electrons);
   aux->Branch("is_z_to_muons", &is_z_to_muons);
   aux->Branch("unpolarised", &unpolarised);
+  aux->Branch("lambda_pos", &lambda_pos);
+  aux->Branch("lambda_neg", &lambda_neg);
   aux->Branch("longitudinal",&longitudinal);
   aux->Branch("transverse",  &transverse);
   aux->Branch("transverse_pos", &transverse_pos);
@@ -178,7 +190,7 @@ void Run(std::string file_name, bool use_z_to_muons = false, bool use_z_to_elect
     //limit entries in case of inclusive J/Psi
     //if(iEntry > 20000 && !use_z_to_muons && !use_z_to_electrons) {
     //if(iEntry > 200000 && !use_z_to_muons && !use_z_to_electrons) {
-    if(iEntry > 50000 && !use_z_to_muons && !use_z_to_electrons) {
+    if(iEntry > 100000 && !use_z_to_muons && !use_z_to_electrons) {
       break;
     }
         
@@ -192,6 +204,7 @@ void Run(std::string file_name, bool use_z_to_muons = false, bool use_z_to_elect
     onia_mu0_eta = jpsi->reco_jpsi_muon0_eta;
     onia_mu1_pt  = jpsi->reco_jpsi_muon1_pt;
     onia_mu1_eta = jpsi->reco_jpsi_muon1_eta;
+    cos_jpsi_mu_plus = jpsi->reco_jpsi_cos_jpsi_mu_plus;
 
     if(use_z_to_muons) {
       z_mass = jpsi->reco_z_from_muons_z_m;
@@ -257,7 +270,6 @@ void Run(std::string file_name, bool use_z_to_muons = false, bool use_z_to_elect
     int binx_cms, biny_cms;
     binx_cms = h_acc_eff_cms->GetXaxis()->FindBin(onia_rap);
     biny_cms = h_acc_eff_cms->GetYaxis()->FindBin(onia_pt);
-
     float weight = 1./h_acc_eff_cms->GetBinContent(binx_cms, biny_cms);
     if (weight>-100 && weight<100.) {
       unpolarised = weight;
@@ -265,6 +277,29 @@ void Run(std::string file_name, bool use_z_to_muons = false, bool use_z_to_elect
     else {
       //cout << "weight not within [-100,100], set weight to 1 " << weight << endl;
       unpolarised = 1.;
+    }
+
+    binx_cms = h_acc_eff_cms_pos->GetXaxis()->FindBin(onia_rap);
+    biny_cms = h_acc_eff_cms_pos->GetYaxis()->FindBin(onia_pt);
+    float weight = 1./h_acc_eff_cms_pos->GetBinContent(binx_cms, biny_cms);
+    if (weight>-100 && weight<100.) {
+      lambda_pos = weight;
+    }
+    else {
+      //cout << "weight not within [-100,100], set weight to 1 " << weight << endl;
+      lambda_pos = 1.;
+    }
+
+    int binx_cms, biny_cms;
+    binx_cms = h_acc_eff_cms_neg->GetXaxis()->FindBin(onia_rap);
+    biny_cms = h_acc_eff_cms_neg->GetYaxis()->FindBin(onia_pt);
+    float weight = 1./h_acc_eff_cms_neg->GetBinContent(binx_cms, biny_cms);
+    if (weight>-100 && weight<100.) {
+      lambda_neg = weight;
+    }
+    else {
+      //cout << "weight not within [-100,100], set weight to 1 " << weight << endl;
+      lambda_neg = 1.;
     }
 
     // find acceptance weights

@@ -9,9 +9,9 @@
 #include <TKey.h>
 #include <TEfficiency.h>
 #include <Riostream.h>
-void calculate_jpsi_efficiencies (string file_name )
+void calculate_jpsi_efficiencies (string file_name, int polarization = 0  )
 {
-  TFile *theFile0 = new TFile( file_name.c_str() );
+  TFile *theFile0 = new TFile( file_name.c_str());
 
   //TODO put this in rootrc
   gStyle->SetLineWidth(2.);
@@ -51,8 +51,27 @@ void calculate_jpsi_efficiencies (string file_name )
   //TH2D *jpsi_pt_vs_rap_mc = (TH2D*) theFile0->Get("ZFinder/MC_All/jpsi_pt_vs_rap_polarization_TPlusZero");
   //TH2D *jpsi_pt_vs_rap_jpsi = (TH2D*) theFile0->Get("ZFinder/Jpsi/jpsi_pt_vs_rap_polarization_TPlusZero");
 
-  TH2D *jpsi_pt_vs_rap_mc = (TH2D*) theFile0->Get("ZFinder/MC_All/jpsi_pt_vs_rap_finer");
-  TH2D *jpsi_pt_vs_rap_jpsi = (TH2D*) theFile0->Get("ZFinder/Dimuon_Jpsi_Vertex_Compatible/jpsi_pt_vs_rap_finer");
+  char *hist_name_gen;
+  char *hist_name_reco;
+  if (polarization == 0) {
+    hist_name_gen = "ZFinder/MC_All/jpsi_pt_vs_rap_finer";
+    hist_name_reco = "ZFinder/Dimuon_Jpsi_Vertex_Compatible/jpsi_pt_vs_rap_finer";
+  }
+  else if (polarization == 1) {
+    hist_name_gen = "ZFinder/MC_All/jpsi_pt_vs_rap_finer_pos";
+    hist_name_reco = "ZFinder/Dimuon_Jpsi_Vertex_Compatible/jpsi_pt_vs_rap_finer_pos";
+  }
+  else if (polarization == -1) {
+    hist_name_gen = "ZFinder/MC_All/jpsi_pt_vs_rap_finer_neg";
+    hist_name_reco = "ZFinder/Dimuon_Jpsi_Vertex_Compatible/jpsi_pt_vs_rap_finer_neg";
+  }
+  else {
+    std::cout << "Unknown polarization" << std::endl;
+  }
+ , //TH2D *jpsi_pt_vs_rap_mc = (TH2D*) theFile0->Get("ZFinder/MC_All/jpsi_pt_vs_rap_finer");
+  //TH2D *jpsi_pt_vs_rap_jpsi = (TH2D*) theFile0->Get("ZFinder/Dimuon_Jpsi_Vertex_Compatible/jpsi_pt_vs_rap_finer");
+  TH2D *jpsi_pt_vs_rap_mc = (TH2D*) theFile0->Get(hist_name_gen);
+  TH2D *jpsi_pt_vs_rap_jpsi = (TH2D*) theFile0->Get(hist_name_reco);
 
   //TH2D *jpsi_pt_vs_rap_mc = (TH2D*) theFile0->Get("ZFinder/MC_All/jpsi_pt_vs_rap");
   //TH2D *jpsi_pt_vs_rap_jpsi = (TH2D*) theFile0->Get("ZFinder/Dimuon_Jpsi_Vertex_Compatible/jpsi_pt_vs_rap");
@@ -147,6 +166,19 @@ void calculate_jpsi_efficiencies (string file_name )
   //  }
   //}
 
-  TFile output("acc_eff_map.root","new");
+  char *out_file_name;
+  if (polarization == 0) {
+    out_file_name = "acc_eff_map_pol_0.root";
+  }
+  else if (polarization == 1) {
+    out_file_name = "acc_eff_map_pol_pos.root";
+  }
+  else if (polarization == -1) {
+    out_file_name = "acc_eff_map_pol_neg.root";
+  }
+  else {
+    std::cout << "Unknown polarization" << std::endl;
+  }
+  TFile output(out_file_name,"new");
   acc_eff_map->Write();
 }
