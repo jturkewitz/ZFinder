@@ -109,6 +109,8 @@ void do_fit(std::string file_name, bool use_pileup_correction = false, std::stri
   RooRealVar *onia_mu1_eta = new RooRealVar("onia_mu1_eta",  "onia_mu1_eta",-3, 3);
 
   RooRealVar *unpolarised  = new RooRealVar("unpolarised" , "unpolarised" ,  -10000000000000., 1000000000.);
+  RooRealVar *lambda_pos  = new RooRealVar("lambda_pos" , "lambda_pos" ,  -10000000000000., 1000000000.);
+  RooRealVar *lambda_neg  = new RooRealVar("lambda_neg" , "lambda_neg" ,  -10000000000000., 1000000000.);
   RooRealVar *longitudinal = new RooRealVar("longitudinal", "longitudinal",  -10000000000000., 1000000000.);
   RooRealVar *transverse   = new RooRealVar("transverse"  , "transverse"  ,  -10000000000000., 1000000000.);
   RooRealVar *transverse_pos  = new RooRealVar("transverse_pos" , "transverse_pos" ,  -10000000000000., 1000000000.);
@@ -119,11 +121,15 @@ void do_fit(std::string file_name, bool use_pileup_correction = false, std::stri
 
   RooArgSet jpsi_argset(*onia_mass, *onia_tau, *onia_pt);
   jpsi_argset.add(*unpolarised); 
+  jpsi_argset.add(*lambda_pos); 
+  jpsi_argset.add(*lambda_neg); 
 
   RooArgSet zjpsi_argset(*onia_mass, *onia_tau, *is_z_to_electrons, *is_z_to_muons, *z_mass, *onia_pt, *onia_rap);
   zjpsi_argset.add(*onia_mu0_pt); zjpsi_argset.add(*onia_mu1_pt);
   zjpsi_argset.add(*onia_mu0_eta); zjpsi_argset.add(*onia_mu1_eta);
   zjpsi_argset.add(*unpolarised); 
+  zjpsi_argset.add(*lambda_pos); 
+  zjpsi_argset.add(*lambda_neg); 
   zjpsi_argset.add(*longitudinal);
   zjpsi_argset.add(*transverse); 
   zjpsi_argset.add(*transverse_pos);
@@ -159,6 +165,8 @@ void do_fit(std::string file_name, bool use_pileup_correction = false, std::stri
   TTree* jpsi_tree = (TTree*) jpsi_ntuple->Get("AUX");
   RooDataSet *jpsi_data = new RooDataSet("jpsi_data", "jpsi_data", jpsi_tree, jpsi_argset);
   RooDataSet *jpsi_data_weighted_testing     = new RooDataSet("jpsi_data_weighted_testing", "jpsi_data_weighted_testing", jpsi_tree, jpsi_argset, 0, "unpolarised");
+  //RooDataSet *jpsi_data_weighted_testing     = new RooDataSet("jpsi_data_weighted_testing", "jpsi_data_weighted_testing", jpsi_tree, jpsi_argset, 0, "lambda_pos");
+  //RooDataSet *jpsi_data_weighted_testing     = new RooDataSet("jpsi_data_weighted_testing", "jpsi_data_weighted_testing", jpsi_tree, jpsi_argset, 0, "lambda_neg");
 
   //      TCut SelectionCut = "onia_mass>2.6 && onia_mass<3.6";
   //  RooDataSet *newdata = (RooDataSet*)data->reduce(SelectionCut);
@@ -276,8 +284,8 @@ void do_fit(std::string file_name, bool use_pileup_correction = false, std::stri
   RooAddPdf jpsi_model("jpsi_model", "jpsi_model", RooArgList(ejpsi_m_sig_tau_sig, ejpsi_m_sig_tau_bg, ejpsi_m_bg_tau_sig, ejpsi_m_bg_tau_bg));
 
   //does not work right now
-  RooFitResult *fr_inclusive = jpsi_model.fitTo(*jpsi_data, NumCPU(4, kTRUE), Verbose(false), PrintLevel(-1), Save());
-  //RooFitResult *fr_inclusive = jpsi_model.fitTo(*jpsi_data_weighted_testing, NumCPU(4, kTRUE), Verbose(false), SumW2Error(kTRUE), PrintLevel(-1), Save());
+  //RooFitResult *fr_inclusive = jpsi_model.fitTo(*jpsi_data, NumCPU(4, kTRUE), Verbose(false), PrintLevel(-1), Save());
+  RooFitResult *fr_inclusive = jpsi_model.fitTo(*jpsi_data_weighted_testing, NumCPU(4, kTRUE), Verbose(false), SumW2Error(kTRUE), PrintLevel(-1), Save());
   fr_inclusive->Print();
 
   int num_mass_bins = 40;
