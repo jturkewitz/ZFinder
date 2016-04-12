@@ -69,13 +69,28 @@ int RooFitPileupEstimation(
   // Set up the variables we're going to read in from the files
   RooRealVar distance_z("distance_z", "#Delta z" , distance_z_min, distance_z_max, "cm");
   //TODO clean up, use variable names
-  distance_z.setRange("negative",-20.0,-3.0);
-  distance_z.setRange("positive",3.0,20.0);
+  distance_z.setRange("negative",distance_z_min,-3.0);
+  distance_z.setRange("positive",3.0,distance_z_max);
   // Define a range named "signal" in distance_z from -1,1
-  distance_z.setRange("signal",-1.0,1.0) ;
+  double signal_min = -0.5;
+  double signal_max = 0.5;
+  distance_z.setRange("signal",signal_min,signal_max) ;
+  double range1_min = -0.5;
+  double range1_max = 0.5;
+  distance_z.setRange("range1",range1_min,range1_max) ;
+  double range2_min = -1.0;
+  double range2_max = 1.0;
+  distance_z.setRange("range2",range2_min,range2_max) ;
+  double range3_min = -2.0;
+  double range3_max = 2.0;
+  distance_z.setRange("range3",range3_min,range3_max) ;
+  double range4_min = -3.0;
+  double range4_max = 3.0;
+  distance_z.setRange("range4",range4_min,range4_max) ;
+
   //distance_z.setRange("signal",-0.5,0.5) ;
   //distance_z.setRange("signal",-0.5,0.5) ;
-  distance_z.setRange("test",-20.0,20.0) ;
+  distance_z.setRange("test",distance_z_min,distance_z_max) ;
 
   //std::string inclusive_jpsi_hist = "ZFinder/Jpsi/";
   std::string inclusive_jpsi_hist = "ZFinder/Dimuon_Jpsi_Vertex_Compatible/";
@@ -120,12 +135,12 @@ int RooFitPileupEstimation(
   
   // Return value of pileup_gauss normalized over distance_z in range [-10,10]
   RooArgSet nset(distance_z) ;
-  std::cout << "pileup_gauss_Norm[distance_z] = " << pileup_gauss.getVal(&nset) << std::endl ;
+  //std::cout << "pileup_gauss_Norm[distance_z] = " << pileup_gauss.getVal(&nset) << std::endl ;
 
   // Create object representing integral over pileup_gauss
   // which is used to calculate  pileup_gauss_Norm[distance_z] == pileup_gauss / pileup_gauss_Int[distance_z]
   RooAbsReal* ipileup_gauss = pileup_gauss.createIntegral(distance_z) ;
-  std::cout << "pileup_gauss_Int[distance_z] = " << ipileup_gauss->getVal() << std::endl ;
+  //std::cout << "pileup_gauss_Int[distance_z] = " << ipileup_gauss->getVal() << std::endl ;
 
 
   // I n t e g r a t e   n o r m a l i z e d   p d f   o v e r   s u b r a n g e
@@ -136,13 +151,21 @@ int RooFitPileupEstimation(
   // This is the fraction of of p.d.f. pileup_gauss_Norm[distance_z] which is in the
   // range named "signal"
   RooAbsReal* ipileup_gauss_sig = pileup_gauss.createIntegral(distance_z,NormSet(distance_z),Range("signal")) ;
+  RooAbsReal* ipileup_gauss_range1 = pileup_gauss.createIntegral(distance_z,NormSet(distance_z),Range("range1")) ;
+  RooAbsReal* ipileup_gauss_range2 = pileup_gauss.createIntegral(distance_z,NormSet(distance_z),Range("range2")) ;
+  RooAbsReal* ipileup_gauss_range3 = pileup_gauss.createIntegral(distance_z,NormSet(distance_z),Range("range3")) ;
+  RooAbsReal* ipileup_gauss_range4 = pileup_gauss.createIntegral(distance_z,NormSet(distance_z),Range("range4")) ;
   RooAbsReal* ipileup_gauss_positive = pileup_gauss.createIntegral(distance_z,NormSet(distance_z),Range("positive")) ;
   RooAbsReal* ipileup_gauss_negative = pileup_gauss.createIntegral(distance_z,NormSet(distance_z),Range("negative")) ;
   RooAbsReal* ipileup_gauss_all = pileup_gauss.createIntegral(distance_z,NormSet(distance_z),Range("test")) ;
-  cout << "pileup_gauss_Int[distance_z|signal]_Norm[distance_z] = " << ipileup_gauss_sig->getVal() << endl ;
-  cout << "pileup_gauss_Int[distance_z|positive]_Norm[distance_z] = " << ipileup_gauss_positive->getVal() << endl ;
-  cout << "pileup_gauss_Int[distance_z|negative]_Norm[distance_z] = " << ipileup_gauss_negative->getVal() << endl ;
-  cout << "pileup_gauss_Int[distance_z|all]_Norm[distance_z] = " << ipileup_gauss_all->getVal() << endl ;
+  //cout << "Integral signal = " << signal_min << " to " << signal_max << " norm " << ipileup_gauss_sig->getVal() << endl ;
+  cout << "Integral range1 = " << range1_min << " to " << range1_max << " norm " << ipileup_gauss_range1->getVal() << endl ;
+  cout << "Integral range2 = " << range2_min << " to " << range2_max << " norm " << ipileup_gauss_range2->getVal() << endl ;
+  cout << "Integral range3 = " << range3_min << " to " << range3_max << " norm " << ipileup_gauss_range3->getVal() << endl ;
+  cout << "Integral range4 = " << range4_min << " to " << range4_max << " norm " << ipileup_gauss_range4->getVal() << endl ;
+  cout << "Integral positve 3 to Inf = " << ipileup_gauss_positive->getVal() << endl ;
+  cout << "Integral negative 3 to Inf = " << ipileup_gauss_negative->getVal() << endl ;
+  cout << "Integral all = " << ipileup_gauss_all->getVal() << endl ;
 
   std::cout << jpsi_hist_name << std::endl;
   //jpsi_fitres->Print("v");

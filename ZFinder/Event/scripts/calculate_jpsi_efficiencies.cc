@@ -68,10 +68,11 @@ void calculate_jpsi_efficiencies (string file_name, int polarization = 0  )
   else {
     std::cout << "Unknown polarization" << std::endl;
   }
- , //TH2D *jpsi_pt_vs_rap_mc = (TH2D*) theFile0->Get("ZFinder/MC_All/jpsi_pt_vs_rap_finer");
-  //TH2D *jpsi_pt_vs_rap_jpsi = (TH2D*) theFile0->Get("ZFinder/Dimuon_Jpsi_Vertex_Compatible/jpsi_pt_vs_rap_finer");
   TH2D *jpsi_pt_vs_rap_mc = (TH2D*) theFile0->Get(hist_name_gen);
   TH2D *jpsi_pt_vs_rap_jpsi = (TH2D*) theFile0->Get(hist_name_reco);
+
+  //TH2D *jpsi_pt_vs_rap_mc = (TH2D*) theFile0->Get("ZFinder/MC_All/jpsi_pt_vs_rap_finer");
+  //TH2D *jpsi_pt_vs_rap_jpsi = (TH2D*) theFile0->Get("ZFinder/Dimuon_Jpsi_Vertex_Compatible/jpsi_pt_vs_rap_finer");
 
   //TH2D *jpsi_pt_vs_rap_mc = (TH2D*) theFile0->Get("ZFinder/MC_All/jpsi_pt_vs_rap");
   //TH2D *jpsi_pt_vs_rap_jpsi = (TH2D*) theFile0->Get("ZFinder/Dimuon_Jpsi_Vertex_Compatible/jpsi_pt_vs_rap");

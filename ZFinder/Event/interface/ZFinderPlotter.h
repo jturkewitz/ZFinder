@@ -36,6 +36,8 @@ namespace zf {
             TH1D* z_mass_fine_;
             TH1D* z_rapidity_;
             TH1D* z_pt_;
+            TH1D* z_rapidity_mc_;
+            TH1D* z_pt_mc_;
             TH1D* z_vtx_prob_;
             TH1D* phistar_;
 
@@ -44,6 +46,8 @@ namespace zf {
             TH1D* z_from_muons_mass_fine_;
             TH1D* z_from_muons_rapidity_;
             TH1D* z_from_muons_pt_;
+            TH1D* z_from_muons_rapidity_mc_;
+            TH1D* z_from_muons_pt_mc_;
             TH1D* z_from_muons_vtx_prob_;
             TH1D* z_from_muons_phistar_;
 

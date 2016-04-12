@@ -82,8 +82,14 @@ int RooFitZMassBackground(
   //RooRealVar z_mass("z_mass", "z_mass" , z_mass_min, z_mass_max, "GeV");
 
   double z_mass_min = 40.0;
-  //double z_mass_min_upper = 50.0;
-  double z_mass_min_upper = 45.0;
+  double z_mass_min_upper;
+  if (USE_Z_TO_EE) {
+    z_mass_min_upper = 50;
+  }
+  else {
+    z_mass_min_upper = 45;
+  }
+  //double z_mass_min_upper = 45.0;
   double z_mass_max = 300.0;
   double z_mass_max_lower = 150.0;
   RooRealVar z_mass("z_mass", "z_mass" , z_mass_min, z_mass_max, "GeV");

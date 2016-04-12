@@ -52,15 +52,99 @@ bool do_pull_calculation = false;
 
 
 //void sPlotfit(std::string file_name, bool use_pileup_correction = false);
-void sPlotFit(std::string file_name, bool use_pileup_correction = false, std::string image_dir = "~/public_html/ZPhysics/tmp/Test90/", int pt_slice = 0 ) { 
-  do_fit(file_name, use_pileup_correction,image_dir,0); 
-  do_fit(file_name, use_pileup_correction,image_dir,1); 
-  do_fit(file_name, use_pileup_correction,image_dir,2); 
-  do_fit(file_name, use_pileup_correction,image_dir,3); 
-  do_fit(file_name, use_pileup_correction,image_dir,4); 
-  do_fit(file_name, use_pileup_correction,image_dir,5); 
+//void sPlotFit(std::string file_name, bool use_pileup_correction = false, std::string image_dir = "~/public_html/ZPhysics/tmp/Test90/", int pt_slice = 0 ) { 
+void sPlotFit(std::string file_name, bool use_pileup_correction = false, std::string image_dir = "~/public_html/ZPhysics/tmp/Test90/", bool use_only_z_to_muons = false, bool use_only_z_to_electrons = false) { 
+
+  const double NUM_ZTOMUMU = 6.93504E06;
+  const double NUM_ZTOEE = 4.63707E06;
+  
+  //std::vector<double> zjpsi_0 = do_fit(file_name, use_pileup_correction,image_dir,0); 
+  //std::vector<double> zjpsi_1 = do_fit(file_name, use_pileup_correction,image_dir,1); 
+  //std::vector<double> zjpsi_2 = do_fit(file_name, use_pileup_correction,image_dir,2); 
+  //std::vector<double> zjpsi_3 = do_fit(file_name, use_pileup_correction,image_dir,3); 
+  //std::vector<double> zjpsi_4 = do_fit(file_name, use_pileup_correction,image_dir,4); 
+  //std::vector<double> zjpsi_5 = do_fit(file_name, use_pileup_correction,image_dir,5); 
+
+  double zjpsi_prompt_events_all = 0.0;
+  double zjpsi_prompt_events_all_error = 0.0;
+  double zjpsi_prompt_events_pt_summed = 0.0;
+  double zjpsi_prompt_events_pt_summed_sq_error = 0.0;
+
+  double zjpsi_non_prompt_events_all = 0.0;
+  double zjpsi_non_prompt_events_all_error = 0.0;
+  double zjpsi_non_prompt_events_pt_summed = 0.0;
+  double zjpsi_non_prompt_events_pt_summed_sq_error = 0.0;
+
+  double zjpsi_prompt_events[6];
+  double zjpsi_prompt_events_error[6];
+  double zjpsi_non_prompt_events[6];
+  double zjpsi_non_prompt_events_error[6];
+
+
+  for (int i=0 ; i < 6 ; ++i) {
+    //for now, if i==0, jpsi_all
+
+      std::vector<double> zjpsi_info = do_fit(file_name, use_pileup_correction,image_dir, use_only_z_to_muons, use_only_z_to_electrons , i); 
+      zjpsi_prompt_events[i] = zjpsi_info[0];
+      zjpsi_prompt_events_error[i] = zjpsi_info[1];
+      zjpsi_non_prompt_events[i] = zjpsi_info[2];
+      zjpsi_non_prompt_events_error[i] = zjpsi_info[3];
+      if (i == 0 ) {
+        zjpsi_prompt_events_all = zjpsi_info[0] ;
+        zjpsi_prompt_events_all_error = zjpsi_info[1];
+        zjpsi_non_prompt_events_all = zjpsi_info[2] ;
+        zjpsi_non_prompt_events_all_error = zjpsi_info[3];
+      }
+      else {
+        zjpsi_prompt_events_pt_summed += zjpsi_info[0] ;
+        zjpsi_prompt_events_pt_summed_sq_error += pow(zjpsi_info[1],2.0) ;
+        zjpsi_non_prompt_events_pt_summed += zjpsi_info[2] ;
+        zjpsi_non_prompt_events_pt_summed_sq_error += pow(zjpsi_info[3], 2.0);
+      }
+  }
+
+  std::cout << "zjpsi_prompt_events_pt_all: " << zjpsi_prompt_events_all << std::endl;
+  std::cout << "zjpsi_prompt_events_pt_all_error: " << zjpsi_prompt_events_all_error << std::endl;
+  std::cout << "zjpsi_non_prompt_events_pt_all: " << zjpsi_non_prompt_events_all << std::endl;
+  std::cout << "zjpsi_non_prompt_events_pt_all_error: " << zjpsi_non_prompt_events_all_error << std::endl;
+
+  std::cout << "zjpsi_prompt_events_pt_summed: " << zjpsi_prompt_events_pt_summed << std::endl;
+  std::cout << "zjpsi_prompt_events_pt_summed_error: " << pow(zjpsi_prompt_events_pt_summed_sq_error , 0.5) << std::endl;
+  std::cout << "zjpsi_non_prompt_events_pt_summed: " << zjpsi_non_prompt_events_pt_summed << std::endl;
+  std::cout << "zjpsi_non_prompt_events_pt_summed_error: " << pow(zjpsi_non_prompt_events_pt_summed_sq_error , 0.5) << std::endl;
+
+  if (use_only_z_to_electrons) {
+    std::cout << "ratio_prompt_pt_summed: " << zjpsi_prompt_events_pt_summed / (NUM_ZTOEE ) << std::endl;
+    std::cout << "ratio_prompt_pt_summed_error: " << pow(zjpsi_prompt_events_pt_summed_sq_error , 0.5) / (NUM_ZTOEE ) << std::endl;
+
+    std::cout << "ratio_nonprompt_pt_summed: " << zjpsi_non_prompt_events_pt_summed / (NUM_ZTOEE ) << std::endl;
+    std::cout << "ratio_nonprompt_pt_summed_error: " << pow(zjpsi_non_prompt_events_pt_summed_sq_error , 0.5) / (NUM_ZTOEE ) << std::endl;
+  }
+  else if (use_only_z_to_muons) {
+
+    std::cout << "ratio_prompt_pt_summed: " << zjpsi_prompt_events_pt_summed / (NUM_ZTOMUMU) << std::endl;
+    std::cout << "ratio_prompt_pt_summed_error: " << pow(zjpsi_prompt_events_pt_summed_sq_error , 0.5) / (NUM_ZTOMUMU) << std::endl;
+
+    std::cout << "ratio_nonprompt_pt_summed: " << zjpsi_non_prompt_events_pt_summed / (NUM_ZTOMUMU) << std::endl;
+    std::cout << "ratio_nonprompt_pt_summed_error: " << pow(zjpsi_non_prompt_events_pt_summed_sq_error , 0.5) / (NUM_ZTOMUMU) << std::endl;
+  }
+  else {
+    std::cout << "ratio_prompt_pt_summed: " << zjpsi_prompt_events_pt_summed / (NUM_ZTOMUMU + NUM_ZTOEE ) << std::endl;
+    std::cout << "ratio_prompt_pt_summed_error: " << pow(zjpsi_prompt_events_pt_summed_sq_error , 0.5) / (NUM_ZTOMUMU + NUM_ZTOEE ) << std::endl;
+
+    std::cout << "ratio_nonprompt_pt_summed: " << zjpsi_non_prompt_events_pt_summed / (NUM_ZTOMUMU + NUM_ZTOEE ) << std::endl;
+    std::cout << "ratio_nonprompt_pt_summed_error: " << pow(zjpsi_non_prompt_events_pt_summed_sq_error , 0.5) / (NUM_ZTOMUMU + NUM_ZTOEE ) << std::endl;
+  }
+
+  std::cout << "i = 0 => all"  << std::endl;
+  std::cout << "i = 1 => 8.5-10" << std::endl;
+  std::cout << "i = 2 => 10-14" << std::endl;
+  std::cout << "i = 3 => 14-18" << std::endl;
+  std::cout << "i = 4 => 18-30" << std::endl;
+  std::cout << "i = 5 => 30-100" << std::endl;
+
 }
-void do_fit(std::string file_name, bool use_pileup_correction = false, std::string image_dir = "~/public_html/ZPhysics/tmp/Test90/", int pt_slice = 0 ) {
+std::vector<double> do_fit(std::string file_name, bool use_pileup_correction = false, std::string image_dir = "~/public_html/ZPhysics/tmp/Test90/", bool use_only_z_to_muons = true, bool use_only_z_to_electrons = true, int pt_slice = 0 ) {
   string PT_SLICE_STRING;          //The string
   ostringstream temp;  //temp as in temporary
   temp<<pt_slice;
@@ -92,11 +176,11 @@ void do_fit(std::string file_name, bool use_pileup_correction = false, std::stri
   //RooRealVar *onia_tau  = new RooRealVar("onia_tau", "J/#psi#rightarrow#mu#mu pseudo-proper time [ps]", -2., 5);
   //RooRealVar *onia_tau  = new RooRealVar("onia_tau", "J/#psi#rightarrow#mu#mu pseudo-proper time [ps]", -0.3, 5);
   RooRealVar *onia_tau  = new RooRealVar("onia_tau", "J/#psi#rightarrow#mu#mu pseudo-proper time [ps]", -1.0, 5);
-  RooRealVar *z_mass    = new RooRealVar("z_mass", "Z Mass [GeV]", 80., 100.);
+  //RooRealVar *z_mass    = new RooRealVar("z_mass", "Z Mass [GeV]", 80., 100.);
   //RooRealVar *z_mass    = new RooRealVar("z_mass", "Z Mass [GeV]", 150., 300.);
   //RooRealVar *z_mass    = new RooRealVar("z_mass", "Z Mass [GeV]", 40., 50.);
   //RooRealVar *z_mass    = new RooRealVar("z_mass", "Z Mass [GeV]", 40., 45.);
-  //RooRealVar *z_mass    = new RooRealVar("z_mass", "Z Mass [GeV]", 40., 300.);
+  RooRealVar *z_mass    = new RooRealVar("z_mass", "Z Mass [GeV]", 80., 100.);
   //RooRealVar *z_mass    = new RooRealVar("z_mass", "Z Mass [GeV]", 50., 150.);
   RooRealVar *is_z_to_electrons    = new RooRealVar("is_z_to_electrons", "is_z_to_electrons", 0, 1);
   RooRealVar *is_z_to_muons  = new RooRealVar("is_z_to_muons", "is_z_to_muons", 0, 1);
@@ -176,6 +260,24 @@ void do_fit(std::string file_name, bool use_pileup_correction = false, std::stri
   TCut SelectionCut_3 = "onia_pt>=14 && onia_pt < 18.0";
   TCut SelectionCut_4 = "onia_pt>=18 && onia_pt < 30.0";
   TCut SelectionCut_5 = "onia_pt>=30 && onia_pt < 100.0";
+
+  TCut SelectionCut_zmuons = "is_z_to_muons == 1";
+  TCut SelectionCut_zelectrons = "is_z_to_electrons == 1";
+
+  if (use_only_z_to_muons) {
+    RooDataSet *zjpsi_data_weighted_testing = (RooDataSet*) zjpsi_data_weighted_testing->reduce(SelectionCut_zmuons);
+    RooDataSet *zjpsi_data = (RooDataSet*) zjpsi_data->reduce(SelectionCut_zmuons);
+  }
+  if (use_only_z_to_electrons) {
+    RooDataSet *zjpsi_data_weighted_testing = (RooDataSet*) zjpsi_data_weighted_testing->reduce(SelectionCut_zelectrons);
+    RooDataSet *zjpsi_data = (RooDataSet*) zjpsi_data->reduce(SelectionCut_zelectrons);
+  }
+
+  //TCut SelectionCut_sb_all = "(is_z_to_muons == 1 && z_mass <= 45) || (is_z_to_muons == 1 && z_mass <= 50) || (z_mass >= 150)";
+  ////TCut SelectionCut_sb_all = "z_mass >= 150";
+  //RooDataSet *zjpsi_data_weighted_testing = (RooDataSet*) zjpsi_data_weighted_testing->reduce(SelectionCut_sb_all);
+  //RooDataSet *zjpsi_data = (RooDataSet*) zjpsi_data->reduce(SelectionCut_sb_all);
+
 
   if (pt_slice == 0) {
     //continue;
@@ -462,10 +564,16 @@ void do_fit(std::string file_name, bool use_pileup_correction = false, std::stri
   double zjpsi_decay_time_continuum_value_err = jpsi_decay_time_continuum.getError();
   double zjpsi_gauss_prompt_mean_value     = jpsi_gauss_prompt_mean.getVal();
   double zjpsi_gauss_prompt_mean_value_err = jpsi_gauss_prompt_mean.getError();
+
   double zjpsi_gauss_prompt_sigma_value     = jpsi_gauss_prompt_sigma.getVal();
   double zjpsi_gauss_prompt_sigma_value_err = jpsi_gauss_prompt_sigma.getError();
   double zjpsi_gauss_prompt_sigma_2_value     = jpsi_gauss_prompt_sigma_2.getVal();
   double zjpsi_gauss_prompt_sigma_2_value_err = jpsi_gauss_prompt_sigma_2.getError();
+
+  //double zjpsi_gauss_prompt_sigma_value     = jpsi_gauss_prompt_sigma.getVal();
+  //double zjpsi_gauss_prompt_sigma_value_err = jpsi_gauss_prompt_sigma.getError();
+  //double zjpsi_gauss_prompt_sigma_2_value     = jpsi_gauss_prompt_sigma_2.getVal();
+  //double zjpsi_gauss_prompt_sigma_2_value_err = jpsi_gauss_prompt_sigma_2.getError();
   double zjpsi_frac_prompt_sharp_value     = jpsi_frac_prompt_sharp.getVal();
   double zjpsi_frac_prompt_sharp_value_err = jpsi_frac_prompt_sharp.getError();
 
@@ -579,6 +687,11 @@ void do_fit(std::string file_name, bool use_pileup_correction = false, std::stri
   RooRealVar Nzjpsi_m_bg_tau_bg  ("Nzjpsi_m_bg_tau_bg",   "Nzjpsi_m_bg_tau_bg",   10, 0, 2000);
   RooRealVar Nzjpsi_m_bg_tau_sig ("Nzjpsi_m_bg_tau_sig",  "Nzjpsi_m_bg_tau_sig",  10, 0, 2000);
 
+  //RooRealVar Nzjpsi_m_sig_tau_sig("Nzjpsi_m_sig_tau_sig", "Nzjpsi_m_sig_tau_sig", 0.3, 0, 2000);
+  //RooRealVar Nzjpsi_m_sig_tau_bg ("Nzjpsi_m_sig_tau_bg",  "Nzjpsi_m_sig_tau_bg",  7, 0, 2000);
+  //RooRealVar Nzjpsi_m_bg_tau_bg  ("Nzjpsi_m_bg_tau_bg",   "Nzjpsi_m_bg_tau_bg",   0, 0, 2000);
+  //RooRealVar Nzjpsi_m_bg_tau_sig ("Nzjpsi_m_bg_tau_sig",  "Nzjpsi_m_bg_tau_sig",  10, 0, 2000);
+
   //RooRealVar Nzjpsi_m_sig_tau_sig("Nzjpsi_m_sig_tau_sig", "Nzjpsi_m_sig_tau_sig", 10, -2, 200);
   //RooRealVar Nzjpsi_m_sig_tau_bg ("Nzjpsi_m_sig_tau_bg",  "Nzjpsi_m_sig_tau_bg",  10, -2, 200);
   //RooRealVar Nzjpsi_m_bg_tau_bg  ("Nzjpsi_m_bg_tau_bg",   "Nzjpsi_m_bg_tau_bg",   10, -2, 200);
@@ -595,7 +708,7 @@ void do_fit(std::string file_name, bool use_pileup_correction = false, std::stri
   //RooFitResult *fr = zjpsi_model.fitTo(*zjpsi_data, NumCPU(4, kTRUE), Verbose(false), PrintLevel(-1), Save());
   //RooFitResult *fr = zjpsi_model.fitTo(*zjpsi_data, NumCPU(4, kTRUE), Verbose(false), PrintLevel(-1), SumW2Error(kTRUE), Save());
   //RooFitResult *fr = zjpsi_model.fitTo(*zjpsi_data_weighted_testing, NumCPU(4, kTRUE), Extended(kTRUE) ,Verbose(false), PrintLevel(-1), SumW2Error(kTRUE), Save());
-  RooFitResult *fr = zjpsi_model.fitTo(*zjpsi_data_weighted_testing, NumCPU(4, kTRUE), Verbose(false), PrintLevel(-1), SumW2Error(kTRUE), Save());
+  RooFitResult *fr = zjpsi_model.fitTo(*zjpsi_data_weighted_testing, NumCPU(4, kTRUE), Verbose(false), Minos(kTRUE), PrintLevel(-1), SumW2Error(kTRUE), Save());
   fr->Print();
 
   if (do_pull_calculation) {
@@ -772,6 +885,17 @@ void do_fit(std::string file_name, bool use_pileup_correction = false, std::stri
   c_dummy_zjpsi->Print(c_dummy_zjpsi_image_name.c_str() , "png");
   c_dummy_zjpsi->Close();
 
+  std::vector<double> zjpsi_info ;
+  double zjpsi_prompt_events = Nzjpsi_m_sig_tau_sig.getVal();
+  double zjpsi_prompt_events_error = Nzjpsi_m_sig_tau_sig.getError();
+  double zjpsi_nonprompt_events = Nzjpsi_m_sig_tau_bg.getVal();
+  double zjpsi_nonprompt_events_error = Nzjpsi_m_sig_tau_bg.getError();
+
+  zjpsi_info.push_back(zjpsi_prompt_events);
+  zjpsi_info.push_back(zjpsi_prompt_events_error);
+  zjpsi_info.push_back(zjpsi_nonprompt_events);
+  zjpsi_info.push_back(zjpsi_nonprompt_events_error);
+  return zjpsi_info;
 
 
 //// *******************************************************

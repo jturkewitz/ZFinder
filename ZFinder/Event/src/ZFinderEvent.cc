@@ -719,6 +719,11 @@ namespace zf {
       x = (pos_x - reco_z.vtx.position().x() );
       y = (pos_y - reco_z.vtx.position().y() );
       z = (pos_z - reco_z.vtx.position().z() );
+      //x = (pos_x -  reco_bs.x);
+      //y = (pos_y -  reco_bs.y);
+      //z = (pos_z -  reco_bs.z);
+
+
       LP_XY = ((x * px) + (y * py)) ; // 2d
       tau_xy = jpsi_lv.mass() * LP_XY / (pt * pt) / C; // ns
 
@@ -741,6 +746,9 @@ namespace zf {
       x = (pos_x - reco_z_from_muons.vtx.position().x() );
       y = (pos_y - reco_z_from_muons.vtx.position().y() );
       z = (pos_z - reco_z_from_muons.vtx.position().z() );
+      //x = (pos_x -  reco_bs.x);
+      //y = (pos_y -  reco_bs.y);
+      //z = (pos_z -  reco_bs.z);
       LP_XY = ((x * px) + (y * py)) ; // 2d
       tau_xy = jpsi_lv.mass() * LP_XY / (pt * pt) / C; // ns
 
@@ -764,6 +772,10 @@ namespace zf {
       x = (pos_x - reco_vert.primary_vert.position().x() );
       y = (pos_y - reco_vert.primary_vert.position().y() );
       z = (pos_z - reco_vert.primary_vert.position().z() );
+
+      //x = (pos_x -  reco_bs.x);
+      //y = (pos_y -  reco_bs.y);
+      //z = (pos_z -  reco_bs.z);
       LP_XY = ((x * px) + (y * py)) ; // 2d
       tau_xy = jpsi_lv.mass() * LP_XY / (pt * pt) / C; // ns
 

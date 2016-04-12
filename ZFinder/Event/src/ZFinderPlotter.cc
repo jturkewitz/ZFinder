@@ -48,9 +48,21 @@ namespace zf {
 
       // z_pt
       const std::string z_pt_name = "z p_{T}";
-      z_pt_ = tdir.make<TH1D>(z_pt_name.c_str(), z_pt_name.c_str(), 500, 0., 500.);
+      z_pt_ = tdir.make<TH1D>(z_pt_name.c_str(), z_pt_name.c_str(), 200, 0., 200.);
       z_pt_->GetXaxis()->SetTitle("p_{T,Z}");
       z_pt_->GetYaxis()->SetTitle("Counts / GeV");
+
+      // z_pt_mc
+      const std::string z_pt_mc_name = "z_pt_mc";
+      z_pt_mc_ = tdir.make<TH1D>(z_pt_mc_name.c_str(), z_pt_mc_name.c_str(), 200, 0., 200.);
+      z_pt_mc_->GetXaxis()->SetTitle("p_{T,Z}");
+      z_pt_mc_->GetYaxis()->SetTitle("Counts / GeV");
+
+      // z_rapidity_mc_
+      const std::string z_rapidity_mc_name = "z_rapidity_mc";
+      z_rapidity_mc_ = tdir.make<TH1D>(z_rapidity_mc_name.c_str(), z_rapidity_mc_name.c_str(), 100, -5., 5.);
+      z_rapidity_mc_->GetXaxis()->SetTitle("Z_{Y}");
+      z_rapidity_mc_->GetYaxis()->SetTitle("Counts");
 
       // z_vtx_prob_
       const std::string z_vtx_prob_name = "dielectron vertex probability";
@@ -90,9 +102,21 @@ namespace zf {
 
       // z_from_muons_pt
       const std::string z_from_muons_pt_name = "Z From Muons p_{T}";
-      z_from_muons_pt_ = tdir.make<TH1D>(z_from_muons_pt_name.c_str(), z_from_muons_pt_name.c_str(), 500, 0., 500.);
+      z_from_muons_pt_ = tdir.make<TH1D>(z_from_muons_pt_name.c_str(), z_from_muons_pt_name.c_str(), 200, 0., 200.);
       z_from_muons_pt_->GetXaxis()->SetTitle("p_{T,Z}");
       z_from_muons_pt_->GetYaxis()->SetTitle("Counts / GeV");
+
+      // z_from_muons_rapidity_mc_
+      const std::string z_from_muons_rapidity_mc_name = "Z From Muons Rapidity MC";
+      z_from_muons_rapidity_mc_ = tdir.make<TH1D>(z_from_muons_rapidity_mc_name.c_str(), z_from_muons_rapidity_mc_name.c_str(), 100, -5., 5.);
+      z_from_muons_rapidity_mc_->GetXaxis()->SetTitle("Z_{Y}");
+      z_from_muons_rapidity_mc_->GetYaxis()->SetTitle("Counts");
+
+      // z_from_muons_pt_mc
+      const std::string z_from_muons_pt_mc_name = "Z From Muons p_{T} MC";
+      z_from_muons_pt_mc_ = tdir.make<TH1D>(z_from_muons_pt_mc_name.c_str(), z_from_muons_pt_mc_name.c_str(), 200, 0., 200.);
+      z_from_muons_pt_mc_->GetXaxis()->SetTitle("p_{T,Z}");
+      z_from_muons_pt_mc_->GetYaxis()->SetTitle("Counts / GeV");
 
       // z_from_muons_vtx_prob_
       const std::string z_from_muons_vtx_prob_name = "Z From Muons dimuon vertex probability";
@@ -518,7 +542,7 @@ namespace zf {
 
       // jpsi_vtx_distance_z_vtx_z
       const std::string jpsi_vtx_distance_z_vtx_z_name = "jpsi_vtx_z - z_vtx_z";
-      jpsi_vtx_distance_z_vtx_z_ = tdir.make<TH1D>(jpsi_vtx_distance_z_vtx_z_name.c_str(), jpsi_vtx_distance_z_vtx_z_name.c_str(), 2000, -20., 20.);
+      jpsi_vtx_distance_z_vtx_z_ = tdir.make<TH1D>(jpsi_vtx_distance_z_vtx_z_name.c_str(), jpsi_vtx_distance_z_vtx_z_name.c_str(), 4000, -40., 40.);
       jpsi_vtx_distance_z_vtx_z_->GetXaxis()->SetTitle("distance [cm]");
       jpsi_vtx_distance_z_vtx_z_->GetYaxis()->SetTitle("Counts / 0.02 cm");
 
@@ -1407,6 +1431,16 @@ namespace zf {
       z_vtx_prob_->Fill(zfe.reco_z.vtx_prob, event_weight);
       phistar_->Fill(zfe.reco_z.phistar, event_weight);
 
+      if (!zfe.is_real_data) {
+        //z_mass_all_mc_->Fill(zfe.truth_z_electrons.m, event_weight);
+        z_rapidity_mc_->Fill(zfe.truth_z_electrons.y, event_weight);
+        z_pt_mc_->Fill(zfe.truth_z_electrons.pt, event_weight);
+
+        //z_from_muons_mass_all_mc_->Fill(zfe.truth_z_muons.m, event_weight);
+        z_from_muons_rapidity_mc_->Fill(zfe.truth_z_muons.y, event_weight);
+        z_from_muons_pt_mc_->Fill(zfe.truth_z_muons.pt, event_weight);
+      }
+
       // Fill the histograms with the information from the approriate electron
       if (zfe.e0 != NULL && zfe.e1 != NULL){
         e0_pt_->Fill(zfe.e0->pt, event_weight);
@@ -1838,6 +1872,13 @@ namespace zf {
       z_mass_fine_->Fill(zfe.truth_z_electrons.m, event_weight);
       z_rapidity_->Fill(zfe.truth_z_electrons.y, event_weight);
       z_pt_->Fill(zfe.truth_z_electrons.pt, event_weight);
+
+      z_from_muons_mass_all_->Fill(zfe.truth_z_muons.m, event_weight);
+      z_from_muons_mass_coarse_->Fill(zfe.truth_z_muons.m, event_weight);
+      z_from_muons_mass_fine_->Fill(zfe.truth_z_muons.m, event_weight);
+      z_from_muons_rapidity_->Fill(zfe.truth_z_muons.y, event_weight);
+      z_from_muons_pt_->Fill(zfe.truth_z_muons.pt, event_weight);
+
       phistar_->Fill(zfe.truth_z_electrons.phistar, event_weight);
 
       // Fill the histograms with the information from the approriate electron
