@@ -36,6 +36,11 @@ namespace zf {
             TH1D* z_mass_fine_;
             TH1D* z_rapidity_;
             TH1D* z_pt_;
+            TH1D* z_pt_jpsi_8p5to10_;
+            TH1D* z_pt_jpsi_10to14_;
+            TH1D* z_pt_jpsi_14to18_;
+            TH1D* z_pt_jpsi_18to30_;
+            TH1D* z_pt_jpsi_30to100_;
             TH1D* z_rapidity_mc_;
             TH1D* z_pt_mc_;
             TH1D* z_vtx_prob_;
@@ -46,6 +51,11 @@ namespace zf {
             TH1D* z_from_muons_mass_fine_;
             TH1D* z_from_muons_rapidity_;
             TH1D* z_from_muons_pt_;
+            TH1D* z_from_muons_pt_jpsi_8p5to10_;
+            TH1D* z_from_muons_pt_jpsi_10to14_;
+            TH1D* z_from_muons_pt_jpsi_14to18_;
+            TH1D* z_from_muons_pt_jpsi_18to30_;
+            TH1D* z_from_muons_pt_jpsi_30to100_;
             TH1D* z_from_muons_rapidity_mc_;
             TH1D* z_from_muons_pt_mc_;
             TH1D* z_from_muons_vtx_prob_;
@@ -85,6 +95,9 @@ namespace zf {
             TH1D* jpsi_mass_fine_ptAbove30_;
 
             TH1D* jpsi_four_lepton_mass_;
+
+            TH2D* jpsi_four_lepton_mass_muons_vs_jpsi_mass_;
+            TH2D* jpsi_four_lepton_mass_electrons_vs_jpsi_mass_;
 
             TH1D* jpsi_rapidity_;
             TH1D* jpsi_pt_;

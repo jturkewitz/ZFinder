@@ -52,6 +52,36 @@ namespace zf {
       z_pt_->GetXaxis()->SetTitle("p_{T,Z}");
       z_pt_->GetYaxis()->SetTitle("Counts / GeV");
 
+      // z_pt_jpsi_8p5to10
+      const std::string z_pt_jpsi_8p5to10_name = "z_pt_jpsi_8p5to10";
+      z_pt_jpsi_8p5to10_ = tdir.make<TH1D>(z_pt_jpsi_8p5to10_name.c_str(), z_pt_jpsi_8p5to10_name.c_str(), 200, 0., 200.);
+      z_pt_jpsi_8p5to10_->GetXaxis()->SetTitle("p_{T,Z} jpsi_8p5to10");
+      z_pt_jpsi_8p5to10_->GetYaxis()->SetTitle("Counts / GeV");
+
+      // z_pt_jpsi_10to14
+      const std::string z_pt_jpsi_10to14_name = "z_pt_jpsi_10to14";
+      z_pt_jpsi_10to14_ = tdir.make<TH1D>(z_pt_jpsi_10to14_name.c_str(), z_pt_jpsi_10to14_name.c_str(), 200, 0., 200.);
+      z_pt_jpsi_10to14_->GetXaxis()->SetTitle("p_{T,Z} jpsi_10to14");
+      z_pt_jpsi_10to14_->GetYaxis()->SetTitle("Counts / GeV");
+
+      // z_pt_jpsi_14to18
+      const std::string z_pt_jpsi_14to18_name = "z_pt_jpsi_14to18";
+      z_pt_jpsi_14to18_ = tdir.make<TH1D>(z_pt_jpsi_14to18_name.c_str(), z_pt_jpsi_14to18_name.c_str(), 200, 0., 200.);
+      z_pt_jpsi_14to18_->GetXaxis()->SetTitle("p_{T,Z} jpsi_14to18");
+      z_pt_jpsi_14to18_->GetYaxis()->SetTitle("Counts / GeV");
+
+      // z_pt_jpsi_18to30
+      const std::string z_pt_jpsi_18to30_name = "z_pt_jpsi_18to30";
+      z_pt_jpsi_18to30_ = tdir.make<TH1D>(z_pt_jpsi_18to30_name.c_str(), z_pt_jpsi_18to30_name.c_str(), 200, 0., 200.);
+      z_pt_jpsi_18to30_->GetXaxis()->SetTitle("p_{T,Z} jpsi_18to30");
+      z_pt_jpsi_18to30_->GetYaxis()->SetTitle("Counts / GeV");
+
+      // z_pt_jpsi_30to100
+      const std::string z_pt_jpsi_30to100_name = "z_pt_jpsi_30to100";
+      z_pt_jpsi_30to100_ = tdir.make<TH1D>(z_pt_jpsi_30to100_name.c_str(), z_pt_jpsi_30to100_name.c_str(), 200, 0., 200.);
+      z_pt_jpsi_30to100_->GetXaxis()->SetTitle("p_{T,Z} jpsi_30to100");
+      z_pt_jpsi_30to100_->GetYaxis()->SetTitle("Counts / GeV");
+
       // z_pt_mc
       const std::string z_pt_mc_name = "z_pt_mc";
       z_pt_mc_ = tdir.make<TH1D>(z_pt_mc_name.c_str(), z_pt_mc_name.c_str(), 200, 0., 200.);
@@ -105,6 +135,36 @@ namespace zf {
       z_from_muons_pt_ = tdir.make<TH1D>(z_from_muons_pt_name.c_str(), z_from_muons_pt_name.c_str(), 200, 0., 200.);
       z_from_muons_pt_->GetXaxis()->SetTitle("p_{T,Z}");
       z_from_muons_pt_->GetYaxis()->SetTitle("Counts / GeV");
+
+      // z_from_muons_pt_jpsi_8p5to10
+      const std::string z_from_muons_pt_jpsi_8p5to10_name = "z_from_muons_pt_jpsi_8p5to10";
+      z_from_muons_pt_jpsi_8p5to10_ = tdir.make<TH1D>(z_from_muons_pt_jpsi_8p5to10_name.c_str(), z_from_muons_pt_jpsi_8p5to10_name.c_str(), 200, 0., 200.);
+      z_from_muons_pt_jpsi_8p5to10_->GetXaxis()->SetTitle("p_{T,Z} jpsi_8p5to10");
+      z_from_muons_pt_jpsi_8p5to10_->GetYaxis()->SetTitle("Counts / GeV");
+
+      // z_from_muons_pt_jpsi_10to14
+      const std::string z_from_muons_pt_jpsi_10to14_name = "z_from_muons_pt_jpsi_10to14";
+      z_from_muons_pt_jpsi_10to14_ = tdir.make<TH1D>(z_from_muons_pt_jpsi_10to14_name.c_str(), z_from_muons_pt_jpsi_10to14_name.c_str(), 200, 0., 200.);
+      z_from_muons_pt_jpsi_10to14_->GetXaxis()->SetTitle("p_{T,Z} jpsi_10to14");
+      z_from_muons_pt_jpsi_10to14_->GetYaxis()->SetTitle("Counts / GeV");
+
+      // z_from_muons_pt_jpsi_14to18
+      const std::string z_from_muons_pt_jpsi_14to18_name = "z_from_muons_pt_jpsi_14to18";
+      z_from_muons_pt_jpsi_14to18_ = tdir.make<TH1D>(z_from_muons_pt_jpsi_14to18_name.c_str(), z_from_muons_pt_jpsi_14to18_name.c_str(), 200, 0., 200.);
+      z_from_muons_pt_jpsi_14to18_->GetXaxis()->SetTitle("p_{T,Z} jpsi_14to18");
+      z_from_muons_pt_jpsi_14to18_->GetYaxis()->SetTitle("Counts / GeV");
+
+      // z_from_muons_pt_jpsi_18to30
+      const std::string z_from_muons_pt_jpsi_18to30_name = "z_from_muons_pt_jpsi_18to30";
+      z_from_muons_pt_jpsi_18to30_ = tdir.make<TH1D>(z_from_muons_pt_jpsi_18to30_name.c_str(), z_from_muons_pt_jpsi_18to30_name.c_str(), 200, 0., 200.);
+      z_from_muons_pt_jpsi_18to30_->GetXaxis()->SetTitle("p_{T,Z} jpsi_18to30");
+      z_from_muons_pt_jpsi_18to30_->GetYaxis()->SetTitle("Counts / GeV");
+
+      // z_from_muons_pt_jpsi_30to100
+      const std::string z_from_muons_pt_jpsi_30to100_name = "z_from_muons_pt_jpsi_30to100";
+      z_from_muons_pt_jpsi_30to100_ = tdir.make<TH1D>(z_from_muons_pt_jpsi_30to100_name.c_str(), z_from_muons_pt_jpsi_30to100_name.c_str(), 200, 0., 200.);
+      z_from_muons_pt_jpsi_30to100_->GetXaxis()->SetTitle("p_{T,Z} jpsi_30to100");
+      z_from_muons_pt_jpsi_30to100_->GetYaxis()->SetTitle("Counts / GeV");
 
       // z_from_muons_rapidity_mc_
       const std::string z_from_muons_rapidity_mc_name = "Z From Muons Rapidity MC";
@@ -249,6 +309,18 @@ namespace zf {
       jpsi_four_lepton_mass_ = tdir.make<TH1D>(jpsi_four_lepton_mass_name.c_str(), jpsi_four_lepton_mass_name.c_str(), 300, 50.0, 200.0);
       jpsi_four_lepton_mass_->GetXaxis()->SetTitle("m_{llll} [GeV]");
       jpsi_four_lepton_mass_->GetYaxis()->SetTitle("Counts / 0.5 GeV");
+
+      // jpsi_four_lepton_mass_muons_vs_jpsi_mass
+      const std::string jpsi_four_lepton_mass_muons_vs_jpsi_mass_name = "four_lepton_mass_muons_vs_jpsi_mass";
+      jpsi_four_lepton_mass_muons_vs_jpsi_mass_ = tdir.make<TH2D>(jpsi_four_lepton_mass_muons_vs_jpsi_mass_name.c_str(), jpsi_four_lepton_mass_muons_vs_jpsi_mass_name.c_str(), 500, 0.0, 100.0, 500, 0.0, 500.0);
+      jpsi_four_lepton_mass_muons_vs_jpsi_mass_->GetXaxis()->SetTitle("m_{mumu} [GeV]");
+      jpsi_four_lepton_mass_muons_vs_jpsi_mass_->GetYaxis()->SetTitle("m_{llll} [GeV]");
+
+      // jpsi_four_lepton_mass_electrons_vs_jpsi_mass
+      const std::string jpsi_four_lepton_mass_electrons_vs_jpsi_mass_name = "four_lepton_mass_electrons_vs_jpsi_mass";
+      jpsi_four_lepton_mass_electrons_vs_jpsi_mass_ = tdir.make<TH2D>(jpsi_four_lepton_mass_electrons_vs_jpsi_mass_name.c_str(), jpsi_four_lepton_mass_electrons_vs_jpsi_mass_name.c_str(), 500, 0.0, 100.0, 500, 0.0, 500.0);
+      jpsi_four_lepton_mass_electrons_vs_jpsi_mass_->GetXaxis()->SetTitle("m_{mumu} [GeV]");
+      jpsi_four_lepton_mass_electrons_vs_jpsi_mass_->GetYaxis()->SetTitle("m_{llll} [GeV]");
 
       // jpsi_mass_fine_ptUnder10_
       const std::string jpsi_mass_fine_ptUnder10_name = "jpsi_mass_ptUnder10";
@@ -1425,6 +1497,8 @@ namespace zf {
       z_mass_fine_->Fill(zfe.reco_z.m, event_weight);
       z_rapidity_->Fill(zfe.reco_z.y, event_weight);
       z_pt_->Fill(zfe.reco_z.pt, event_weight);
+
+
       z_vtx_x_->Fill(zfe.reco_z.vtx_x, event_weight);
       z_vtx_y_->Fill(zfe.reco_z.vtx_y, event_weight);
       z_vtx_z_->Fill(zfe.reco_z.vtx_z, event_weight);
@@ -1459,6 +1533,8 @@ namespace zf {
       z_from_muons_mass_fine_->Fill(zfe.reco_z_from_muons.m, event_weight);
       z_from_muons_rapidity_->Fill(zfe.reco_z_from_muons.y, event_weight);
       z_from_muons_pt_->Fill(zfe.reco_z_from_muons.pt, event_weight);
+
+
       z_from_muons_vtx_x_->Fill(zfe.reco_z_from_muons.vtx_x, event_weight);
       z_from_muons_vtx_y_->Fill(zfe.reco_z_from_muons.vtx_y, event_weight);
       z_from_muons_vtx_z_->Fill(zfe.reco_z_from_muons.vtx_z, event_weight);
@@ -1519,8 +1595,45 @@ namespace zf {
         jpsi_mass_coarse_->Fill(zfe.reco_jpsi.m.at(i), event_weight);
         jpsi_mass_fine_->Fill(zfe.reco_jpsi.m.at(i), event_weight);
         jpsi_four_lepton_mass_->Fill(zfe.reco_jpsi.four_lepton_mass.at(i), event_weight);
+
+        jpsi_four_lepton_mass_muons_vs_jpsi_mass_->Fill(zfe.reco_jpsi.m.at(i),zfe.reco_jpsi.four_lepton_mass.at(i), event_weight);
+        jpsi_four_lepton_mass_electrons_vs_jpsi_mass_->Fill(zfe.reco_jpsi.m.at(i),zfe.reco_jpsi.four_lepton_mass.at(i), event_weight);
+
         jpsi_rapidity_->Fill(zfe.reco_jpsi.y.at(i), event_weight);
         jpsi_pt_->Fill(zfe.reco_jpsi.pt.at(i), event_weight);
+
+        if (zfe.reco_jpsi.pt.at(i) >= 8.5 && zfe.reco_jpsi.pt.at(i) < 10.0 ) {
+          z_pt_jpsi_8p5to10_->Fill(zfe.reco_z.pt, event_weight);
+        }
+        if (zfe.reco_jpsi.pt.at(i) >= 10.0 && zfe.reco_jpsi.pt.at(i) < 14.0 ) {
+          z_pt_jpsi_10to14_->Fill(zfe.reco_z.pt, event_weight);
+        }
+        if (zfe.reco_jpsi.pt.at(i) >= 14.0 && zfe.reco_jpsi.pt.at(i) < 18.0 ) {
+          z_pt_jpsi_14to18_->Fill(zfe.reco_z.pt, event_weight);
+        }
+        if (zfe.reco_jpsi.pt.at(i) >= 18.0 && zfe.reco_jpsi.pt.at(i) < 30.0 ) {
+          z_pt_jpsi_18to30_->Fill(zfe.reco_z.pt, event_weight);
+        }
+        if (zfe.reco_jpsi.pt.at(i) >= 30.0 && zfe.reco_jpsi.pt.at(i) < 100.0 ) {
+          z_pt_jpsi_30to100_->Fill(zfe.reco_z.pt, event_weight);
+        }
+
+        if (zfe.reco_jpsi.pt.at(i) >= 8.5 && zfe.reco_jpsi.pt.at(i) < 10.0 ) {
+          z_from_muons_pt_jpsi_8p5to10_->Fill(zfe.reco_z_from_muons.pt, event_weight);
+        }
+        if (zfe.reco_jpsi.pt.at(i) >= 10.0 && zfe.reco_jpsi.pt.at(i) < 14.0 ) {
+          z_from_muons_pt_jpsi_10to14_->Fill(zfe.reco_z_from_muons.pt, event_weight);
+        }
+        if (zfe.reco_jpsi.pt.at(i) >= 14.0 && zfe.reco_jpsi.pt.at(i) < 18.0 ) {
+          z_from_muons_pt_jpsi_14to18_->Fill(zfe.reco_z_from_muons.pt, event_weight);
+        }
+        if (zfe.reco_jpsi.pt.at(i) >= 18.0 && zfe.reco_jpsi.pt.at(i) < 30.0 ) {
+          z_from_muons_pt_jpsi_18to30_->Fill(zfe.reco_z_from_muons.pt, event_weight);
+        }
+        if (zfe.reco_jpsi.pt.at(i) >= 30.0 && zfe.reco_jpsi.pt.at(i) < 100.0 ) {
+          z_from_muons_pt_jpsi_30to100_->Fill(zfe.reco_z_from_muons.pt, event_weight);
+        }
+
         jpsi_efficiency_->Fill(zfe.reco_jpsi.jpsi_efficiency.at(i), event_weight);
         jpsi_acc_eff_->Fill(zfe.reco_jpsi.jpsi_acc_eff.at(i), event_weight);
         jpsi_scale_factor_->Fill(zfe.reco_jpsi.jpsi_scale_factor.at(i), event_weight);

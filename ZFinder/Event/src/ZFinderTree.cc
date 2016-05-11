@@ -188,7 +188,7 @@ namespace zf {
     int n_jpsi = 0;
     unsigned int best_jpsi_pos = 0;
     if (true) {
-      float best_jpsi_val = 1000000000.0;
+      float best_jpsi_val = -1000000000.0;
       //use this loop to determine the best J/Psi candidate which passes all cuts
       for (unsigned int i = 0; i < zfe.reco_jpsi.m.size() ; ++i ) {
         //TODO should fold in eta window cut here??
@@ -233,7 +233,9 @@ namespace zf {
           continue;
         }
         n_jpsi++;
-        if (fabs(zfe.reco_jpsi.vtx_prob.at(i)) < best_jpsi_val) {
+        //if (fabs(zfe.reco_jpsi.vtx_prob.at(i)) < best_jpsi_val) {
+        if (fabs(zfe.reco_jpsi.vtx_prob.at(i)) > best_jpsi_val) {
+          best_jpsi_val = fabs(zfe.reco_jpsi.vtx_prob.at(i));
           best_jpsi_pos = i;
         }
         

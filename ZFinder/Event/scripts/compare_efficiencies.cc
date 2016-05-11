@@ -6,9 +6,19 @@
 #include "TTree.h"
 #include "TKey.h"
 #include "Riostream.h"
+#include <math.h>
+#include <stdio.h>
 //void compare_polarizations (string file_name_mc, string file_name_data_zmumu, string file_name_data_zee)
 void compare_efficiencies (string file_name_mc, string file_name_data_inclusive_z, string file_name_data_associated_z,  bool use_z_to_ee, string out_dir)
 {
+   
+  for (int i=0;i<6;++i) {
+    run_compare_efficiencies(file_name_mc, file_name_data_inclusive_z, file_name_data_associated_z,  use_z_to_ee, i, out_dir);
+  }
+}
+void run_compare_efficiencies(string file_name_mc, string file_name_data_inclusive_z, string file_name_data_associated_z,  bool use_z_to_ee, int pt_slice, string out_dir)
+{
+  std::cout << "pt_slice " << pt_slice << std::endl;
   
   //TODO give this better documentation/ a more descriptive name
   //TFile *file_mc = new TFile("/home/user1/turkewitz/Work/CMSSW_5_3_13_ZJPsi/src/test9d10.root");
@@ -32,19 +42,62 @@ void compare_efficiencies (string file_name_mc, string file_name_data_inclusive_
     hist_path_reco = "ZFinder/Z_To_Electrons/z p_{T}";
     hist_path_reco_mc = "ZFinder/Z_To_Electrons/z_pt_mc";
     hist_path_truth = "ZFinder/MC_All/z p_{T}";
-    hist_path_associated = "ZFinder/Z_To_Electrons_And_Jpsi/z p_{T}";
+    
+    if (pt_slice == 0) {
+      hist_path_associated = "ZFinder/Z_To_Electrons_And_Jpsi/z p_{T}";
+    }
+    else if (pt_slice == 1) {
+      hist_path_associated = "ZFinder/Z_To_Electrons_And_Jpsi/z_pt_jpsi_8p5to10";
+    }
+    else if (pt_slice == 2) {
+      hist_path_associated = "ZFinder/Z_To_Electrons_And_Jpsi/z_pt_jpsi_10to14";
+    }
+    else if (pt_slice == 3) {
+      hist_path_associated = "ZFinder/Z_To_Electrons_And_Jpsi/z_pt_jpsi_14to18";
+    }
+    else if (pt_slice == 4) {
+      hist_path_associated = "ZFinder/Z_To_Electrons_And_Jpsi/z_pt_jpsi_18to30";
+    }
+    else if (pt_slice == 5) {
+      hist_path_associated = "ZFinder/Z_To_Electrons_And_Jpsi/z_pt_jpsi_30to100";
+    }
+    else {
+      std::cout << "pt_slice out of range" << std::endl;
+    }
   }
   else {
     hist_path_reco = "ZFinder/Z_To_Muons/Z From Muons p_{T}";
     hist_path_reco_mc = "ZFinder/Z_To_Muons/Z From Muons p_{T} MC";
     hist_path_truth = "ZFinder/MC_All/Z From Muons p_{T}";
-    hist_path_associated = "ZFinder/Z_To_Muons_And_Jpsi/Z From Muons p_{T}";
+    if (pt_slice == 0) {
+      hist_path_associated = "ZFinder/Z_To_Muons_And_Jpsi/Z From Muons p_{T}";
+    }
+    else if (pt_slice == 1) {
+      hist_path_associated = "ZFinder/Z_To_Muons_And_Jpsi/z_from_muons_pt_jpsi_8p5to10";
+    }
+    else if (pt_slice == 2) {
+      hist_path_associated = "ZFinder/Z_To_Muons_And_Jpsi/z_from_muons_pt_jpsi_10to14";
+    }
+    else if (pt_slice == 3) {
+      hist_path_associated = "ZFinder/Z_To_Muons_And_Jpsi/z_from_muons_pt_jpsi_14to18";
+    }
+    else if (pt_slice == 4) {
+      hist_path_associated = "ZFinder/Z_To_Muons_And_Jpsi/z_from_muons_pt_jpsi_18to30";
+    }
+    else if (pt_slice == 5) {
+      hist_path_associated = "ZFinder/Z_To_Muons_And_Jpsi/z_from_muons_pt_jpsi_30to100";
+    }
+    else {
+      std::cout << "pt_slice out of range" << std::endl;
+    }
   }
 
   TH1D *h_z_pt_mc_truth = (TH1D*) file_mc->Get(hist_path_truth.c_str());
   TH1D *h_z_pt_mc_reco = (TH1D*) file_mc->Get(hist_path_reco_mc.c_str());
   TH1D *h_z_pt_data_inclusive = (TH1D*) file_data_inclusive_z->Get(hist_path_reco.c_str());
   TH1D *h_z_pt_data_associated = (TH1D*) file_data_associated_z->Get(hist_path_associated.c_str());
+
+  TH1D *h_z_pt_data_associated_clone = h_z_pt_data_associated->Clone();
 
   h_z_pt_mc_reco->GetXaxis()->SetRangeUser(0,200);
 
@@ -132,8 +185,34 @@ void compare_efficiencies (string file_name_mc, string file_name_data_inclusive_
   ////leg2->AddEntry(h_jpsi_pt_zjpsi_mpi,"J/#psi MC (Z+J/#psi MPI)","lep");
   //leg2->Draw();
 
+  //int nbinsx = h_z_pt_data_associated->GetXaxis()->GetNbins();
+  int nxbins = h_z_pt_data_associated->GetNbinsX();
+  //int nybins = calibMapEB_->GetNbinsY();
+  double error_sum_sq = 0;
+  for (int x=1;x<=nxbins;++x)
+  {
+    double binentsM = h_z_pt_data_associated_clone->GetBinContent(x);
+    if (binentsM == 0) {
+      continue;
+    }
+    double binents_eff = h_z_pt_mc_reco->GetBinContent(x);
+    double error = pow( binentsM, 0.5 );
+
+
+    error_sum_sq = error_sum_sq + pow((final_integral_associated  - 1.0 / binents_eff * norm_data_associated ) / pow(final_integral_associated,2.0) * error, 2.0) ;
+    
+
+    //std::cout << binentsM << std::endl; 
+  }
+  
+  std::cout << "error sum sq " << error_sum_sq << std::endl;
+  std::cout << "error " << pow(error_sum_sq,0.5) << std::endl;
+  std::cout << "error ratio " << pow(error_sum_sq,0.5) / efficiency_inclusive << std::endl;
+
+  
+
   std::string image_name2 = out_dir;
-  if (use_z_to_ee) { 
+  if (use_z_to_ee) {
     image_name2 = image_name2.append("zee_efficiency_mc");
   }
   else {
@@ -143,7 +222,7 @@ void compare_efficiencies (string file_name_mc, string file_name_data_inclusive_
   c2->Print(image_name2.c_str() , "png");
 
   std::string image_name3 = out_dir;
-  if (use_z_to_ee) { 
+  if (use_z_to_ee) {
     image_name3 = image_name3.append("zee_efficiency_data");
   }
   else {
@@ -153,7 +232,7 @@ void compare_efficiencies (string file_name_mc, string file_name_data_inclusive_
   c3->Print(image_name3.c_str() , "png");
 
   std::string image_name4 = out_dir;
-  if (use_z_to_ee) { 
+  if (use_z_to_ee) {
     image_name4 = image_name4.append("zee_associated_efficiency_data");
   }
   else {

@@ -1008,6 +1008,8 @@ namespace zf {
       }
     }
 
+    //TODO remove this
+    //if ( (jpsi_lv.mass() <= MAX_JPSI_MASS && jpsi_lv.mass() >= MIN_JPSI_MASS) && ((four_lepton_lv.mass() >= 80.0) && (four_lepton_lv.mass() <= 100.0) )) {
     if ( jpsi_lv.mass() <= MAX_JPSI_MASS && jpsi_lv.mass() >= MIN_JPSI_MASS ) {
       reco_jpsi.is_within_jpsi_mass_window.push_back(true);
     }

@@ -181,6 +181,7 @@ std::vector<double> do_fit(std::string file_name, bool use_pileup_correction = f
   //RooRealVar *z_mass    = new RooRealVar("z_mass", "Z Mass [GeV]", 40., 50.);
   //RooRealVar *z_mass    = new RooRealVar("z_mass", "Z Mass [GeV]", 40., 45.);
   RooRealVar *z_mass    = new RooRealVar("z_mass", "Z Mass [GeV]", 80., 100.);
+  //RooRealVar *z_mass    = new RooRealVar("z_mass", "Z Mass [GeV]", 40., 100.);
   //RooRealVar *z_mass    = new RooRealVar("z_mass", "Z Mass [GeV]", 50., 150.);
   RooRealVar *is_z_to_electrons    = new RooRealVar("is_z_to_electrons", "is_z_to_electrons", 0, 1);
   RooRealVar *is_z_to_muons  = new RooRealVar("is_z_to_muons", "is_z_to_muons", 0, 1);
@@ -346,10 +347,14 @@ std::vector<double> do_fit(std::string file_name, bool use_pileup_correction = f
   RooRealVar jpsi_frac_prompt_sharp("jpsi_frac_prompt_sharp", "jpsi_frac_prompt_sharp" , 0.5, 0.0, 1.0);
   RooAddPdf jpsi_oniatau_gauss_sum_fitpdf("jpsi_oniatau_gauss_sum_fitpdf", "jpsi_oniatau_gauss_sum_fitpdf", RooArgList(jpsi_prompt_gauss,jpsi_prompt_gauss_2), RooArgList(jpsi_frac_prompt_sharp));
 
-  RooRealVar jpsi_sigma("jpsi_sigma", "jpsi_sigma", 0.05, 0.0002, 0.1);
-//  RooRealVar jpsi_sigma("jpsi_sigma", "jpsi_sigma", 2.75528e-02, 2.75528e-02-1.22859e-03, 2.75528e-02+1.22859e-03);
-  RooRealVar jpsi_alpha("jpsi_alpha", "jpsi_alpha", 1.8, 1.0, 2.5);
-  RooRealVar jpsi_n("jpsi_n", "jpsi_n", 2., 1.0, 80.);
+  //RooRealVar jpsi_sigma("jpsi_sigma", "jpsi_sigma", 0.05, 0.0002, 0.1);
+  //RooRealVar jpsi_alpha("jpsi_alpha", "jpsi_alpha", 1.8, 1.0, 2.5);
+  //RooRealVar jpsi_n("jpsi_n", "jpsi_n", 2., 1.0, 80.);
+
+  RooRealVar jpsi_sigma("jpsi_sigma", "jpsi_sigma", 0.05, 0.008, 0.1);
+  RooRealVar jpsi_alpha("jpsi_alpha", "jpsi_alpha", 1.8, 1.0, 5.5);
+  RooRealVar jpsi_n("jpsi_n", "jpsi_n", 20., 1.0, 200.);
+
   RooRealVar jpsi_dimuon_mean("jpsi_dimuon_mean", "jpsi_dimuon_mean", 3.1, 3.0, 3.2);
   RooCBShape jpsi_crystal_ball ("jpsi_crystal_ball", "jpsi_crystal_ball", *onia_mass, jpsi_dimuon_mean, jpsi_sigma, jpsi_alpha, jpsi_n );
   RooRealVar jpsi_dimuon_sigma("jpsi_dimuon_sigma", "jpsi_dimuon_sigma", 0.02, 0.001, 0.1);
@@ -371,10 +376,10 @@ std::vector<double> do_fit(std::string file_name, bool use_pileup_correction = f
 
   //yield ranges probably need to be changed?
   // yields
-  RooRealVar Njpsi_m_sig_tau_sig("Njpsi_m_sig_tau_sig", "Njpsi_m_sig_tau_sig", 1000, 0, 10000000);  
-  RooRealVar Njpsi_m_sig_tau_bg ("Njpsi_m_sig_tau_bg",  "Njpsi_m_sig_tau_bg",  1000, 0, 10000000); 
-  RooRealVar Njpsi_m_bg_tau_bg  ("Njpsi_m_bg_tau_bg",   "Njpsi_m_bg_tau_bg",   100, 0, 10000000); 
-  RooRealVar Njpsi_m_bg_tau_sig ("Njpsi_m_bg_tau_sig",  "Njpsi_m_bg_tau_sig",  100, 0, 10000000); 
+  RooRealVar Njpsi_m_sig_tau_sig("Njpsi_m_sig_tau_sig", "Njpsi_m_sig_tau_sig", 10000, 0, 1000000);  
+  RooRealVar Njpsi_m_sig_tau_bg ("Njpsi_m_sig_tau_bg",  "Njpsi_m_sig_tau_bg",  4000, 0, 1000000); 
+  RooRealVar Njpsi_m_bg_tau_bg  ("Njpsi_m_bg_tau_bg",   "Njpsi_m_bg_tau_bg",   1000, 0, 1000000); 
+  RooRealVar Njpsi_m_bg_tau_sig ("Njpsi_m_bg_tau_sig",  "Njpsi_m_bg_tau_sig",  400, 0, 1000000); 
 
   // extended PDFs
   RooExtendPdf ejpsi_m_sig_tau_sig("ejpsi_m_sig_tau_sig", "ejpsi_m_sig_tau_sig", jpsi_m_sig_tau_sig, Njpsi_m_sig_tau_sig); 
@@ -387,7 +392,7 @@ std::vector<double> do_fit(std::string file_name, bool use_pileup_correction = f
 
   //does not work right now
   //RooFitResult *fr_inclusive = jpsi_model.fitTo(*jpsi_data, NumCPU(4, kTRUE), Verbose(false), PrintLevel(-1), Save());
-  RooFitResult *fr_inclusive = jpsi_model.fitTo(*jpsi_data_weighted_testing, NumCPU(4, kTRUE), Verbose(false), SumW2Error(kTRUE), PrintLevel(-1), Save());
+  RooFitResult *fr_inclusive = jpsi_model.fitTo(*jpsi_data_weighted_testing, NumCPU(8, kTRUE), Verbose(false), SumW2Error(kTRUE), PrintLevel(-1), Save());
   fr_inclusive->Print();
 
   int num_mass_bins = 40;
@@ -708,7 +713,12 @@ std::vector<double> do_fit(std::string file_name, bool use_pileup_correction = f
   //RooFitResult *fr = zjpsi_model.fitTo(*zjpsi_data, NumCPU(4, kTRUE), Verbose(false), PrintLevel(-1), Save());
   //RooFitResult *fr = zjpsi_model.fitTo(*zjpsi_data, NumCPU(4, kTRUE), Verbose(false), PrintLevel(-1), SumW2Error(kTRUE), Save());
   //RooFitResult *fr = zjpsi_model.fitTo(*zjpsi_data_weighted_testing, NumCPU(4, kTRUE), Extended(kTRUE) ,Verbose(false), PrintLevel(-1), SumW2Error(kTRUE), Save());
-  RooFitResult *fr = zjpsi_model.fitTo(*zjpsi_data_weighted_testing, NumCPU(4, kTRUE), Verbose(false), Minos(kTRUE), PrintLevel(-1), SumW2Error(kTRUE), Save());
+  //RooFitResult *fr = zjpsi_model.fitTo(*zjpsi_data_weighted_testing, NumCPU(1, kTRUE), Extended(kTRUE) , Verbose(false), PrintLevel(-1), SumW2Error(kTRUE), Save());
+  //RooFitResult *fr = zjpsi_model.fitTo(*zjpsi_data_weighted_testing, NumCPU(4, kTRUE), Verbose(false), Minimizer(1), PrintLevel(-1), SumW2Error(kTRUE), Save());
+
+  RooFitResult *fr = zjpsi_model.fitTo(*zjpsi_data_weighted_testing, NumCPU(1, kTRUE), Verbose(false), PrintLevel(-1), SumW2Error(kTRUE), Save());
+  //RooFitResult *fr = zjpsi_model.fitTo(*zjpsi_data_weighted_testing, NumCPU(4, kTRUE), Verbose(false), InitialHesse(kTRUE), PrintLevel(-1), SumW2Error(kTRUE), Save());
+  //RooFitResult *fr = zjpsi_model.fitTo(*zjpsi_data_weighted_testing, NumCPU(4, kTRUE), Verbose(false), Minos(kTRUE), PrintLevel(-1), SumW2Error(kTRUE), Save());
   fr->Print();
 
   if (do_pull_calculation) {
