@@ -6,9 +6,12 @@
 #include "TTree.h"
 #include "TKey.h"
 #include "Riostream.h"
-void make_images2 (string file_name_mc, string file_name_data_zmumu, string file_name_data_zee)
+#include "tdrStyle.C"
+
+void make_images2 (string file_name_mc, string file_name_data_zmumu, string file_name_data_zee, string output_dir = "~/public_html/ZPhysics/tmp/Test90/")
 {
   
+  setTDRStyle();
   //TODO give this better documentation/ a more descriptive name
   //TFile *file_mc = new TFile("/home/user1/turkewitz/Work/CMSSW_5_3_13_ZJPsi/src/test9d10.root");
   TFile *file_mc = new TFile( file_name_mc.c_str() );
@@ -30,7 +33,8 @@ void make_images2 (string file_name_mc, string file_name_data_zmumu, string file
   std::string image_name14 = "";
   std::string image_name15 = "";
   std::string image_name16 = "";
-  path = "/home/user1/turkewitz/public_html/ZPhysics/tmp/Test50/";
+
+  std::string path = output_dir;
   image_name1.append(path);
   image_name2.append(path);
   image_name3.append(path);
@@ -54,17 +58,45 @@ void make_images2 (string file_name_mc, string file_name_data_zmumu, string file
   gROOT->ForceStyle();
   gStyle->SetOptStat(0);
 
+  TLatex mark;
+  mark.SetTextSize(0.035);
+  mark.SetNDC(true);
+
+
   //Jpsi
   TH1D *h_truth_vtx_minus_reco_vtx = (TH1D*) file_mc->Get("ZFinder/Dimuon_Jpsi_Vertex_Compatible/jpsi_truth_vtx_z_minus_jpsi_reco_vtx_z_");
 
   TCanvas *c1 = new TCanvas("c1", "c1");
   c1->cd();
   c1->SetLogy();
-  h_truth_vtx_minus_reco_vtx->GetXaxis()->SetRangeUser(-1,1);
   h_truth_vtx_minus_reco_vtx->SetTitle("J/#psi MC");
+  h_truth_vtx_minus_reco_vtx->Rebin(5);
   h_truth_vtx_minus_reco_vtx->Draw();
+  h_truth_vtx_minus_reco_vtx->GetXaxis()->SetRangeUser(-2,2);
+  //h_truth_vtx_minus_reco_vtx->GetXaxis()->SetTitle("truth vtx_{z} - reco vtx_{z} (cm)");
+  h_truth_vtx_minus_reco_vtx->GetXaxis()->SetTitle("#Deltaz Between Truth Vertex and Reco Vertex (cm)");
+  h_truth_vtx_minus_reco_vtx->GetXaxis()->SetLabelSize(0.03);
+  h_truth_vtx_minus_reco_vtx->GetXaxis()->SetTitleSize(0.045);
+  h_truth_vtx_minus_reco_vtx->GetYaxis()->SetTitle("Events / 0.05 cm");
   image_name1 = image_name1.append("jpsi_truth_vtx_z_minus_jpsi_reco_vtx_z");
   image_name1.append(".png");
+
+  Double_t xl1=.62, yl1=0.8, xl2=xl1+.30, yl2=yl1+.10;
+  TLegend *leg1 = new TLegend(xl1,yl1,xl2,yl2);
+  leg1->AddEntry(h_truth_vtx_minus_reco_vtx,"J/#psi#rightarrow#mu#mu MC","l");
+  leg1->Draw();
+  leg1->SetShadowColor(0);
+  leg1->SetFillStyle(0);
+  leg1->SetBorderSize(0);
+  leg1->SetLineWidth(1);
+  leg1->SetNColumns(1);
+  leg1->SetTextFont(42);
+  leg1->SetTextSize(0.03);
+
+  mark.DrawLatex(0.745,0.957,"19.7 fb^{-1} (8 TeV)");
+  mark.DrawLatex(0.195,0.89,"CMS");
+  mark.DrawLatex(0.195,0.86,"#it{Preliminary}");
+
   c1->Print(image_name1.c_str() , "png");
   //c1->Close();
   //delete c1;
@@ -83,31 +115,48 @@ void make_images2 (string file_name_mc, string file_name_data_zmumu, string file
   h_jpsi_pt->Rebin(5);
   h_jpsi_pt_zmumu_jpsi->Rebin(5);
   h_jpsi_pt->GetXaxis()->SetRangeUser(8.5,100);
-  h_jpsi_pt->GetXaxis()->SetTitle("J/#psi p_{T}");
-  h_jpsi_pt->GetYaxis()->SetTitle("Norm. Events / 5 GeV");
-  h_jpsi_pt->SetTitle("J/#psi p_{T}");
+  h_jpsi_pt->GetXaxis()->SetTitle("J/#psi p_{T} (GeV)");
+  h_jpsi_pt->GetYaxis()->SetTitle("Normalized Events / 5 GeV");
+  h_jpsi_pt->SetTitle("J/#psi p_{T} (GeV)");
   double norm_mc_zjpsi = h_jpsi_pt_zjpsi_mpi->GetEntries();
   double norm_mc = h_jpsi_pt->GetEntries();
   double norm_data = h_jpsi_pt_zmumu_jpsi->GetEntries();
   //TODO testing
-  h_jpsi_pt->Scale(1/norm_mc*norm_data);
-  //h_jpsi_pt->GetYaxis()->SetRangeUser(1e-6,0.9);
+  //h_jpsi_pt->Scale(1/norm_mc*norm_data);
+  h_jpsi_pt->Scale(1.0/norm_mc);
+  h_jpsi_pt->GetYaxis()->SetRangeUser(1e-6,1.1);
   h_jpsi_pt->Draw();
   //h_jpsi_pt_zmumu_jpsi->Scale(1/norm_data);
   h_jpsi_pt_zmumu_jpsi->SetLineColor(kRed-2);
+  h_jpsi_pt_zmumu_jpsi->Scale(1.0/norm_data);
   h_jpsi_pt_zmumu_jpsi->Draw("same");
 
 
-  h_jpsi_pt_zjpsi_mpi->Scale(1/norm_mc_zjpsi*norm_data);
-  h_jpsi_pt_zjpsi_mpi->SetLineColor(kGreen-2);
-  h_jpsi_pt_zjpsi_mpi->Draw("same");
+  //h_jpsi_pt_zjpsi_mpi->Scale(1/norm_mc_zjpsi*norm_data);
+  //h_jpsi_pt_zjpsi_mpi->SetLineColor(kGreen-2);
+  //h_jpsi_pt_zjpsi_mpi->Draw("same");
 
-  Double_t xl1=.55, yl1=0.70, xl2=xl1+.30, yl2=yl1+.20;
+  Double_t xl1=.62, yl1=0.8, xl2=xl1+.30, yl2=yl1+.10;
   TLegend *leg2 = new TLegend(xl1,yl1,xl2,yl2);
-  leg2->AddEntry(h_jpsi_pt_zmumu_jpsi,"Z->ll + J/#psi Data","lep");
-  leg2->AddEntry(h_jpsi_pt,"J/#psi MC","lep");
-  leg2->AddEntry(h_jpsi_pt_zjpsi_mpi,"J/#psi MC (Z+J/#psi MPI)","lep");
+  leg2->AddEntry(h_jpsi_pt_zmumu_jpsi,"Z#rightarrowll + J/#psi#rightarrow#mu#mu Data","l");
+  leg2->AddEntry(h_jpsi_pt,"J/#psi#rightarrow#mu#mu MC","l");
+  //leg2->AddEntry(h_jpsi_pt_zjpsi_mpi,"J/#psi MC (Z+J/#psi MPI)","lep");
   leg2->Draw();
+  leg2->SetShadowColor(0);
+  leg2->SetFillStyle(0);
+  leg2->SetBorderSize(0);
+  leg2->SetLineWidth(1);
+  leg2->SetNColumns(1);
+  leg2->SetTextFont(42);
+  leg2->SetTextSize(0.03);
+
+  mark.DrawLatex(0.745,0.957,"19.7 fb^{-1} (8 TeV)");
+  mark.DrawLatex(0.305,0.89,"CMS");
+  mark.DrawLatex(0.305,0.86,"#it{Preliminary}");
+
+  //mark.DrawLatex(0.745,0.957,"19.7 fb^{-1} (8 TeV)");
+  //mark.DrawLatex(0.195,0.89,"CMS");
+  //mark.DrawLatex(0.195,0.86,"#it{Preliminary}");
 
   image_name2 = image_name2.append("jpsi_pt");
   image_name2.append(".png");
@@ -123,9 +172,8 @@ void make_images2 (string file_name_mc, string file_name_data_zmumu, string file
   c3->cd();
   c3->SetLogy();
   h_jpsi_rap->SetTitle("J/#psi Rapidity");
-  h_jpsi_rap->GetXaxis()->SetTitle("J/#psi Rap");
-  h_jpsi_rap->GetXaxis()->SetRangeUser(-2.1,2.1);
-  h_jpsi_rap->GetYaxis()->SetTitle("Norm. Events / 0.1");
+  h_jpsi_rap->GetXaxis()->SetTitle("J/#psi Rapidity");
+  h_jpsi_rap->GetYaxis()->SetTitle("Normalized Events / 0.5");
 
   h_jpsi_rap_zjpsi_mpi->Rebin(5);
   h_jpsi_rap->Rebin(5);
@@ -133,23 +181,48 @@ void make_images2 (string file_name_mc, string file_name_data_zmumu, string file
 
   double norm_mc_zjpsi = h_jpsi_rap_zjpsi_mpi->GetEntries();
   double norm_mc = h_jpsi_rap->GetEntries();
-  double norm_data = h_jpsi_rap_zmumu->GetEntries();
-  h_jpsi_rap->Scale(norm_data/norm_mc);
+  //double norm_data = h_jpsi_rap_zmumu->GetEntries();
+  //h_jpsi_rap->Scale(norm_data/norm_mc);
+  h_jpsi_rap->Scale(1/norm_mc);
+  h_jpsi_rap_zmumu->Scale(1/norm_data);
   //h_jpsi_rap->GetYaxis()->SetRangeUser(1e-4,0.9);
   h_jpsi_rap->Draw();
-  h_jpsi_rap_zjpsi_mpi->SetLineColor(kGreen-2);
-  h_jpsi_rap_zjpsi_mpi->Scale(norm_data/norm_mc_zjpsi);
-  h_jpsi_rap_zjpsi_mpi->Draw("same");
+  //h_jpsi_rap_zjpsi_mpi->SetLineColor(kGreen-2);
+  //h_jpsi_rap_zjpsi_mpi->Scale(norm_data/norm_mc_zjpsi);
+  //h_jpsi_rap_zjpsi_mpi->Draw("same");
   //h_jpsi_rap_zmumu->Scale(1/);
   h_jpsi_rap_zmumu->SetLineColor(kRed-2);
   h_jpsi_rap_zmumu->Draw("same");
+  h_jpsi_rap->GetXaxis()->SetRangeUser(-2.1,2.1);
+  h_jpsi_rap->GetYaxis()->SetRangeUser(1e-4,1.2);
+  //h_jpsi_rap_zmumu->GetXaxis()->SetRangeUser(-2.1,2.1);
+  h_jpsi_rap->GetXaxis()->SetNdivisions(8);
 
-  Double_t xl1=.55, yl1=0.70, xl2=xl1+.30, yl2=yl1+.20;
+  //Double_t xl1=.55, yl1=0.70, xl2=xl1+.30, yl2=yl1+.20;
+  //TLegend *leg3 = new TLegend(xl1,yl1,xl2,yl2);
+  //leg3->AddEntry(h_jpsi_rap_zmumu,"Z->ll + J/#psi Data","lep");
+  //leg3->AddEntry(h_jpsi_rap,"J/#psi MC","lep");
+  //leg3->AddEntry(h_jpsi_pt_zjpsi_mpi,"J/#psi MC (Z+J/#psi MPI)","lep");
+
+  Double_t xl1=.56, yl1=0.8, xl2=xl1+.30, yl2=yl1+.10;
   TLegend *leg3 = new TLegend(xl1,yl1,xl2,yl2);
-  leg3->AddEntry(h_jpsi_rap_zmumu,"Z->ll + J/#psi Data","lep");
-  leg3->AddEntry(h_jpsi_rap,"J/#psi MC","lep");
-  leg3->AddEntry(h_jpsi_pt_zjpsi_mpi,"J/#psi MC (Z+J/#psi MPI)","lep");
+  leg3->AddEntry(h_jpsi_rap_zmumu,"Z#rightarrowll + J/#psi#rightarrow#mu#mu Data","l");
+  leg3->AddEntry(h_jpsi_rap,"J/#psi#rightarrow#mu#mu MC","l");
+  //leg3->AddEntry(h_jpsi_pt_zjpsi_mpi,"J/#psi MC (Z+J/#psi MPI)","lep");
+  //leg3->Draw();
+  leg3->SetShadowColor(0);
+  leg3->SetFillStyle(0);
+  leg3->SetBorderSize(0);
+  leg3->SetLineWidth(1);
+  leg3->SetNColumns(1);
+  leg3->SetTextFont(42);
+  leg3->SetTextSize(0.035);
+
+  mark.DrawLatex(0.745,0.957,"19.7 fb^{-1} (8 TeV)");
+  mark.DrawLatex(0.195,0.89,"CMS");
+  mark.DrawLatex(0.195,0.86,"#it{Preliminary}");
   leg3->Draw();
+
   image_name3.append("jpsi_rap");
   image_name3.append(".png");
   c3->Print(image_name3.c_str() , "png");
@@ -171,7 +244,28 @@ void make_images2 (string file_name_mc, string file_name_data_zmumu, string file
   //c5->SetLogy();
   //h_jpsi_pt->GetXaxis()->SetRangeUser(-1,1);
   h_jpsi_cos_mu_plus->SetTitle("J/#psi MC");
+  h_jpsi_cos_mu_plus->Rebin(2);
   h_jpsi_cos_mu_plus->Draw();
+  h_jpsi_cos_mu_plus->GetXaxis()->SetTitle("#mu_{+} cos(#theta)");
+  h_jpsi_cos_mu_plus->GetYaxis()->SetTitle("Events / 0.02");
+  h_jpsi_cos_mu_plus->GetYaxis()->SetLabelSize(0.04);
+
+  Double_t xl1=.7, yl1=0.8, xl2=xl1+.30, yl2=yl1+.10;
+  TLegend *leg_cos = new TLegend(xl1,yl1,xl2,yl2);
+  leg_cos->AddEntry(h_jpsi_cos_mu_plus,"J/#psi#rightarrow#mu#mu MC","l");
+  leg_cos->SetShadowColor(0);
+  leg_cos->SetFillStyle(0);
+  leg_cos->SetBorderSize(0);
+  leg_cos->SetLineWidth(1);
+  leg_cos->SetNColumns(1);
+  leg_cos->SetTextFont(42);
+  leg_cos->SetTextSize(0.035);
+
+  mark.DrawLatex(0.735,0.957,"19.7 fb^{-1} (8 TeV)");
+  mark.DrawLatex(0.195,0.89,"CMS");
+  mark.DrawLatex(0.195,0.86,"#it{Preliminary}");
+  leg_cos->Draw();
+
   image_name5.append("jpsi_cos_mu_plus");
   image_name5.append(".png");
   c5->Print(image_name5.c_str() , "png");
@@ -217,13 +311,12 @@ void make_images2 (string file_name_mc, string file_name_data_zmumu, string file
   c8->SetLogy();
   h_mu0_pt->SetTitle("J/#psi #mu_{0} p_{T}");
   h_mu0_pt->GetXaxis()->SetTitle("#mu_{0} p_{T}");
-  h_mu0_pt->GetXaxis()->SetRangeUser(3.5,100);
-  h_mu0_pt->GetYaxis()->SetTitle("Norm. Events / 5 GeV");
+  h_mu0_pt->GetYaxis()->SetTitle("Normalized Events / 5 GeV");
   h_mu0_pt->Rebin(10);
   h_mu0_pt_zmumu->Rebin(10);
   h_mu0_pt->Draw();
 
-  double norm_mc = h_jpsi_rap->GetEntries();
+  double norm_mc = h_mu0_pt->GetEntries();
   h_mu0_pt->Scale(1/norm_mc);
   h_mu0_pt->GetYaxis()->SetRangeUser(1e-5,0.9);
   h_mu0_pt->Draw();
@@ -231,11 +324,32 @@ void make_images2 (string file_name_mc, string file_name_data_zmumu, string file
   h_mu0_pt_zmumu->Scale(1/norm_data);
   h_mu0_pt_zmumu->SetLineColor(kRed-2);
   h_mu0_pt_zmumu->Draw("same");
+  h_mu0_pt->GetXaxis()->SetRangeUser(3.5,100);
+  h_mu0_pt->GetYaxis()->SetRangeUser(1e-6,1.2);
 
-  Double_t xl1=.55, yl1=0.70, xl2=xl1+.30, yl2=yl1+.20;
+  //Double_t xl1=.55, yl1=0.70, xl2=xl1+.30, yl2=yl1+.20;
+  //TLegend *leg8 = new TLegend(xl1,yl1,xl2,yl2);
+  //leg8->AddEntry(h_jpsi_rap_zmumu,"Z->ll + J/#psi Data","lep");
+  //leg8->AddEntry(h_jpsi_rap,"J/#psi MC","lep");
+  //leg8->Draw();
+
+  Double_t xl1=.56, yl1=0.8, xl2=xl1+.30, yl2=yl1+.10;
   TLegend *leg8 = new TLegend(xl1,yl1,xl2,yl2);
-  leg8->AddEntry(h_jpsi_rap_zmumu,"Z->ll + J/#psi Data","lep");
-  leg8->AddEntry(h_jpsi_rap,"J/#psi MC","lep");
+  leg8->AddEntry(h_mu0_pt_zmumu,"Z#rightarrowll + J/#psi#rightarrow#mu#mu Data","l");
+  leg8->AddEntry(h_mu0_pt,"J/#psi#rightarrow#mu#mu MC","l");
+  //leg8->AddEntry(h_jpsi_pt_zjpsi_mpi,"J/#psi MC (Z+J/#psi MPI)","lep");
+  //leg8->Draw();
+  leg8->SetShadowColor(0);
+  leg8->SetFillStyle(0);
+  leg8->SetBorderSize(0);
+  leg8->SetLineWidth(1);
+  leg8->SetNColumns(1);
+  leg8->SetTextFont(42);
+  leg8->SetTextSize(0.035);
+
+  mark.DrawLatex(0.745,0.957,"19.7 fb^{-1} (8 TeV)");
+  mark.DrawLatex(0.305,0.89,"CMS");
+  mark.DrawLatex(0.305,0.86,"#it{Preliminary}");
   leg8->Draw();
   image_name8.append("mu0_pT");
   image_name8.append(".png");
@@ -261,13 +375,12 @@ void make_images2 (string file_name_mc, string file_name_data_zmumu, string file
   c9->SetLogy();
   h_mu1_pt->SetTitle("J/#psi #mu_{1} p_{T}");
   h_mu1_pt->GetXaxis()->SetTitle("#mu_{1} p_{T}");
-  h_mu1_pt->GetXaxis()->SetRangeUser(3.5,100);
-  h_mu1_pt->GetYaxis()->SetTitle("Norm. Events / GeV");
-  h_mu1_pt->Rebin(2);
-  h_mu1_pt_zmumu->Rebin(2);
+  h_mu1_pt->GetYaxis()->SetTitle("Normalized Events / 5 GeV");
+  h_mu1_pt->Rebin(10);
+  h_mu1_pt_zmumu->Rebin(10);
   h_mu1_pt->Draw();
 
-  double norm_mc = h_jpsi_rap->GetEntries();
+  double norm_mc = h_mu1_pt->GetEntries();
   h_mu1_pt->Scale(1/norm_mc);
   h_mu1_pt->GetYaxis()->SetRangeUser(1e-5,0.9);
   h_mu1_pt->Draw();
@@ -275,15 +388,67 @@ void make_images2 (string file_name_mc, string file_name_data_zmumu, string file
   h_mu1_pt_zmumu->Scale(1/norm_data);
   h_mu1_pt_zmumu->SetLineColor(kRed-2);
   h_mu1_pt_zmumu->Draw("same");
+  h_mu1_pt->GetXaxis()->SetRangeUser(3.5,100);
+  h_mu1_pt->GetYaxis()->SetRangeUser(1e-6,1.2);
 
-  Double_t xl1=.55, yl1=0.70, xl2=xl1+.30, yl2=yl1+.20;
+  Double_t xl1=.56, yl1=0.8, xl2=xl1+.30, yl2=yl1+.10;
   TLegend *leg9 = new TLegend(xl1,yl1,xl2,yl2);
-  leg9->AddEntry(h_jpsi_rap_zmumu,"Z->ll + J/#psi Data","lep");
-  leg9->AddEntry(h_jpsi_rap,"J/#psi MC","lep");
+  leg9->AddEntry(h_mu1_pt_zmumu,"Z#rightarrowll + J/#psi#rightarrow#mu#mu Data","l");
+  leg9->AddEntry(h_mu1_pt,"J/#psi#rightarrow#mu#mu MC","l");
+  //leg8->AddEntry(h_jpsi_pt_zjpsi_mpi,"J/#psi MC (Z+J/#psi MPI)","lep");
+  //leg8->Draw();
+  leg9->SetShadowColor(0);
+  leg9->SetFillStyle(0);
+  leg9->SetBorderSize(0);
+  leg9->SetLineWidth(1);
+  leg9->SetNColumns(1);
+  leg9->SetTextFont(42);
+  leg9->SetTextSize(0.035);
+
+  mark.DrawLatex(0.745,0.957,"19.7 fb^{-1} (8 TeV)");
+  mark.DrawLatex(0.305,0.89,"CMS");
+  mark.DrawLatex(0.305,0.86,"#it{Preliminary}");
   leg9->Draw();
   image_name9.append("mu1_pT");
   image_name9.append(".png");
   c9->Print(image_name9.c_str() , "png");
+
+
+
+
+
+  //TH1D *h_mu1_pt = (TH1D*) file_mc->Get("ZFinder/Dimuon_Jpsi_Vertex_Compatible/p_{T,mu_{1}}");
+  //TH1D *h_mu1_pt_zmumu = (TH1D*) file_data_zmumu->Get("ZFinder/Z_To_Muons_And_Jpsi/p_{T,mu_{1}}");
+  //TH1D *h_mu1_pt_zee = (TH1D*) file_data_zee->Get("ZFinder/Z_To_Electrons_And_Jpsi/p_{T,mu_{1}}");
+  //h_mu1_pt_zmumu->Add(h_mu1_pt_zee);
+  //TCanvas *c9 = new TCanvas("c9", "c9");
+  //c9->cd();
+  //c9->SetLogy();
+  //h_mu1_pt->SetTitle("J/#psi #mu_{1} p_{T}");
+  //h_mu1_pt->GetXaxis()->SetTitle("#mu_{1} p_{T}");
+  //h_mu1_pt->GetXaxis()->SetRangeUser(3.5,100);
+  //h_mu1_pt->GetYaxis()->SetTitle("Norm. Events / GeV");
+  //h_mu1_pt->Rebin(2);
+  //h_mu1_pt_zmumu->Rebin(2);
+  //h_mu1_pt->Draw();
+
+  //double norm_mc = h_jpsi_rap->GetEntries();
+  //h_mu1_pt->Scale(1/norm_mc);
+  //h_mu1_pt->GetYaxis()->SetRangeUser(1e-5,0.9);
+  //h_mu1_pt->Draw();
+  //double norm_data = h_mu1_pt_zmumu->GetEntries();
+  //h_mu1_pt_zmumu->Scale(1/norm_data);
+  //h_mu1_pt_zmumu->SetLineColor(kRed-2);
+  //h_mu1_pt_zmumu->Draw("same");
+
+  //Double_t xl1=.55, yl1=0.70, xl2=xl1+.30, yl2=yl1+.20;
+  //TLegend *leg9 = new TLegend(xl1,yl1,xl2,yl2);
+  //leg9->AddEntry(h_jpsi_rap_zmumu,"Z->ll + J/#psi Data","lep");
+  //leg9->AddEntry(h_jpsi_rap,"J/#psi MC","lep");
+  //leg9->Draw();
+  //image_name9.append("mu1_pT");
+  //image_name9.append(".png");
+  //c9->Print(image_name9.c_str() , "png");
 
   TH1D *h_mu0_eta = (TH1D*) file_mc->Get("ZFinder/Dimuon_Jpsi_Vertex_Compatible/#eta_{mu_{0}}");
   TCanvas *c10 = new TCanvas("c10", "c10");

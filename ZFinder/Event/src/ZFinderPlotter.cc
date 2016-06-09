@@ -1685,9 +1685,25 @@ namespace zf {
           }
         }
         jpsi_pt_vs_rap_->Fill(zfe.reco_jpsi.y.at(i), zfe.reco_jpsi.pt.at(i) , event_weight);
-        jpsi_pt_vs_rap_finer_->Fill(zfe.reco_jpsi.y.at(i), zfe.reco_jpsi.pt.at(i) , event_weight);
-        jpsi_pt_vs_rap_finer_pos_->Fill(zfe.reco_jpsi.y.at(i), zfe.reco_jpsi.pt.at(i) , event_weight * lambda1);
-        jpsi_pt_vs_rap_finer_neg_->Fill(zfe.reco_jpsi.y.at(i), zfe.reco_jpsi.pt.at(i) , event_weight * lambdaNeg1);
+
+
+        if (!zfe.is_real_data) {
+          for (unsigned int j = 0; j < zfe.truth_jpsi.m.size() ; ++j ) {
+            if (n_jpsi > 1 ) {
+              continue;
+            }
+            jpsi_pt_vs_rap_finer_->Fill(zfe.truth_jpsi.y.at(j), zfe.truth_jpsi.pt.at(j) , event_weight);
+            jpsi_pt_vs_rap_finer_pos_->Fill(zfe.truth_jpsi.y.at(j), zfe.truth_jpsi.pt.at(j) , event_weight * lambda1);
+            jpsi_pt_vs_rap_finer_neg_->Fill(zfe.truth_jpsi.y.at(j), zfe.truth_jpsi.pt.at(j) , event_weight * lambdaNeg1);
+          }
+        }
+        else {
+          jpsi_pt_vs_rap_finer_->Fill(zfe.reco_jpsi.y.at(i), zfe.reco_jpsi.pt.at(i) , event_weight);
+          jpsi_pt_vs_rap_finer_pos_->Fill(zfe.reco_jpsi.y.at(i), zfe.reco_jpsi.pt.at(i) , event_weight * lambda1);
+          jpsi_pt_vs_rap_finer_neg_->Fill(zfe.reco_jpsi.y.at(i), zfe.reco_jpsi.pt.at(i) , event_weight * lambdaNeg1);
+        }
+
+
         jpsi_pt_vs_rap_fine_->Fill(zfe.reco_jpsi.y.at(i), zfe.reco_jpsi.pt.at(i) , event_weight);
         jpsi_pt_vs_rap_polarization_long->Fill(zfe.reco_jpsi.y.at(i), zfe.reco_jpsi.pt.at(i) , 
             event_weight * (1.0 - pow(zfe.reco_jpsi.cos_jpsi_mu_plus.at(i), 2.0) ));

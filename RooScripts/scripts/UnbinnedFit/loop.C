@@ -90,6 +90,7 @@ void Run(std::string file_name, bool use_z_to_muons = false, bool use_z_to_elect
 
   double onia_mass, z_mass, onia_tau, onia_pt, onia_rap;
   double onia_mu0_pt, onia_mu1_pt, onia_mu0_eta, onia_mu1_eta;
+  double z_delta_phi;
   double unpolarised, lambda_pos, lambda_neg, longitudinal, transverse, transverse_pos, transverse_neg; 
   double is_z_to_electrons, is_z_to_muons;
   double reco_muon0_weight, reco_muon1_weight;
@@ -169,6 +170,7 @@ void Run(std::string file_name, bool use_z_to_muons = false, bool use_z_to_elect
   aux->Branch("onia_mu1_pt", &onia_mu1_pt);
   aux->Branch("onia_mu0_eta",&onia_mu0_eta);
   aux->Branch("onia_mu1_eta",&onia_mu1_eta);
+  aux->Branch("z_delta_phi", &z_delta_phi);
   aux->Branch("cos_jpsi_mu_plus", &cos_jpsi_mu_plus);
   aux->Branch("is_z_to_electrons", &is_z_to_electrons);
   aux->Branch("is_z_to_muons", &is_z_to_muons);
@@ -204,6 +206,7 @@ void Run(std::string file_name, bool use_z_to_muons = false, bool use_z_to_elect
     onia_mu0_eta = jpsi->reco_jpsi_muon0_eta;
     onia_mu1_pt  = jpsi->reco_jpsi_muon1_pt;
     onia_mu1_eta = jpsi->reco_jpsi_muon1_eta;
+    z_delta_phi = jpsi->reco_jpsi_z_delta_phi;
     cos_jpsi_mu_plus = jpsi->reco_jpsi_cos_jpsi_mu_plus;
 
     if(use_z_to_muons) {

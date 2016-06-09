@@ -10,6 +10,7 @@
 #include "TH1.h"
 #include "TGraph.h"
 #include "TLegend.h"
+#include "TLatex.h"
 
 // RooFit
 #include "RooAddPdf.h"
@@ -39,6 +40,10 @@
 
 #include "BW_CB_pdf_class.h"
 
+#include <TROOT.h>
+#include <TStyle.h>
+#include "tdrStyle.C"
+
 using namespace RooFit;
 
 int RooFitZMassBackground(
@@ -53,6 +58,7 @@ int RooFitZMassBackground(
     return 1;
   }
   // Pass the open files to the main RooFitter
+  setTDRStyle();
   const int RET_CODE = RooFitZMassBackground(f_data_1, USE_Z_TO_EE, OUT_DIR);
 
   // Clean up and return the exit code
@@ -286,7 +292,7 @@ int RooFitZMassBackground(
   }
   z_fitres->Print();
 
-  TCanvas *canvas1 = new TCanvas("canvas1", "canvas1", 2000, 750);
+  TCanvas *canvas1 = new TCanvas("canvas1", "canvas1", 1200, 900);
 
   canvas1->cd(1);
   //gPad->SetLogy();
@@ -306,21 +312,45 @@ int RooFitZMassBackground(
   bg_exponential.plotOn(z_mass_fitframe, LineColor(kBlue-2), VLines(), Range("signal"), RooFit::Name("signal"));
   bg_exponential.plotOn(z_mass_fitframe, LineColor(kRed-2), VLines(), RooFit::Name("background"));
 
-  Double_t xl1=.58, yl1=0.55, xl2=xl1+.3, yl2=yl1+.325;
+  //Double_t xl1=.58, yl1=0.55, xl2=xl1+.3, yl2=yl1+.325;
+  Double_t xl1=.60, yl1=0.70, xl2=xl1+.3, yl2=yl1+.15;
   TLegend *leg = new TLegend(xl1,yl1,xl2,yl2);
   leg->SetFillColor(kWhite);
   leg->AddEntry(z_mass_fitframe->findObject("signal"),"signal region","l");
   leg->AddEntry(z_mass_fitframe->findObject("background"),"background region","l");
+
+  leg->SetShadowColor(0);
+  leg->SetFillStyle(0);
+  leg->SetBorderSize(0);
+  leg->SetLineWidth(1);
+  leg->SetNColumns(1);
+  leg->SetTextFont(42);
+  leg->SetTextSize(0.03);
+
+  TLatex mark;
+  mark.SetTextSize(0.035);
+  mark.SetNDC(true);
 
   //z_mass_fitpdf.plotOn(z_mass_fitframe, Components(voigtian), LineColor(kGreen-2));
   //z_mass_fitpdf.plotOn(z_mass_fitframe, Components(MyBackgroundPdf), LineColor(kBlue-2));
   //z_mass_fitpdf.plotOn(z_mass_fitframe, LineColor(kRed-2));
   z_mass_fitframe->SetMinimum(10);
   z_mass_fitframe->SetMaximum(10e6);
+  z_mass_fitframe->GetYaxis()->SetTitle("Events / 1 GeV");
+  z_mass_fitframe->GetXaxis()->SetLabelSize(0.033);
+  if(USE_Z_TO_EE) {
+    z_mass_fitframe->GetXaxis()->SetTitle("M_{ee} (GeV)");
+  }
+  else {
+    z_mass_fitframe->GetXaxis()->SetTitle("M_{#mu#mu} (GeV)");
+  }
 
   gPad->SetLogy();
   z_mass_fitframe->Draw();
   leg->Draw();
+  mark.DrawLatex(0.795,0.957,"19.7 fb^{-1} (8 TeV)");
+  mark.DrawLatex(0.195,0.89,"CMS");
+  mark.DrawLatex(0.195,0.86,"#it{Preliminary}");
 
   std::string z_image_name = OUT_DIR;
   z_image_name.append(z_hist_name);

@@ -9,6 +9,8 @@
 #include <TCanvas.h>
 #include "TH1.h"
 #include "TGraph.h"
+#include "TLegend.h"
+#include "TLatex.h"
 
 // RooFit
 #include "RooAddPdf.h"
@@ -30,6 +32,9 @@
 #include "RooPlot.h"
 #include "RooRealVar.h"
 #include "RooWorkspace.h"
+#include <TROOT.h>
+#include <TStyle.h>
+#include "tdrStyle.C"
 
 
 using namespace RooFit;
@@ -60,6 +65,7 @@ int RooFitPileupEstimation(
   // Constants
   //const int N_CPU = 8;
   const int N_CPU = 1;
+  setTDRStyle();
 
   RooMsgService::instance().setGlobalKillBelow(RooFit::WARNING) ;
   gErrorIgnoreLevel = kWarning;
@@ -174,7 +180,7 @@ int RooFitPileupEstimation(
 //  jpsi_fitres_low->Print();
 //  jpsi_fitres_high->Print();
 
-  TCanvas *canvas = new TCanvas("canvas", "canvas", 2000, 750);
+  TCanvas *canvas = new TCanvas("canvas", "canvas", 1200, 900);
 
   // Plot the left side
   canvas->cd(1);
@@ -187,10 +193,41 @@ int RooFitPileupEstimation(
   distance_z_data_hist.plotOn(distance_z_fitframe);
   pileup_gauss_test.plotOn(distance_z_fitframe, LineColor(kGreen-2), NormRange("negative,positive"));
   pileup_gauss.plotOn(distance_z_fitframe, LineColor(kRed-2));
+
+  pileup_gauss.plotOn(distance_z_fitframe, LineColor(kBlue-2), VLines(), Range("signal"), RooFit::Name("signal"));
+  pileup_gauss.plotOn(distance_z_fitframe, LineColor(kRed-2), VLines(), RooFit::Name("background"));
   distance_z_fitframe->SetMinimum(10);
   distance_z_fitframe->SetMaximum(1e7);
 
+  distance_z_fitframe->GetYaxis()->SetTitle("Events / 0.08 cm");
+  distance_z_fitframe->GetXaxis()->SetTitleSize(0.055);
+  distance_z_fitframe->GetXaxis()->SetLabelSize(0.035);
+  //distance_z_fitframe->GetXaxis()->SetNdivisions(5);
+  distance_z_fitframe->GetXaxis()->SetTitle("#Delta z Between Primary Vertex and J/#psi Vertex (cm)");
   distance_z_fitframe->Draw();
+
+  Double_t xl1=.7, yl1=0.75, xl2=xl1+.3, yl2=yl1+.15;
+  TLegend *leg = new TLegend(xl1,yl1,xl2,yl2);
+  leg->SetFillColor(kWhite);
+  leg->AddEntry(distance_z_fitframe->findObject("signal"),"signal region","l");
+  leg->AddEntry(distance_z_fitframe->findObject("background"),"background region","l");
+  
+  leg->SetShadowColor(0);
+  leg->SetFillStyle(0);
+  leg->SetBorderSize(0);
+  leg->SetLineWidth(1);
+  leg->SetNColumns(1);
+  leg->SetTextFont(42);
+  leg->SetTextSize(0.03);
+  leg->Draw();
+
+  TLatex mark;
+  mark.SetTextSize(0.035);
+  mark.SetNDC(true);
+  mark.DrawLatex(0.795,0.957,"19.7 fb^{-1} (8 TeV)");
+  mark.DrawLatex(0.195,0.89,"CMS");
+  mark.DrawLatex(0.195,0.86,"#it{Preliminary}");
+
 
   std::string jpsi_image_name = OUT_DIR;
   jpsi_image_name.append(jpsi_hist_name);

@@ -8,9 +8,13 @@
 #include "Riostream.h"
 #include <math.h>
 #include <stdio.h>
+#include "tdrStyle.C"
+
 //void compare_polarizations (string file_name_mc, string file_name_data_zmumu, string file_name_data_zee)
 void compare_efficiencies (string file_name_mc, string file_name_data_inclusive_z, string file_name_data_associated_z,  bool use_z_to_ee, string out_dir)
 {
+  setTDRStyle();
+  //gStyle->SetPadRightMargin(0.04);
    
   for (int i=0;i<6;++i) {
     run_compare_efficiencies(file_name_mc, file_name_data_inclusive_z, file_name_data_associated_z,  use_z_to_ee, i, out_dir);
@@ -19,6 +23,10 @@ void compare_efficiencies (string file_name_mc, string file_name_data_inclusive_
 void run_compare_efficiencies(string file_name_mc, string file_name_data_inclusive_z, string file_name_data_associated_z,  bool use_z_to_ee, int pt_slice, string out_dir)
 {
   std::cout << "pt_slice " << pt_slice << std::endl;
+
+  TLatex mark;
+  mark.SetTextSize(0.035);
+  mark.SetNDC(true);
   
   //TODO give this better documentation/ a more descriptive name
   //TFile *file_mc = new TFile("/home/user1/turkewitz/Work/CMSSW_5_3_13_ZJPsi/src/test9d10.root");
@@ -115,21 +123,42 @@ void run_compare_efficiencies(string file_name_mc, string file_name_data_inclusi
   //c2->SetLogy();
 
 
-  //h_jpsi_pt_zjpsi_mpi->Rebin(5);
-  //h_jpsi_pt->Rebin(5);
-  //h_jpsi_pt_zmumu_jpsi->Rebin(5);
-
   //h_z_pt_mc_truth->GetXaxis()->SetTitle("J/#psi cos #mu+");
-  h_z_pt_mc_reco->GetYaxis()->SetTitle("Efficiency");
+  h_z_pt_mc_reco->Rebin(5);
+  h_z_pt_mc_truth->Rebin(5);
+  h_z_pt_data_associated->Rebin(5);
+  h_z_pt_data_inclusive->Rebin(5);
 
   h_z_pt_mc_reco->Divide(h_z_pt_mc_truth);
   if (use_z_to_ee) {
     h_z_pt_mc_reco->SetTitle("Z->ee Madgraph MC");
+    h_z_pt_mc_reco->GetXaxis()->SetTitle("M_{ee} p_{T} (GeV)");
   }
   else {
     h_z_pt_mc_reco->SetTitle("Z->#mu#mu Madgraph MC");
+    h_z_pt_mc_reco->GetXaxis()->SetTitle("M_{#mu#mu} p_{T} (GeV)");
   }
+  h_z_pt_mc_reco->GetXaxis()->SetRangeUser(0,194);
+  h_z_pt_mc_reco->GetYaxis()->SetTitle("Efficiency / 5 GeV");
+  h_z_pt_mc_reco->GetYaxis()->SetRangeUser(0,0.7);
   h_z_pt_mc_reco->Draw();
+
+  Double_t xl1=.62, yl1=0.8, xl2=xl1+.30, yl2=yl1+.10;
+  TLegend *leg2 = new TLegend(xl1,yl1,xl2,yl2);
+  leg2->AddEntry(h_z_pt_mc_reco,"Madgraph MC","l");
+  //leg2->AddEntry(h_jpsi_pt_zjpsi_mpi,"J/#psi MC (Z+J/#psi MPI)","lep");
+  leg2->Draw();
+  leg2->SetShadowColor(0);
+  leg2->SetFillStyle(0);
+  leg2->SetBorderSize(0);
+  leg2->SetLineWidth(1);
+  leg2->SetNColumns(1);
+  leg2->SetTextFont(42);
+  leg2->SetTextSize(0.03);
+
+  mark.DrawLatex(0.745,0.957,"19.7 fb^{-1} (8 TeV)");
+  mark.DrawLatex(0.195,0.89,"CMS");
+  mark.DrawLatex(0.195,0.86,"#it{Preliminary}");
 
   TCanvas *c3 = new TCanvas("c3", "c3");
   c3->cd();
@@ -231,12 +260,19 @@ void run_compare_efficiencies(string file_name_mc, string file_name_data_inclusi
   image_name3.append(".png");
   c3->Print(image_name3.c_str() , "png");
 
+  string PT_SLICE_STRING;          //The string
+  ostringstream temp;  //temp as in temporary
+  temp<<pt_slice;
+  PT_SLICE_STRING=temp.str();      //str is temp as string
+
   std::string image_name4 = out_dir;
   if (use_z_to_ee) {
-    image_name4 = image_name4.append("zee_associated_efficiency_data");
+    image_name4 = image_name4.append("zee_associated_efficiency_data_");
+    image_name4 = image_name4.append(PT_SLICE_STRING);
   }
   else {
     image_name4 = image_name4.append("zmumu_associated_efficiency_data");
+    image_name4 = image_name4.append(PT_SLICE_STRING);
   }
   image_name4.append(".png");
   c4->Print(image_name4.c_str() , "png");
