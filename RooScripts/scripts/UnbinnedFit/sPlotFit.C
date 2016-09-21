@@ -66,13 +66,6 @@ void sPlotFit(std::string file_name, bool use_pileup_correction = false, std::st
   const double NUM_ZTOMUMU = 6.93504E06;
   const double NUM_ZTOEE = 4.63707E06;
   
-  //std::vector<double> zjpsi_0 = do_fit(file_name, use_pileup_correction,image_dir,0); 
-  //std::vector<double> zjpsi_1 = do_fit(file_name, use_pileup_correction,image_dir,1); 
-  //std::vector<double> zjpsi_2 = do_fit(file_name, use_pileup_correction,image_dir,2); 
-  //std::vector<double> zjpsi_3 = do_fit(file_name, use_pileup_correction,image_dir,3); 
-  //std::vector<double> zjpsi_4 = do_fit(file_name, use_pileup_correction,image_dir,4); 
-  //std::vector<double> zjpsi_5 = do_fit(file_name, use_pileup_correction,image_dir,5); 
-
   double zjpsi_prompt_events_all = 0.0;
   double zjpsi_prompt_events_all_error = 0.0;
   double zjpsi_prompt_events_pt_summed = 0.0;
@@ -90,9 +83,9 @@ void sPlotFit(std::string file_name, bool use_pileup_correction = false, std::st
 
 
   for (int i=0 ; i < 6 ; ++i) {
-    //if (i != 5) {
-    //  continue;
-    //}
+    if (i != 0) {
+      continue;
+    }
   //for (int i=1 ; i < 2 ; ++i) {
     //for now, if i==0, jpsi_all
 
@@ -187,6 +180,8 @@ std::vector<double> do_fit(std::string file_name, bool use_pileup_correction = f
   RooRealVar *onia_mass = new RooRealVar("onia_mass", "J/#psi#rightarrow#mu#mu [GeV]", 2.85, 3.35);
   RooRealVar *onia_tau  = new RooRealVar("onia_tau", "J/#psi#rightarrow#mu#mu pseudo-proper time [ps]", -1.0, 5);
 
+  onia_tau->setRange("prompt_range",-1,0.3) ;
+
   RooRealVar *z_mass    = new RooRealVar("z_mass", "Z Mass [GeV]", 80., 100.);
   //RooRealVar *z_mass    = new RooRealVar("z_mass", "Z Mass [GeV]", 40., 300.);
 
@@ -253,7 +248,10 @@ std::vector<double> do_fit(std::string file_name, bool use_pileup_correction = f
   TTree* zjpsi_tree = (TTree*) zjpsi_ntuple->Get("AUX");
   RooDataSet *zjpsi_data     = new RooDataSet("zjpsi_data", "zjpsi_data", zjpsi_tree, zjpsi_argset);
 
-  RooDataSet *zjpsi_data_weighted_testing     = new RooDataSet("zjpsi_data_weighted_testing", "zjpsi_data_weighted_testing", zjpsi_tree, zjpsi_argset,0, "unpolarised");
+  //For calculating significance, use unweighted dataset
+  RooDataSet *zjpsi_data_weighted_testing     = new RooDataSet("zjpsi_data_weighted_testing", "zjpsi_data_weighted_testing", zjpsi_tree, zjpsi_argset);
+
+  //RooDataSet *zjpsi_data_weighted_testing     = new RooDataSet("zjpsi_data_weighted_testing", "zjpsi_data_weighted_testing", zjpsi_tree, zjpsi_argset,0, "unpolarised");
   //RooDataSet *zjpsi_data_weighted_testing     = new RooDataSet("zjpsi_data_weighted_testing", "zjpsi_data_weighted_testing", zjpsi_tree, zjpsi_argset,0, "lambda_pos");
   //RooDataSet *zjpsi_data_weighted_testing     = new RooDataSet("zjpsi_data_weighted_testing", "zjpsi_data_weighted_testing", zjpsi_tree, zjpsi_argset,0, "lambda_neg");
 
@@ -355,13 +353,66 @@ std::vector<double> do_fit(std::string file_name, bool use_pileup_correction = f
   // *****************************************************************
 
   RooRealVar jpsi_gaussmean("jpsi_gaussmean", "Mean of the smearing jpsi Gaussian", 0.0);
-  RooRealVar jpsi_gausssigma("jpsi_gausssigma", "Width of the smearing jpsi Gaussian", 0.02, 0.001, 0.5);
+
+  double jpsi_gausssigma_init = 0.3;
+  double jpsi_gausssigma_min = 0.25;
+  double jpsi_gausssigma_max = 0.6;
+  if (pt_slice == 1) {
+    jpsi_gausssigma_init = 0.5;
+    jpsi_gausssigma_min = 0.36;
+    jpsi_gausssigma_max = 0.8 ;
+  }
+  if (pt_slice == 4) {
+    jpsi_gausssigma_init = 0.3;
+    jpsi_gausssigma_min = 0.25;
+    jpsi_gausssigma_max = 0.9;
+  }
+  if (pt_slice == 5) {
+    jpsi_gausssigma_init = 0.2;
+    jpsi_gausssigma_min = 0.15;
+    jpsi_gausssigma_max = 0.35;
+  }
+  RooRealVar jpsi_gausssigma("jpsi_gausssigma", "Width of the smearing jpsi Gaussian", jpsi_gausssigma_init, jpsi_gausssigma_min, jpsi_gausssigma_max);
+
   RooGaussModel jpsi_smear_gauss_model("jpsi_smear_gauss", "Gaussian used to smear the jpsi Exponential Decay", *onia_tau, jpsi_gaussmean, jpsi_gausssigma);
+
+///////////////////////
+  // Build another gaussian resolution model
+  RooRealVar jpsi_bias2("jpsi_bias2","jpsi_bias2",0) ;
+
+  double jpsi_gausssigma_2_init = 0.1;
+  double jpsi_gausssigma_2_min = 0.05;
+  double jpsi_gausssigma_2_max = 0.2;
+  if (pt_slice == 1) {
+    jpsi_gausssigma_2_init = 0.15;
+    jpsi_gausssigma_2_min = 0.1;
+    jpsi_gausssigma_2_max = 0.25;
+  }
+  if (pt_slice == 4) {
+    jpsi_gausssigma_2_init = 0.1;
+    jpsi_gausssigma_2_min = 0.07;
+    jpsi_gausssigma_2_max = 0.25;
+  }
+  if (pt_slice == 5) {
+    jpsi_gausssigma_2_init = 0.08;
+    jpsi_gausssigma_2_min = 0.06;
+    jpsi_gausssigma_2_max = 0.09;
+  }
+  RooRealVar jpsi_gausssigma2("jpsi_gausssigma2","jpsi_gausssigma2",jpsi_gausssigma_2_init,jpsi_gausssigma_2_min,jpsi_gausssigma_2_max) ;  
+  RooGaussModel jpsi_gm2("jpsi_gm2","gauss model 2",*onia_tau,jpsi_bias2,jpsi_gausssigma2) ;
+
+  // Build a composite resolution model
+  RooRealVar jpsi_gm1_frac("jpsi_gm1_frac","jpsi_gm1_frac",0.55,0.0,1.0) ;
+  RooAddModel jpsi_gmsum("jpsi_gmsum","sum of gm1 and gm2",RooArgList(jpsi_smear_gauss_model,jpsi_gm2),jpsi_gm1_frac) ;
+///////////////////////
+
   RooRealVar jpsi_decay_time("jpsi_decay_time", "jpsi_Tau", 0.8, 0.5, 1.5);
-  RooDecay jpsi_decay_exp("jpsi_decay_exp", "jpsi_Exponential Decay", *onia_tau,jpsi_decay_time,jpsi_smear_gauss_model,RooDecay::SingleSided);
+  //RooDecay jpsi_decay_exp("jpsi_decay_exp", "jpsi_Exponential Decay", *onia_tau,jpsi_decay_time,jpsi_smear_gauss_model,RooDecay::SingleSided);
+  RooDecay jpsi_decay_exp("jpsi_decay_exp", "jpsi_Exponential Decay", *onia_tau,jpsi_decay_time,jpsi_gmsum,RooDecay::SingleSided);
 
   RooRealVar jpsi_decay_time_continuum("jpsi_decay_time_continuum", "jpsi_Tau_continuum", 0.8, 0.5, 1.5);
-  RooDecay jpsi_decay_exp_continuum("jpsi_decay_exp_continuum", "jpsi_Exponential Decay_continuum", *onia_tau,jpsi_decay_time_continuum,jpsi_smear_gauss_model,RooDecay::SingleSided);
+  //RooDecay jpsi_decay_exp_continuum("jpsi_decay_exp_continuum", "jpsi_Exponential Decay_continuum", *onia_tau,jpsi_decay_time_continuum,jpsi_smear_gauss_model,RooDecay::SingleSided);
+  RooDecay jpsi_decay_exp_continuum("jpsi_decay_exp_continuum", "jpsi_Exponential Decay_continuum", *onia_tau,jpsi_decay_time_continuum,jpsi_gmsum,RooDecay::SingleSided);
 
   RooRealVar jpsi_gauss_prompt_mean("jpsi_gauss_prompt_mean", "Mean of the Prompt jpsi_Gaussian", 0.0, -0.1, 0.1);
 
@@ -375,7 +426,7 @@ std::vector<double> do_fit(std::string file_name, bool use_pileup_correction = f
   if (pt_slice == 1) {
     jpsi_gauss_prompt_sigma_init = 0.075;
     jpsi_gauss_prompt_sigma_min = 0.05;
-    jpsi_gauss_prompt_sigma_max = 0.08;
+    jpsi_gauss_prompt_sigma_max = 0.12;
   }
   if (pt_slice == 2) {
     jpsi_gauss_prompt_sigma_init = 0.06;
@@ -389,13 +440,13 @@ std::vector<double> do_fit(std::string file_name, bool use_pileup_correction = f
   }
   if (pt_slice == 4) {
     jpsi_gauss_prompt_sigma_init = 0.05;
-    jpsi_gauss_prompt_sigma_min = 0.04;
-    jpsi_gauss_prompt_sigma_max = 0.08;
+    jpsi_gauss_prompt_sigma_min = 0.01;
+    jpsi_gauss_prompt_sigma_max = 0.07;
   }
   if (pt_slice == 5) {
-    jpsi_gauss_prompt_sigma_init = 0.02;
-    jpsi_gauss_prompt_sigma_min = 0.01;
-    jpsi_gauss_prompt_sigma_max = 0.03;
+    jpsi_gauss_prompt_sigma_init = 0.04;
+    jpsi_gauss_prompt_sigma_min = 0.03;
+    jpsi_gauss_prompt_sigma_max = 0.052;
   }
   RooRealVar jpsi_gauss_prompt_sigma("jpsi_gauss_prompt_sigma", "Width of the Prompt jpsi_Gaussian", jpsi_gauss_prompt_sigma_init, jpsi_gauss_prompt_sigma_min, jpsi_gauss_prompt_sigma_max);
   RooGaussian jpsi_prompt_gauss("jpsi_prompt_gauss", "Gaussian of the Prompt jpsi_Peak", *onia_tau, jpsi_gauss_prompt_mean, jpsi_gauss_prompt_sigma);
@@ -409,7 +460,7 @@ std::vector<double> do_fit(std::string file_name, bool use_pileup_correction = f
   jpsi_gauss_prompt_sigma_2_max = 0.2;
   if (pt_slice == 1) {
     jpsi_gauss_prompt_sigma_2_init = 0.16;
-    jpsi_gauss_prompt_sigma_2_min = 0.11;
+    jpsi_gauss_prompt_sigma_2_min = 0.13;
     jpsi_gauss_prompt_sigma_2_max = 0.25;
   }
   if (pt_slice == 2) {
@@ -423,14 +474,14 @@ std::vector<double> do_fit(std::string file_name, bool use_pileup_correction = f
     jpsi_gauss_prompt_sigma_2_max = 0.12;
   }
   if (pt_slice == 4) {
-    jpsi_gauss_prompt_sigma_2_init = 0.15;
-    jpsi_gauss_prompt_sigma_2_min = 0.1;
-    jpsi_gauss_prompt_sigma_2_max = 0.45;
+    jpsi_gauss_prompt_sigma_2_init = 0.1;
+    jpsi_gauss_prompt_sigma_2_min = 0.05;
+    jpsi_gauss_prompt_sigma_2_max = 0.3;
   }
   if (pt_slice == 5) {
-    jpsi_gauss_prompt_sigma_2_init = 0.08;
-    jpsi_gauss_prompt_sigma_2_min = 0.04;
-    jpsi_gauss_prompt_sigma_2_max = 0.1;
+    jpsi_gauss_prompt_sigma_2_init = 0.075;
+    jpsi_gauss_prompt_sigma_2_min = 0.058;
+    jpsi_gauss_prompt_sigma_2_max = 0.12;
   }
   RooRealVar jpsi_gauss_prompt_sigma_2("jpsi_gauss_prompt_sigma_2", "Width of the Prompt jpsi_Gaussian_2", jpsi_gauss_prompt_sigma_2_init, jpsi_gauss_prompt_sigma_2_min, jpsi_gauss_prompt_sigma_2_max);
   RooGaussian jpsi_prompt_gauss_2("jpsi_prompt_gauss_2", "Gaussian_2 of the Prompt jpsi_Peak", *onia_tau, jpsi_gauss_prompt_mean, jpsi_gauss_prompt_sigma_2);
@@ -470,9 +521,9 @@ std::vector<double> do_fit(std::string file_name, bool use_pileup_correction = f
     jpsi_dimuon_sigma_min = 0.01;
   }
   else if (pt_slice == 5) {
-    jpsi_dimuon_sigma_init = 0.008;
-    jpsi_dimuon_sigma_max = 0.02;
-    jpsi_dimuon_sigma_min = 0.005;
+    jpsi_dimuon_sigma_init = 0.015;
+    jpsi_dimuon_sigma_max = 0.025;
+    jpsi_dimuon_sigma_min = 0.008;
   }
   else {
     jpsi_dimuon_sigma_init = 0.02;
@@ -506,12 +557,12 @@ std::vector<double> do_fit(std::string file_name, bool use_pileup_correction = f
   else if (pt_slice == 5) {
     jpsi_dimuon_sigma_2_init = 0.04;
     jpsi_dimuon_sigma_2_max = 0.08;
-    jpsi_dimuon_sigma_2_min = 0.02;
+    jpsi_dimuon_sigma_2_min = 0.036;
   }
   else {
     jpsi_dimuon_sigma_2_init = 0.04;
-    jpsi_dimuon_sigma_2_max = 0.08;
-    jpsi_dimuon_sigma_2_min = 0.02;
+    jpsi_dimuon_sigma_2_max = 0.06;
+    jpsi_dimuon_sigma_2_min = 0.03;
   }
   RooRealVar jpsi_dimuon_sigma_2("jpsi_dimuon_sigma_2", "jpsi_dimuon_sigma_2", jpsi_dimuon_sigma_2_init, jpsi_dimuon_sigma_2_min, jpsi_dimuon_sigma_2_max);
   RooGaussian jpsi_dimuon_gauss_2 ("jpsi_dimuon_gauss_2", "jpsi_dimuon_gauss_2", *onia_mass, jpsi_dimuon_mean, jpsi_dimuon_sigma_2);
@@ -587,9 +638,9 @@ std::vector<double> do_fit(std::string file_name, bool use_pileup_correction = f
     m_bg_tau_sig_init = num_entries * 0.077;
   }
   else if (pt_slice == 1) {
-    m_sig_tau_sig_init = num_entries * 2.0;
+    m_sig_tau_sig_init = num_entries * 2.5;
     m_sig_tau_bg_init = num_entries * 0.8;
-    m_bg_tau_bg_init = num_entries * 0.25;
+    m_bg_tau_bg_init = num_entries * 0.2;
     m_bg_tau_sig_init = num_entries * 0.1;
   }
   else if (pt_slice == 2) {
@@ -605,15 +656,15 @@ std::vector<double> do_fit(std::string file_name, bool use_pileup_correction = f
     m_bg_tau_sig_init = num_entries * 0.05;
   }
   else {
-    m_sig_tau_sig_init = num_entries * 1.5;
-    m_sig_tau_bg_init = num_entries * 0.7;
-    m_bg_tau_bg_init = num_entries * 0.19;
+    m_sig_tau_sig_init = num_entries * 0.7;
+    m_sig_tau_bg_init = num_entries * 1.5;
+    m_bg_tau_bg_init = num_entries * 0.15;
     m_bg_tau_sig_init = num_entries * 0.077;
   }
-  RooRealVar Njpsi_m_sig_tau_sig("Njpsi_m_sig_tau_sig", "Njpsi_m_sig_tau_sig", m_sig_tau_sig_init, 0, num_entries * 5);  
-  RooRealVar Njpsi_m_sig_tau_bg ("Njpsi_m_sig_tau_bg",  "Njpsi_m_sig_tau_bg",  m_sig_tau_bg_init, 0, num_entries * 5); 
-  RooRealVar Njpsi_m_bg_tau_bg  ("Njpsi_m_bg_tau_bg",   "Njpsi_m_bg_tau_bg",   m_bg_tau_bg_init, 0, num_entries * 5); 
-  RooRealVar Njpsi_m_bg_tau_sig ("Njpsi_m_bg_tau_sig",  "Njpsi_m_bg_tau_sig",  m_bg_tau_sig_init, 0, num_entries * 5);
+  RooRealVar Njpsi_m_sig_tau_sig("Njpsi_m_sig_tau_sig", "Njpsi_m_sig_tau_sig", m_sig_tau_sig_init, 0, num_entries * 10);
+  RooRealVar Njpsi_m_sig_tau_bg ("Njpsi_m_sig_tau_bg",  "Njpsi_m_sig_tau_bg",  m_sig_tau_bg_init, 0, num_entries * 10); 
+  RooRealVar Njpsi_m_bg_tau_bg  ("Njpsi_m_bg_tau_bg",   "Njpsi_m_bg_tau_bg",   m_bg_tau_bg_init, 0, num_entries * 10); 
+  RooRealVar Njpsi_m_bg_tau_sig ("Njpsi_m_bg_tau_sig",  "Njpsi_m_bg_tau_sig",  m_bg_tau_sig_init, 0, num_entries * 10);
 
   // extended PDFs
   RooExtendPdf ejpsi_m_sig_tau_sig("ejpsi_m_sig_tau_sig", "ejpsi_m_sig_tau_sig", jpsi_m_sig_tau_sig, Njpsi_m_sig_tau_sig); 
@@ -628,6 +679,13 @@ std::vector<double> do_fit(std::string file_name, bool use_pileup_correction = f
   //RooFitResult *fr_inclusive = jpsi_model.fitTo(*jpsi_data, NumCPU(4, kTRUE), Verbose(false), PrintLevel(-1), Save());
   RooFitResult *fr_inclusive = jpsi_model.fitTo(*jpsi_data_weighted_testing, NumCPU(8, kTRUE), Verbose(false), SumW2Error(kTRUE), PrintLevel(-1), Save());
   fr_inclusive->Print();
+
+
+  RooAbsReal* ibg_nonprompt_low_time = jpsi_decay_exp.createIntegral(*onia_tau,NormSet(*onia_tau),Range("prompt_range")) ;
+  std::cout << "nonprompt_small_lifetime_fraction = " << ibg_nonprompt_low_time->getVal() << std::endl ;
+
+  RooAbsReal* ibg_prompt_low_time = jpsi_oniatau_gauss_sum_fitpdf.createIntegral(*onia_tau,NormSet(*onia_tau),Range("prompt_range")) ;
+  std::cout << "prompt_small_lifetime_fraction = " << ibg_prompt_low_time->getVal() << std::endl ;
 
   int num_mass_bins = 40;
   int num_time_bins = 40;
@@ -833,8 +891,14 @@ std::vector<double> do_fit(std::string file_name, bool use_pileup_correction = f
 
   //Then would do:
 
+  double zjpsi_gausssigma2_value = jpsi_gausssigma2.getVal();
+  //double zjpsi_gausssigma2_value = jpsi_gausssigma2.getVal() * 1.1;
+  double zjpsi_bias2_value = jpsi_bias2.getVal();
+  double zjpsi_gm1_frac_value = jpsi_gm1_frac.getVal();
+
   double zjpsi_gaussmean_value = jpsi_gaussmean.getVal();
   double zjpsi_gausssigma_value     = jpsi_gausssigma.getVal();
+  //double zjpsi_gausssigma_value     = jpsi_gausssigma.getVal() * 1.1;
   double zjpsi_gausssigma_value_err = jpsi_gausssigma.getError();
   double zjpsi_decay_time_value     = jpsi_decay_time.getVal();
   double zjpsi_decay_time_value_err = jpsi_decay_time.getError();
@@ -844,10 +908,10 @@ std::vector<double> do_fit(std::string file_name, bool use_pileup_correction = f
   double zjpsi_gauss_prompt_mean_value_err = jpsi_gauss_prompt_mean.getError();
 
   double zjpsi_gauss_prompt_sigma_value     = jpsi_gauss_prompt_sigma.getVal();
-  //double zjpsi_gauss_prompt_sigma_value     = jpsi_gauss_prompt_sigma.getVal() * 1.05;
+  //double zjpsi_gauss_prompt_sigma_value     = jpsi_gauss_prompt_sigma.getVal() * 1.1;
   double zjpsi_gauss_prompt_sigma_value_err = jpsi_gauss_prompt_sigma.getError();
   double zjpsi_gauss_prompt_sigma_2_value     = jpsi_gauss_prompt_sigma_2.getVal();
-  //double zjpsi_gauss_prompt_sigma_2_value     = jpsi_gauss_prompt_sigma_2.getVal() * 1.05;
+  //double zjpsi_gauss_prompt_sigma_2_value     = jpsi_gauss_prompt_sigma_2.getVal() * 1.1;
   double zjpsi_gauss_prompt_sigma_2_value_err = jpsi_gauss_prompt_sigma_2.getError();
 
   //double zjpsi_gauss_prompt_sigma_value     = jpsi_gauss_prompt_sigma.getVal();
@@ -873,11 +937,11 @@ std::vector<double> do_fit(std::string file_name, bool use_pileup_correction = f
   double zjpsi_dimuon_mean_value_err = jpsi_dimuon_mean.getError();
 
   double zjpsi_dimuon_sigma_value     = jpsi_dimuon_sigma.getVal();
-  //double zjpsi_dimuon_sigma_value     = jpsi_dimuon_sigma.getVal() * 1.05;
+  //double zjpsi_dimuon_sigma_value     = jpsi_dimuon_sigma.getVal() * 1.1;
   double zjpsi_dimuon_sigma_value_err = jpsi_dimuon_sigma.getError();
 
   double zjpsi_dimuon_sigma_2_value     = jpsi_dimuon_sigma_2.getVal();
-  //double zjpsi_dimuon_sigma_2_value     = jpsi_dimuon_sigma_2.getVal() * 1.05;
+  //double zjpsi_dimuon_sigma_2_value     = jpsi_dimuon_sigma_2.getVal() * 1.1;
   double zjpsi_dimuon_sigma_2_value_err = jpsi_dimuon_sigma_2.getError();
 
   double zjpsi_frac_cball_value     = jpsi_frac_cball.getVal();
@@ -895,11 +959,25 @@ std::vector<double> do_fit(std::string file_name, bool use_pileup_correction = f
   RooRealVar zjpsi_gaussmean("zjpsi_gaussmean", "Mean of the smearing zjpsi Gaussian", zjpsi_gaussmean_value);
   RooRealVar zjpsi_gausssigma("zjpsi_gausssigma", "Width of the smearing zjpsi Gaussian", zjpsi_gausssigma_value);
   RooGaussModel zjpsi_smear_gauss_model("zjpsi_smear_gauss", "Gaussian used to smear the zjpsi Exponential Decay", *onia_tau, zjpsi_gaussmean, zjpsi_gausssigma);
+
+///////////////////////
+  // Build another gaussian resolution model
+  RooRealVar zjpsi_bias2("zjpsi_bias2","zjpsi_bias2",zjpsi_bias2_value) ;
+  RooRealVar zjpsi_gausssigma2("zjpsi_gausssigma2","zjpsi_gausssigma2",zjpsi_gausssigma2_value) ;  
+  RooGaussModel zjpsi_gm2("zjpsi_gm2","gauss model 2",*onia_tau,zjpsi_bias2,zjpsi_gausssigma2) ;
+
+  // Build a composite resolution model
+  RooRealVar zjpsi_gm1_frac("zjpsi_gm1_frac","zjpsi_gm1_frac",zjpsi_gm1_frac_value) ;
+  RooAddModel zjpsi_gmsum("zjpsi_gmsum","sum of gm1 and gm2",RooArgList(zjpsi_smear_gauss_model,zjpsi_gm2),zjpsi_gm1_frac) ;
+///////////////////////
+
   RooRealVar zjpsi_decay_time("zjpsi_decay_time", "zjpsi_Tau", zjpsi_decay_time_value);
-  RooDecay zjpsi_decay_exp("zjpsi_decay_exp", "zjpsi_Exponential Decay", *onia_tau,zjpsi_decay_time,zjpsi_smear_gauss_model,RooDecay::SingleSided);
+  //RooDecay zjpsi_decay_exp("zjpsi_decay_exp", "zjpsi_Exponential Decay", *onia_tau,zjpsi_decay_time,zjpsi_smear_gauss_model,RooDecay::SingleSided);
+  RooDecay zjpsi_decay_exp("zjpsi_decay_exp", "zjpsi_Exponential Decay", *onia_tau,zjpsi_decay_time,zjpsi_gmsum,RooDecay::SingleSided);
 
   RooRealVar zjpsi_decay_time_continuum("zjpsi_decay_time_continuum", "zjpsi_Tau_continuum", zjpsi_decay_time_continuum_value);
-  RooDecay zjpsi_decay_exp_continuum("zjpsi_decay_exp_continuum", "zjpsi_Exponential Decay_continuum", *onia_tau,zjpsi_decay_time_continuum,zjpsi_smear_gauss_model,RooDecay::SingleSided);
+  //RooDecay zjpsi_decay_exp_continuum("zjpsi_decay_exp_continuum", "zjpsi_Exponential Decay_continuum", *onia_tau,zjpsi_decay_time_continuum,zjpsi_smear_gauss_model,RooDecay::SingleSided);
+  RooDecay zjpsi_decay_exp_continuum("zjpsi_decay_exp_continuum", "zjpsi_Exponential Decay_continuum", *onia_tau,zjpsi_decay_time_continuum,zjpsi_gmsum,RooDecay::SingleSided);
 
   RooRealVar zjpsi_gauss_prompt_mean("zjpsi_gauss_prompt_mean", "Mean of the Prompt zjpsi_Gaussian", zjpsi_gauss_prompt_mean_value);
   RooRealVar zjpsi_gauss_prompt_sigma("zjpsi_gauss_prompt_sigma", "Width of the Prompt zjpsi_Gaussian", zjpsi_gauss_prompt_sigma_value);
@@ -1013,8 +1091,14 @@ std::vector<double> do_fit(std::string file_name, bool use_pileup_correction = f
   RooProdPdf zjpsi_m_bg_tau_sig ("zjpsi_m_bg_tau_sig",  "zjpsi_m_bg_tau_sig",  RooArgList(zjpsi_dimuon_bg_exponential, onia_tau_gauss_sum_fitpdf ));
 
   // yields
-  RooRealVar Nzjpsi_m_sig_tau_sig("Nzjpsi_m_sig_tau_sig", "Nzjpsi_m_sig_tau_sig", 10, 0, 2000);
+  //RooRealVar Nzjpsi_m_sig_tau_sig("Nzjpsi_m_sig_tau_sig", "Nzjpsi_m_sig_tau_sig", 10, 0, 2000);
+  //RooRealVar Nzjpsi_m_sig_tau_sig("Nzjpsi_m_sig_tau_sig", "Nzjpsi_m_sig_tau_sig", 1.13); //unweighted PU events in signal [-0.5,0.5]
+  //RooRealVar Nzjpsi_m_sig_tau_sig("Nzjpsi_m_sig_tau_sig", "Nzjpsi_m_sig_tau_sig", 5.09); //unweighted PU events, DPS sigma_eff = 20.7
+  //RooRealVar Nzjpsi_m_sig_tau_sig("Nzjpsi_m_sig_tau_sig", "Nzjpsi_m_sig_tau_sig", 6.59); //unweighted PU events, DPS sigma_eff = 15
+  //RooRealVar Nzjpsi_m_sig_tau_sig("Nzjpsi_m_sig_tau_sig", "Nzjpsi_m_sig_tau_sig", 9.33); //unweighted PU events, DPS sigma_eff = 10
+  RooRealVar Nzjpsi_m_sig_tau_sig("Nzjpsi_m_sig_tau_sig", "Nzjpsi_m_sig_tau_sig", 17.53); //unweighted PU events, DPS sigma_eff = 5
   RooRealVar Nzjpsi_m_sig_tau_bg ("Nzjpsi_m_sig_tau_bg",  "Nzjpsi_m_sig_tau_bg",  10, 0, 2000);
+  //RooRealVar Nzjpsi_m_sig_tau_bg ("Nzjpsi_m_sig_tau_bg",  "Nzjpsi_m_sig_tau_bg",  1.70); //Unweighted PU events in signal [-0.5,0.5]
   RooRealVar Nzjpsi_m_bg_tau_bg  ("Nzjpsi_m_bg_tau_bg",   "Nzjpsi_m_bg_tau_bg",   10, 0, 2000);
   RooRealVar Nzjpsi_m_bg_tau_sig ("Nzjpsi_m_bg_tau_sig",  "Nzjpsi_m_bg_tau_sig",  10, 0, 2000);
 

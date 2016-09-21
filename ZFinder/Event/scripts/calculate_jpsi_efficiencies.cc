@@ -9,15 +9,19 @@
 #include <TKey.h>
 #include <TEfficiency.h>
 #include <Riostream.h>
-void calculate_jpsi_efficiencies (string file_name, int polarization = 0  )
+#include "tdrStyle.C"
+void calculate_jpsi_efficiencies (string file_name, string output_dir = "~/public_html/ZPhysics/tmp/Test90/", int polarization = 0  )
 {
   TFile *theFile0 = new TFile( file_name.c_str());
+  char *out_file_name;
 
   //TODO put this in rootrc
   gStyle->SetLineWidth(2.);
   gStyle->SetHistLineWidth(2.5);
   gROOT->ForceStyle();
+  setTDRStyle();
   gStyle->SetOptStat(0);
+  gStyle->SetPadRightMargin(0.13);
   //TH1D *h_n_truth_matched_muons_all = (TH1D*) theFile0->Get("ZFinder/All/N_truth_matched_jpsi_muons");
   //TH1D *h_n_truth_matched_muons_dimuon = (TH1D*) theFile0->Get("ZFinder/Dimuon_Jpsi/N_truth_matched_jpsi_muons");
   //TH1D *h_n_truth_matched_muons_dimuon_soft = (TH1D*) theFile0->Get("ZFinder/Dimuon_Jpsi_Soft/N_truth_matched_jpsi_muons");
@@ -58,18 +62,25 @@ void calculate_jpsi_efficiencies (string file_name, int polarization = 0  )
     hist_name_reco = "ZFinder/Dimuon_Jpsi_Vertex_Compatible/jpsi_pt_vs_rap_finer";
   }
   else if (polarization == 1) {
-    hist_name_gen = "ZFinder/MC_All/jpsi_pt_vs_rap_finer_pos";
-    hist_name_reco = "ZFinder/Dimuon_Jpsi_Vertex_Compatible/jpsi_pt_vs_rap_finer_pos";
+    //hist_name_gen = "ZFinder/MC_All/jpsi_pt_vs_rap_finer_pos";
+    //hist_name_reco = "ZFinder/Dimuon_Jpsi_Vertex_Compatible/jpsi_pt_vs_rap_finer_pos";
+    hist_name_gen = "ZFinder/MC_All/jpsi_pt_vs_rap_finer_pos_0p1";
+    hist_name_reco = "ZFinder/Dimuon_Jpsi_Vertex_Compatible/jpsi_pt_vs_rap_finer_pos_0p1";
   }
   else if (polarization == -1) {
-    hist_name_gen = "ZFinder/MC_All/jpsi_pt_vs_rap_finer_neg";
-    hist_name_reco = "ZFinder/Dimuon_Jpsi_Vertex_Compatible/jpsi_pt_vs_rap_finer_neg";
+    //hist_name_gen = "ZFinder/MC_All/jpsi_pt_vs_rap_finer_neg";
+    //hist_name_reco = "ZFinder/Dimuon_Jpsi_Vertex_Compatible/jpsi_pt_vs_rap_finer_neg";
+    hist_name_gen = "ZFinder/MC_All/jpsi_pt_vs_rap_finer_neg_0p1";
+    hist_name_reco = "ZFinder/Dimuon_Jpsi_Vertex_Compatible/jpsi_pt_vs_rap_finer_neg_0p1";
   }
   else {
     std::cout << "Unknown polarization" << std::endl;
   }
   TH2D *jpsi_pt_vs_rap_mc = (TH2D*) theFile0->Get(hist_name_gen);
   TH2D *jpsi_pt_vs_rap_jpsi = (TH2D*) theFile0->Get(hist_name_reco);
+
+  TH1D *jpsi_pt_reco = (TH1D*) theFile0->Get("ZFinder/Dimuon_Jpsi_Vertex_Compatible/jpsi p_{T}");
+  TH1D *jpsi_pt_mc = (TH1D*) theFile0->Get("ZFinder/MC_All/jpsi p_{T}");
 
   //TH2D *jpsi_pt_vs_rap_mc = (TH2D*) theFile0->Get("ZFinder/MC_All/jpsi_pt_vs_rap_finer");
   //TH2D *jpsi_pt_vs_rap_jpsi = (TH2D*) theFile0->Get("ZFinder/Dimuon_Jpsi_Vertex_Compatible/jpsi_pt_vs_rap_finer");
@@ -89,8 +100,37 @@ void calculate_jpsi_efficiencies (string file_name, int polarization = 0  )
   //TODO uncomment following two lines as we only use 1 bin of pT
   //jpsi_pt_vs_rap_mc->Rebin2D(21,1);
   //jpsi_pt_vs_rap_jpsi->Rebin2D(21,1);
-  jpsi_pt_vs_rap_mc->Rebin2D(3,1);
-  jpsi_pt_vs_rap_jpsi->Rebin2D(3,1);
+
+  bool do_not_draw = true;
+  //bool do_not_draw = false;
+
+  if(do_not_draw) {
+    jpsi_pt_vs_rap_mc->Rebin2D(3,1);
+    jpsi_pt_vs_rap_jpsi->Rebin2D(3,1);
+    //jpsi_pt_vs_rap_mc->Rebin2D(21,1);
+    //jpsi_pt_vs_rap_jpsi->Rebin2D(21,1);
+  }
+  else {
+    jpsi_pt_vs_rap_mc->Rebin2D(3,2);
+    jpsi_pt_vs_rap_jpsi->Rebin2D(3,2);
+  }
+
+  TH1D *jpsi_pt_clone = jpsi_pt_mc->Clone();
+  jpsi_pt_clone->Divide(jpsi_pt_reco, jpsi_pt_mc, 1.0, 1.0, "B");
+
+  TCanvas *c0 = new TCanvas("c0", "c0",800,600);
+  c0->cd();
+  //c1->SetLogy();
+  jpsi_pt_clone->Draw();
+  jpsi_pt_clone->GetXaxis()->SetRangeUser(8.5,100);
+  jpsi_pt_clone->GetYaxis()->SetTitle("Efficiency / GeV");
+  jpsi_pt_clone->GetXaxis()->SetTitle("p_{T,J/#psi} (GeV)");
+  std::string image_name0 = "";
+  image_name0.append(output_dir);
+  image_name0.append("jpsi_efficiency_pt");
+  image_name0.append(".png");
+  c0->Print(image_name0.c_str() , "png");
+    
   std::cout << jpsi_pt_vs_rap_mc->Integral() << std::endl;
   std::cout << jpsi_pt_vs_rap_jpsi->Integral() << std::endl;
   std::cout << "eff overall: " << jpsi_pt_vs_rap_jpsi->Integral() / jpsi_pt_vs_rap_mc->Integral() << std::endl;
@@ -98,12 +138,33 @@ void calculate_jpsi_efficiencies (string file_name, int polarization = 0  )
   jpsi_pt_vs_rap_jpsi->Sumw2();
   TH2D *acc_eff_map = jpsi_pt_vs_rap_mc->Clone();
   acc_eff_map->Divide(jpsi_pt_vs_rap_jpsi, jpsi_pt_vs_rap_mc, 1.0, 1.0, "B");
+
+  acc_eff_map->GetXaxis()->SetTitle("J/#psi Rapidity");
+  acc_eff_map->GetYaxis()->SetTitle("J/#psi p_{T} (GeV)");
+  acc_eff_map->GetYaxis()->SetTitleOffset(1.1);
+
+  if(!do_not_draw) {
+    acc_eff_map->GetYaxis()->SetRangeUser(8.5,18.5);
+    acc_eff_map->GetYaxis()->SetMoreLogLabels(1);
+  }
+  acc_eff_map->GetZaxis()->SetRangeUser(0,1);
+
+
+
   //acc_eff_map->Divide(jpsi_pt_vs_rap_jpsi, jpsi_pt_vs_rap_mc, 1.0, 1.0);
   //acc_eff_map->Divide(jpsi_pt_vs_rap_jpsi, jpsi_pt_vs_rap_mc, "cl=0.683 b(1,1) mode");
 
 
 
-  acc_eff_map->Draw("colz");
+  TCanvas *c1 = new TCanvas("c1", "c1",800,600);
+  c1->cd();
+  c1->SetLogy();
+  if(do_not_draw) {
+    acc_eff_map->Draw("colz");
+  }
+  else {
+    acc_eff_map->Draw("textcolz");
+  }
   
 
   //TEfficiency * pEff = 0;
@@ -167,19 +228,28 @@ void calculate_jpsi_efficiencies (string file_name, int polarization = 0  )
   //  }
   //}
 
-  char *out_file_name;
+  std::string image_name1 = "";
+  std::string path = output_dir;
+  image_name1.append(output_dir);
+  image_name1.append("acceptance_map");
   if (polarization == 0) {
     out_file_name = "acc_eff_map_pol_0.root";
+    image_name1.append("_pol0");
   }
   else if (polarization == 1) {
     out_file_name = "acc_eff_map_pol_pos.root";
+    image_name1.append("_pol1");
   }
   else if (polarization == -1) {
     out_file_name = "acc_eff_map_pol_neg.root";
+    image_name1.append("_polneg1");
   }
   else {
     std::cout << "Unknown polarization" << std::endl;
   }
+  image_name1.append(".png");
+  c1->Print(image_name1.c_str() , "png");
+
   TFile output(out_file_name,"new");
   acc_eff_map->Write();
 }

@@ -7,10 +7,9 @@ namespace zf {
   //https://twiki.cern.ch/twiki/bin/viewauth/CMS/EgammaPOG
   const double MIN_JPSI_MASS = 2.85; //GeV
   const double MAX_JPSI_MASS = 3.35; //GeV
-  //const double MIN_Z_MASS = 60.0; //GeV
-  //const double MAX_Z_MASS = 120.0; //GeV
-  const double MIN_Z_MASS = 40.0; //GeV
-  const double MAX_Z_MASS = 300.0; //GeV
+  const double MIN_Z_MASS = 80.0; //GeV
+  const double MAX_Z_MASS = 100.0; //GeV
+  //const double MAX_Z_MASS = 300.0; //GeV
   //const double MIN_Z_MASS = 40.0; //GeV
   //const double MAX_Z_MASS = 300.0; //GeV
   //TODO TESTING

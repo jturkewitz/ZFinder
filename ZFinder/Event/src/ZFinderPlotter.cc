@@ -106,6 +106,15 @@ namespace zf {
       phistar_->GetXaxis()->SetTitle("#phi*");
       phistar_->GetYaxis()->SetTitle("Counts");
 
+      // phistar_2
+      double bins_phistar[] = {0.000, 0.004, 0.008, 0.012, 0.016, 0.020, 0.024, 0.029, 0.034, 0.039, 0.045, 0.052, 0.057, 0.064, 0.072, 0.081, 0.091,
+          0.102, 0.114, 0.128, 0.145, 0.165, 0.189, 0.219, 0.258, 0.312, 0.391, 0.524, 0.695, 0.918, 1.153, 1.496, 1.947, 2.522, 3.277};
+      int bins_phistar_number = 34;
+      const std::string phistar_2_name = "#phi* Binned";
+      phistar_2_ = tdir.make<TH1D>(phistar_2_name.c_str(), phistar_2_name.c_str(), bins_phistar_number, bins_phistar);
+      phistar_2_->GetXaxis()->SetTitle("#phi*");
+      phistar_2_->GetYaxis()->SetTitle("Counts");
+
       // z_from_muons_mass_all_
       const std::string z_from_muons_mass_all_name = "Z From Muons Mass: All";
       z_from_muons_mass_all_ = tdir.make<TH1D>(z_from_muons_mass_all_name.c_str(), z_from_muons_mass_all_name.c_str(), 300, 0., 300.);
@@ -189,6 +198,12 @@ namespace zf {
       z_from_muons_phistar_ = tdir.make<TH1D>(z_from_muons_phistar_name.c_str(), z_from_muons_phistar_name.c_str(), 100, 0., 1.);
       z_from_muons_phistar_->GetXaxis()->SetTitle("#phi*");
       z_from_muons_phistar_->GetYaxis()->SetTitle("Counts");
+
+      // z_from_muons_phistar_2
+      const std::string z_from_muons_phistar_2_name = "Z From Muons #phi* Binned";
+      z_from_muons_phistar_2_ = tdir.make<TH1D>(z_from_muons_phistar_2_name.c_str(), z_from_muons_phistar_2_name.c_str(), bins_phistar_number, bins_phistar);
+      z_from_muons_phistar_2_->GetXaxis()->SetTitle("#phi*");
+      z_from_muons_phistar_2_->GetYaxis()->SetTitle("Counts");
 
       // muon0_from_z_pt
       const std::string muon0_from_z_pt_name = "muon0_from_z_pt";
@@ -585,6 +600,16 @@ namespace zf {
       jpsi_pt_vs_rap_finer_neg_->GetXaxis()->SetTitle("jpsi Rapidity");
       jpsi_pt_vs_rap_finer_neg_->GetYaxis()->SetTitle("jpsi Pt");
 
+      const std::string jpsi_pt_vs_rap_finer_pos_0p1_name = "jpsi_pt_vs_rap_finer_pos_0p1";
+      jpsi_pt_vs_rap_finer_pos_0p1_ = tdir.make<TH2D>(jpsi_pt_vs_rap_finer_pos_0p1_name.c_str(), jpsi_pt_vs_rap_finer_pos_0p1_name.c_str(), 21, -2.1, 2.1, bin_finer_number, bins_finer);
+      jpsi_pt_vs_rap_finer_pos_0p1_->GetXaxis()->SetTitle("jpsi Rapidity");
+      jpsi_pt_vs_rap_finer_pos_0p1_->GetYaxis()->SetTitle("jpsi Pt");
+
+      const std::string jpsi_pt_vs_rap_finer_neg_0p1_name = "jpsi_pt_vs_rap_finer_neg_0p1";
+      jpsi_pt_vs_rap_finer_neg_0p1_ = tdir.make<TH2D>(jpsi_pt_vs_rap_finer_neg_0p1_name.c_str(), jpsi_pt_vs_rap_finer_neg_0p1_name.c_str(), 21, -2.1, 2.1, bin_finer_number, bins_finer);
+      jpsi_pt_vs_rap_finer_neg_0p1_->GetXaxis()->SetTitle("jpsi Rapidity");
+      jpsi_pt_vs_rap_finer_neg_0p1_->GetYaxis()->SetTitle("jpsi Pt");
+
       const std::string jpsi_pt_vs_rap_fine_name = "jpsi_pt_vs_rap_fine";
       jpsi_pt_vs_rap_fine_ = tdir.make<TH2D>(jpsi_pt_vs_rap_fine_name.c_str(), jpsi_pt_vs_rap_fine_name.c_str(), 21, -2.1, 2.1, 400, 0, 200);
       jpsi_pt_vs_rap_fine_->GetXaxis()->SetTitle("jpsi Rapidity");
@@ -617,6 +642,36 @@ namespace zf {
       jpsi_vtx_distance_z_vtx_z_ = tdir.make<TH1D>(jpsi_vtx_distance_z_vtx_z_name.c_str(), jpsi_vtx_distance_z_vtx_z_name.c_str(), 4000, -40., 40.);
       jpsi_vtx_distance_z_vtx_z_->GetXaxis()->SetTitle("distance [cm]");
       jpsi_vtx_distance_z_vtx_z_->GetYaxis()->SetTitle("Counts / 0.02 cm");
+
+      // jpsi_vtx_distance_z_vtx_z_8p5to10
+      const std::string jpsi_vtx_distance_z_vtx_z_8p5to10_name = "jpsi_vtx_z - z_vtx_z_8p5to10";
+      jpsi_vtx_distance_z_vtx_z_8p5to10_ = tdir.make<TH1D>(jpsi_vtx_distance_z_vtx_z_8p5to10_name.c_str(), jpsi_vtx_distance_z_vtx_z_8p5to10_name.c_str(), 4000, -40., 40.);
+      jpsi_vtx_distance_z_vtx_z_8p5to10_->GetXaxis()->SetTitle("distance [cm]");
+      jpsi_vtx_distance_z_vtx_z_8p5to10_->GetYaxis()->SetTitle("Counts / 0.02 cm");
+
+      // jpsi_vtx_distance_z_vtx_z_10to14
+      const std::string jpsi_vtx_distance_z_vtx_z_10to14_name = "jpsi_vtx_z - z_vtx_z_10to14";
+      jpsi_vtx_distance_z_vtx_z_10to14_ = tdir.make<TH1D>(jpsi_vtx_distance_z_vtx_z_10to14_name.c_str(), jpsi_vtx_distance_z_vtx_z_10to14_name.c_str(), 4000, -40., 40.);
+      jpsi_vtx_distance_z_vtx_z_10to14_->GetXaxis()->SetTitle("distance [cm]");
+      jpsi_vtx_distance_z_vtx_z_10to14_->GetYaxis()->SetTitle("Counts / 0.02 cm");
+
+      // jpsi_vtx_distance_z_vtx_z_14to18
+      const std::string jpsi_vtx_distance_z_vtx_z_14to18_name = "jpsi_vtx_z - z_vtx_z_14to18";
+      jpsi_vtx_distance_z_vtx_z_14to18_ = tdir.make<TH1D>(jpsi_vtx_distance_z_vtx_z_14to18_name.c_str(), jpsi_vtx_distance_z_vtx_z_14to18_name.c_str(), 4000, -40., 40.);
+      jpsi_vtx_distance_z_vtx_z_14to18_->GetXaxis()->SetTitle("distance [cm]");
+      jpsi_vtx_distance_z_vtx_z_14to18_->GetYaxis()->SetTitle("Counts / 0.02 cm");
+
+      // jpsi_vtx_distance_z_vtx_z_18to30
+      const std::string jpsi_vtx_distance_z_vtx_z_18to30_name = "jpsi_vtx_z - z_vtx_z_18to30";
+      jpsi_vtx_distance_z_vtx_z_18to30_ = tdir.make<TH1D>(jpsi_vtx_distance_z_vtx_z_18to30_name.c_str(), jpsi_vtx_distance_z_vtx_z_18to30_name.c_str(), 4000, -40., 40.);
+      jpsi_vtx_distance_z_vtx_z_18to30_->GetXaxis()->SetTitle("distance [cm]");
+      jpsi_vtx_distance_z_vtx_z_18to30_->GetYaxis()->SetTitle("Counts / 0.02 cm");
+
+      // jpsi_vtx_distance_z_vtx_z_30to100
+      const std::string jpsi_vtx_distance_z_vtx_z_30to100_name = "jpsi_vtx_z - z_vtx_z_30to100";
+      jpsi_vtx_distance_z_vtx_z_30to100_ = tdir.make<TH1D>(jpsi_vtx_distance_z_vtx_z_30to100_name.c_str(), jpsi_vtx_distance_z_vtx_z_30to100_name.c_str(), 4000, -40., 40.);
+      jpsi_vtx_distance_z_vtx_z_30to100_->GetXaxis()->SetTitle("distance [cm]");
+      jpsi_vtx_distance_z_vtx_z_30to100_->GetYaxis()->SetTitle("Counts / 0.02 cm");
 
       // jpsi_distance
       const std::string jpsi_distance_name = "jpsi distance";
@@ -1429,6 +1484,36 @@ namespace zf {
       z_jpsi_delta_phi_->GetXaxis()->SetTitle("Angle [rad]");
       z_jpsi_delta_phi_->GetYaxis()->SetTitle("delta Phi / 0.1");
 
+      // z_jpsi_delta_phi_8p5to10_
+      const std::string z_jpsi_delta_phi_8p5to10_name = "z jpsi delta phi_8p5to10";
+      z_jpsi_delta_phi_8p5to10_ = tdir.make<TH1D>(z_jpsi_delta_phi_8p5to10_name.c_str(), z_jpsi_delta_phi_8p5to10_name.c_str(), 35, 0.0, 3.5);
+      z_jpsi_delta_phi_8p5to10_->GetXaxis()->SetTitle("Angle [rad]");
+      z_jpsi_delta_phi_8p5to10_->GetYaxis()->SetTitle("delta Phi / 0.1");
+
+      // z_jpsi_delta_phi_10to14_
+      const std::string z_jpsi_delta_phi_10to14_name = "z jpsi delta phi_10to14";
+      z_jpsi_delta_phi_10to14_ = tdir.make<TH1D>(z_jpsi_delta_phi_10to14_name.c_str(), z_jpsi_delta_phi_10to14_name.c_str(), 35, 0.0, 3.5);
+      z_jpsi_delta_phi_10to14_->GetXaxis()->SetTitle("Angle [rad]");
+      z_jpsi_delta_phi_10to14_->GetYaxis()->SetTitle("delta Phi / 0.1");
+
+      // z_jpsi_delta_phi_14to18_
+      const std::string z_jpsi_delta_phi_14to18_name = "z jpsi delta phi_14to18";
+      z_jpsi_delta_phi_14to18_ = tdir.make<TH1D>(z_jpsi_delta_phi_14to18_name.c_str(), z_jpsi_delta_phi_14to18_name.c_str(), 35, 0.0, 3.5);
+      z_jpsi_delta_phi_14to18_->GetXaxis()->SetTitle("Angle [rad]");
+      z_jpsi_delta_phi_14to18_->GetYaxis()->SetTitle("delta Phi / 0.1");
+
+      // z_jpsi_delta_phi_18to30_
+      const std::string z_jpsi_delta_phi_18to30_name = "z jpsi delta phi_18to30";
+      z_jpsi_delta_phi_18to30_ = tdir.make<TH1D>(z_jpsi_delta_phi_18to30_name.c_str(), z_jpsi_delta_phi_18to30_name.c_str(), 35, 0.0, 3.5);
+      z_jpsi_delta_phi_18to30_->GetXaxis()->SetTitle("Angle [rad]");
+      z_jpsi_delta_phi_18to30_->GetYaxis()->SetTitle("delta Phi / 0.1");
+
+      // z_jpsi_delta_phi_30to100_
+      const std::string z_jpsi_delta_phi_30to100_name = "z jpsi delta phi_30to100";
+      z_jpsi_delta_phi_30to100_ = tdir.make<TH1D>(z_jpsi_delta_phi_30to100_name.c_str(), z_jpsi_delta_phi_30to100_name.c_str(), 35, 0.0, 3.5);
+      z_jpsi_delta_phi_30to100_->GetXaxis()->SetTitle("Angle [rad]");
+      z_jpsi_delta_phi_30to100_->GetYaxis()->SetTitle("delta Phi / 0.1");
+
       // nmuons
       const std::string nmuons_name = "N_{mu}";
       nmuons_ = tdir.make<TH1D>(nmuons_name.c_str(), nmuons_name.c_str(), 10, 0., 10.);
@@ -1504,6 +1589,7 @@ namespace zf {
       z_vtx_z_->Fill(zfe.reco_z.vtx_z, event_weight);
       z_vtx_prob_->Fill(zfe.reco_z.vtx_prob, event_weight);
       phistar_->Fill(zfe.reco_z.phistar, event_weight);
+      phistar_2_->Fill(zfe.reco_z.phistar, event_weight);
 
       if (!zfe.is_real_data) {
         //z_mass_all_mc_->Fill(zfe.truth_z_electrons.m, event_weight);
@@ -1540,6 +1626,7 @@ namespace zf {
       z_from_muons_vtx_z_->Fill(zfe.reco_z_from_muons.vtx_z, event_weight);
       z_from_muons_vtx_prob_->Fill(zfe.reco_z_from_muons.vtx_prob, event_weight);
       z_from_muons_phistar_->Fill(zfe.reco_z_from_muons.phistar, event_weight);
+      z_from_muons_phistar_2_->Fill(zfe.reco_z_from_muons.phistar, event_weight);
 
       if (zfe.reco_z_from_muons.m > -1) {
         muon0_from_z_pt_->Fill(zfe.z_muon0.pt(), event_weight);
@@ -1600,7 +1687,7 @@ namespace zf {
         jpsi_four_lepton_mass_electrons_vs_jpsi_mass_->Fill(zfe.reco_jpsi.m.at(i),zfe.reco_jpsi.four_lepton_mass.at(i), event_weight);
 
         jpsi_rapidity_->Fill(zfe.reco_jpsi.y.at(i), event_weight);
-        jpsi_pt_->Fill(zfe.reco_jpsi.pt.at(i), event_weight);
+        //jpsi_pt_->Fill(zfe.reco_jpsi.pt.at(i), event_weight);
 
         if (zfe.reco_jpsi.pt.at(i) >= 8.5 && zfe.reco_jpsi.pt.at(i) < 10.0 ) {
           z_pt_jpsi_8p5to10_->Fill(zfe.reco_z.pt, event_weight);
@@ -1646,6 +1733,11 @@ namespace zf {
         double lambdaNeg1 = (1.0 - pow(zfe.reco_jpsi.cos_jpsi_mu_plus.at(i), 2.0) );
         //divide by 2.0 for lambda positive 1 to keep weight less than 1
         double lambda1 = (1.0 + pow(zfe.reco_jpsi.cos_jpsi_mu_plus.at(i), 2.0)) / 2.0;
+
+        double lambda_neg_0p1 = (1.0 - (0.1 * pow(zfe.reco_jpsi.cos_jpsi_mu_plus.at(i), 2.0)) );
+        //divide by 2.0 for lambda positive 1 to keep weight less than 1
+        double lambda_pos_0p1 = (1.0 + (0.1 * pow(zfe.reco_jpsi.cos_jpsi_mu_plus.at(i), 2.0))) / 2.0;
+
         jpsi_cos_mu_plus_lambdaNeg1_->Fill(zfe.reco_jpsi.cos_jpsi_mu_plus.at(i), event_weight * lambdaNeg1);
         jpsi_cos_mu_plus_lambda1_->Fill(zfe.reco_jpsi.cos_jpsi_mu_plus.at(i), event_weight * lambda1);
         if (zfe.reco_jpsi.pt.at(i) >= 8.0 && zfe.reco_jpsi.pt.at(i) < 8.5 ) {
@@ -1695,12 +1787,21 @@ namespace zf {
             jpsi_pt_vs_rap_finer_->Fill(zfe.truth_jpsi.y.at(j), zfe.truth_jpsi.pt.at(j) , event_weight);
             jpsi_pt_vs_rap_finer_pos_->Fill(zfe.truth_jpsi.y.at(j), zfe.truth_jpsi.pt.at(j) , event_weight * lambda1);
             jpsi_pt_vs_rap_finer_neg_->Fill(zfe.truth_jpsi.y.at(j), zfe.truth_jpsi.pt.at(j) , event_weight * lambdaNeg1);
+
+            jpsi_pt_vs_rap_finer_pos_0p1_->Fill(zfe.truth_jpsi.y.at(j), zfe.truth_jpsi.pt.at(j) , event_weight * lambda_pos_0p1);
+            jpsi_pt_vs_rap_finer_neg_0p1_->Fill(zfe.truth_jpsi.y.at(j), zfe.truth_jpsi.pt.at(j) , event_weight * lambda_neg_0p1);
+            jpsi_pt_->Fill(zfe.truth_jpsi.pt.at(j), event_weight);
           }
         }
         else {
           jpsi_pt_vs_rap_finer_->Fill(zfe.reco_jpsi.y.at(i), zfe.reco_jpsi.pt.at(i) , event_weight);
           jpsi_pt_vs_rap_finer_pos_->Fill(zfe.reco_jpsi.y.at(i), zfe.reco_jpsi.pt.at(i) , event_weight * lambda1);
           jpsi_pt_vs_rap_finer_neg_->Fill(zfe.reco_jpsi.y.at(i), zfe.reco_jpsi.pt.at(i) , event_weight * lambdaNeg1);
+
+          jpsi_pt_vs_rap_finer_pos_0p1_->Fill(zfe.reco_jpsi.y.at(i), zfe.reco_jpsi.pt.at(i) , event_weight * lambda_pos_0p1);
+          jpsi_pt_vs_rap_finer_neg_0p1_->Fill(zfe.reco_jpsi.y.at(i), zfe.reco_jpsi.pt.at(i) , event_weight * lambda_neg_0p1);
+
+          jpsi_pt_->Fill(zfe.reco_jpsi.pt.at(i), event_weight);
         }
 
 
@@ -1711,7 +1812,25 @@ namespace zf {
             event_weight * (1.0 + pow(zfe.reco_jpsi.cos_jpsi_mu_plus.at(i), 2.0) ));
         jpsi_vtx_distance_z_vtx_x_->Fill( zfe.reco_jpsi.distance_x.at(i), event_weight);
         jpsi_vtx_distance_z_vtx_y_->Fill( zfe.reco_jpsi.distance_y.at(i), event_weight);
+
         jpsi_vtx_distance_z_vtx_z_->Fill( zfe.reco_jpsi.distance_z.at(i), event_weight);
+        if (zfe.reco_jpsi.pt.at(i) >= 8.5 && zfe.reco_jpsi.pt.at(i) < 10 ) {
+          jpsi_vtx_distance_z_vtx_z_8p5to10_->Fill( zfe.reco_jpsi.distance_z.at(i), event_weight);
+        }
+        if (zfe.reco_jpsi.pt.at(i) >= 10 && zfe.reco_jpsi.pt.at(i) < 14 ) {
+          jpsi_vtx_distance_z_vtx_z_10to14_->Fill( zfe.reco_jpsi.distance_z.at(i), event_weight);
+        }
+        if (zfe.reco_jpsi.pt.at(i) >= 14 && zfe.reco_jpsi.pt.at(i) < 18.0 ) {
+          jpsi_vtx_distance_z_vtx_z_14to18_->Fill( zfe.reco_jpsi.distance_z.at(i), event_weight);
+        }
+        if (zfe.reco_jpsi.pt.at(i) >= 18.0 && zfe.reco_jpsi.pt.at(i) < 30.0 ) {
+          jpsi_vtx_distance_z_vtx_z_18to30_->Fill( zfe.reco_jpsi.distance_z.at(i), event_weight);
+        }
+        if (zfe.reco_jpsi.pt.at(i) >= 30.0 && zfe.reco_jpsi.pt.at(i) < 100.0 ) {
+          jpsi_vtx_distance_z_vtx_z_30to100_->Fill( zfe.reco_jpsi.distance_z.at(i), event_weight);
+        }
+
+
         jpsi_distance_->Fill(zfe.reco_jpsi.distance.at(i), event_weight);
         jpsi_dist_err_->Fill(zfe.reco_jpsi.dist_err.at(i), event_weight);
         jpsi_chi2_->Fill(zfe.reco_jpsi.chi2.at(i), event_weight);
@@ -1890,6 +2009,21 @@ namespace zf {
         dimuon_vtx_prob_->Fill(zfe.reco_jpsi.vtx_prob.at(i), event_weight);
 
         z_jpsi_delta_phi_->Fill(zfe.reco_jpsi.z_delta_phi.at(i), event_weight);
+        if (zfe.reco_jpsi.pt.at(i) >= 8.5 && zfe.reco_jpsi.pt.at(i) < 10.0 ) {
+          z_jpsi_delta_phi_8p5to10_->Fill(zfe.reco_jpsi.z_delta_phi.at(i), event_weight);
+        }
+        if (zfe.reco_jpsi.pt.at(i) >= 10.0 && zfe.reco_jpsi.pt.at(i) < 14.0 ) {
+          z_jpsi_delta_phi_10to14_->Fill(zfe.reco_jpsi.z_delta_phi.at(i), event_weight);
+        }
+        if (zfe.reco_jpsi.pt.at(i) >= 14.0 && zfe.reco_jpsi.pt.at(i) < 18.0 ) {
+          z_jpsi_delta_phi_14to18_->Fill(zfe.reco_jpsi.z_delta_phi.at(i), event_weight);
+        }
+        if (zfe.reco_jpsi.pt.at(i) >= 18.0 && zfe.reco_jpsi.pt.at(i) < 30.0 ) {
+          z_jpsi_delta_phi_18to30_->Fill(zfe.reco_jpsi.z_delta_phi.at(i), event_weight);
+        }
+        if (zfe.reco_jpsi.pt.at(i) >= 30.0 && zfe.reco_jpsi.pt.at(i) < 100.0 ) {
+          z_jpsi_delta_phi_30to100_->Fill(zfe.reco_jpsi.z_delta_phi.at(i), event_weight);
+        }
 
         dimuon_delta_phi_->Fill(zfe.reco_jpsi.muons_delta_phi.at(i), event_weight);
         dimuon_deltaR_->Fill(zfe.reco_jpsi.muons_deltaR.at(i), event_weight);
@@ -2050,8 +2184,17 @@ namespace zf {
         double lambdaNeg1 = (1.0 - pow(zfe.truth_jpsi.cos_jpsi_mu_plus.at(i), 2.0) );
         //divide by 2.0 for lambda positive 1 to keep weight less than 1
         double lambda1 = (1.0 + pow(zfe.truth_jpsi.cos_jpsi_mu_plus.at(i), 2.0)) / 2.0;
+
+        double lambda_neg_0p1 = (1.0 - (0.1 * pow(zfe.truth_jpsi.cos_jpsi_mu_plus.at(i), 2.0)) );
+        //divide by 2.0 for lambda positive 1 to keep weight less than 1
+        double lambda_pos_0p1 = (1.0 + (0.1 * pow(zfe.truth_jpsi.cos_jpsi_mu_plus.at(i), 2.0))) / 2.0;
+
         jpsi_pt_vs_rap_finer_pos_->Fill(zfe.truth_jpsi.y.at(i), zfe.truth_jpsi.pt.at(i) , event_weight * lambda1);
         jpsi_pt_vs_rap_finer_neg_->Fill(zfe.truth_jpsi.y.at(i), zfe.truth_jpsi.pt.at(i) , event_weight * lambdaNeg1);
+
+        jpsi_pt_vs_rap_finer_pos_0p1_->Fill(zfe.truth_jpsi.y.at(i), zfe.truth_jpsi.pt.at(i) , event_weight * lambda_pos_0p1);
+        jpsi_pt_vs_rap_finer_neg_0p1_->Fill(zfe.truth_jpsi.y.at(i), zfe.truth_jpsi.pt.at(i) , event_weight * lambda_neg_0p1);
+
         jpsi_pt_vs_rap_finer_->Fill(zfe.truth_jpsi.y.at(i), zfe.truth_jpsi.pt.at(i) , event_weight);
 
         jpsi_pt_vs_rap_polarization_long->Fill(zfe.truth_jpsi.y.at(i), zfe.truth_jpsi.pt.at(i) , 

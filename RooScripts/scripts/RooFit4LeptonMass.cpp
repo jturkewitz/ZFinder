@@ -10,6 +10,7 @@
 #include "TH1.h"
 #include "TGraph.h"
 #include "TLegend.h"
+#include "TLatex.h"
 
 // RooFit
 #include "RooAddPdf.h"
@@ -38,6 +39,9 @@
 #include "RooEffProd.h"
 
 #include "BW_CB_pdf_class.h"
+#include <TROOT.h>
+#include <TStyle.h>
+#include "tdrStyle.C"
 
 using namespace RooFit;
 
@@ -67,11 +71,12 @@ int RooFit4LeptonMass(
     const std::string& OUT_DIR
     ) {
   const int N_CPU = 1;
+  setTDRStyle();
 
   RooMsgService::instance().setGlobalKillBelow(RooFit::WARNING) ;
   gErrorIgnoreLevel = kWarning;
 
-  double z_mass_min = 60.0;
+  double z_mass_min = 40.0;
   double z_mass_max = 200.0;
   RooRealVar z_mass("z_mass", "z_mass" , z_mass_min, z_mass_max, "GeV");
   z_mass.setRange("signal",80.0,100.0) ;
@@ -102,11 +107,11 @@ int RooFit4LeptonMass(
 
   //RooRealVar mean("mean","mean", 110.0, 70, 130);
   RooRealVar mean_low("mean_low","mean_low", 91.2);
-  RooRealVar sigma_low("sigma_low","sigma_low", 5.0, 0.01, 30.0);
+  RooRealVar sigma_low("sigma_low","sigma_low", 3.5, 2.0, 6.0);
   RooGaussian gauss_low("gauss_low","gauss_low", z_mass, mean_low, sigma_low);  
 
   RooRealVar mean_high("mean_high","mean_high", 110,70,130);
-  RooRealVar sigma_high("sigma_high","sigma_high", 5.0, 0.01, 30.0);
+  RooRealVar sigma_high("sigma_high","sigma_high", 5.0, 0.01, 40.0);
   RooGaussian gauss_high("gauss_high","gauss_high", z_mass, mean_high, sigma_high);
 
   //RooRealVar slope("slope", "slope", -0.1, -50., 50.);
@@ -152,7 +157,8 @@ int RooFit4LeptonMass(
     std::cout << "z to mumu" << std::endl;
   }
 
-  TCanvas *canvas1 = new TCanvas("canvas1", "canvas1", 2000, 750);
+  //TCanvas *canvas1 = new TCanvas("canvas1", "canvas1", 2000, 750);
+  TCanvas *canvas1 = new TCanvas("canvas1", "canvas1", 2000, 1000);
 
   canvas1->cd(1);
   //gPad->SetLogy();
@@ -160,10 +166,13 @@ int RooFit4LeptonMass(
   RooPlot* z_mass_fitframe;
   if (USE_Z_TO_EE) { 
     z_mass_fitframe = z_mass.frame( Title("Z->ee") );
+    z_mass_fitframe->GetYaxis()->SetTitle("M_{ee} (GeV)");
   }
   else {
     z_mass_fitframe = z_mass.frame( Title("Z->mumu") );
+    z_mass_fitframe->GetYaxis()->SetTitle("M_{#mu#mu} (GeV)");
   }
+  z_mass_fitframe->GetYaxis()->SetTitle("Events / 5 GeV");
 
   z_mass_data_hist.plotOn(z_mass_fitframe);
 
@@ -173,12 +182,12 @@ int RooFit4LeptonMass(
   z_mass_fitpdf.plotOn(z_mass_fitframe, Components(gauss_low),  LineColor(kGreen-2), RooFit::Name("gauss_low"));
   z_mass_fitpdf.plotOn(z_mass_fitframe, Components(gauss_high), LineColor(kBlue-2), RooFit::Name("gauss_high"));
 
-  Double_t xl1=.58, yl1=0.55, xl2=xl1+.3, yl2=yl1+.325;
-  TLegend *leg = new TLegend(xl1,yl1,xl2,yl2);
-  leg->SetFillColor(kWhite);
-  leg->AddEntry(z_mass_fitframe->findObject("total"),"total","l");
-  leg->AddEntry(z_mass_fitframe->findObject("gauss_low"),"gauss_low","l");
-  leg->AddEntry(z_mass_fitframe->findObject("gauss_high"),"gauss_high","l");
+  //Double_t xl1=.58, yl1=0.55, xl2=xl1+.3, yl2=yl1+.325;
+  //TLegend *leg = new TLegend(xl1,yl1,xl2,yl2);
+  //leg->SetFillColor(kWhite);
+  //leg->AddEntry(z_mass_fitframe->findObject("total"),"total","l");
+  //leg->AddEntry(z_mass_fitframe->findObject("gauss_low"),"gauss_low","l");
+  //leg->AddEntry(z_mass_fitframe->findObject("gauss_high"),"gauss_high","l");
 
   //z_mass_fitpdf.plotOn(z_mass_fitframe, Components(voigtian), LineColor(kGreen-2));
   //z_mass_fitpdf.plotOn(z_mass_fitframe, Components(MyBackgroundPdf), LineColor(kBlue-2));
@@ -190,7 +199,39 @@ int RooFit4LeptonMass(
 
   //gPad->SetLogy();
   z_mass_fitframe->Draw();
+  if (USE_Z_TO_EE) { 
+    z_mass_fitframe->GetXaxis()->SetTitle("M_{ee} (GeV)");
+  }
+  else {
+    z_mass_fitframe->GetXaxis()->SetTitle("M_{#mu#mu} (GeV)");
+  }
+  z_mass_fitframe->GetYaxis()->SetTitleOffset(0.8);
+  //gStyle->SetPadRightMargin(0.35); 
+  //gROOT->ForceStyle();
+
+  Double_t xl1=.8, yl1=0.55, xl2=xl1+.3, yl2=yl1+.325;
+  TLegend *leg = new TLegend(xl1,yl1,xl2,yl2);
+  leg->SetFillColor(kWhite);
+  leg->AddEntry(z_mass_fitframe->findObject("total"),"total","l");
+  leg->AddEntry(z_mass_fitframe->findObject("gauss_low"),"signal","l");
+  leg->AddEntry(z_mass_fitframe->findObject("gauss_high"),"background","l");
+  leg->SetFillColor(kWhite);
+  
+  leg->SetShadowColor(0);
+  leg->SetFillStyle(0);
+  leg->SetBorderSize(0);
+  leg->SetLineWidth(1);
+  leg->SetNColumns(1);
+  leg->SetTextFont(42);
+  leg->SetTextSize(0.03);
   leg->Draw();
+
+  TLatex mark;
+  mark.SetTextSize(0.035);
+  mark.SetNDC(true);
+  mark.DrawLatex(0.845,0.957,"19.7 fb^{-1} (8 TeV)");
+  mark.DrawLatex(0.195,0.89,"CMS");
+  mark.DrawLatex(0.195,0.86,"#it{Preliminary}");
 
   std::string z_image_name = OUT_DIR;
   z_image_name.append(z_hist_name);

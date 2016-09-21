@@ -33,6 +33,9 @@ void make_images2 (string file_name_mc, string file_name_data_zmumu, string file
   std::string image_name14 = "";
   std::string image_name15 = "";
   std::string image_name16 = "";
+  std::string image_name19 = "";
+  std::string image_name20 = "";
+  std::string image_name21 = "";
 
   std::string path = output_dir;
   image_name1.append(path);
@@ -51,6 +54,9 @@ void make_images2 (string file_name_mc, string file_name_data_zmumu, string file
   image_name14.append(path);
   image_name15.append(path);
   image_name16.append(path);
+  image_name19.append(path);
+  image_name20.append(path);
+  image_name21.append(path);
 
   //TODO put this in rootrc
   gStyle->SetLineWidth(2.);
@@ -61,7 +67,6 @@ void make_images2 (string file_name_mc, string file_name_data_zmumu, string file
   TLatex mark;
   mark.SetTextSize(0.035);
   mark.SetNDC(true);
-
 
   //Jpsi
   TH1D *h_truth_vtx_minus_reco_vtx = (TH1D*) file_mc->Get("ZFinder/Dimuon_Jpsi_Vertex_Compatible/jpsi_truth_vtx_z_minus_jpsi_reco_vtx_z_");
@@ -414,9 +419,6 @@ void make_images2 (string file_name_mc, string file_name_data_zmumu, string file
   c9->Print(image_name9.c_str() , "png");
 
 
-
-
-
   //TH1D *h_mu1_pt = (TH1D*) file_mc->Get("ZFinder/Dimuon_Jpsi_Vertex_Compatible/p_{T,mu_{1}}");
   //TH1D *h_mu1_pt_zmumu = (TH1D*) file_data_zmumu->Get("ZFinder/Z_To_Muons_And_Jpsi/p_{T,mu_{1}}");
   //TH1D *h_mu1_pt_zee = (TH1D*) file_data_zee->Get("ZFinder/Z_To_Electrons_And_Jpsi/p_{T,mu_{1}}");
@@ -471,4 +473,88 @@ void make_images2 (string file_name_mc, string file_name_data_zmumu, string file
   image_name11.append("mu1_eta");
   image_name11.append(".png");
   c11->Print(image_name11.c_str() , "png");
+
+  TH1D *h_zjpsi_delta_phi = (TH1D*) file_data_zmumu->Get("ZFinder/Z_To_Muons_And_Jpsi/z jpsi delta phi");
+  TH1D *h_zjpsi_delta_phi_zee = (TH1D*) file_data_zee->Get("ZFinder/Z_To_Electrons_And_Jpsi/z jpsi delta phi");
+  h_zjpsi_delta_phi->Add(h_zjpsi_delta_phi_zee);
+  TCanvas *c19 = new TCanvas("c19", "c19");
+  c19->cd();
+  //c5->SetLogy();
+  //h_jpsi_pt->GetXaxis()->SetRangeUser(-1,1);
+  h_zjpsi_delta_phi->SetTitle("Z J/#psi Delta #phi");
+  h_zjpsi_delta_phi->Rebin(5);
+  h_zjpsi_delta_phi->Draw();
+  h_zjpsi_delta_phi->GetXaxis()->SetTitle("#Delta#phi between Z and J/#psi (Radians)");
+  h_zjpsi_delta_phi->GetYaxis()->SetTitle("Events / 0.2");
+  h_zjpsi_delta_phi->GetYaxis()->SetLabelSize(0.04);
+
+  Double_t xl1=.5, yl1=0.8, xl2=xl1+.30, yl2=yl1+.10;
+  TLegend *leg19 = new TLegend(xl1,yl1,xl2,yl2);
+  leg19->AddEntry(h_zjpsi_delta_phi,"Z and J/#psi","l");
+  leg19->SetShadowColor(0);
+  leg19->SetFillStyle(0);
+  leg19->SetBorderSize(0);
+  leg19->SetLineWidth(1);
+  leg19->SetNColumns(1);
+  leg19->SetTextFont(42);
+  leg19->SetTextSize(0.035);
+
+  mark.DrawLatex(0.735,0.957,"19.7 fb^{-1} (8 TeV)");
+  mark.DrawLatex(0.195,0.89,"CMS");
+  mark.DrawLatex(0.195,0.86,"#it{Preliminary}");
+  leg19->Draw();
+
+  image_name19.append("zjpsi_delta_phi");
+  image_name19.append(".png");
+  c19->Print(image_name19.c_str() , "png");
+
+  gStyle->SetPadRightMargin(0.1);
+  gROOT->ForceStyle();
+  TH2D *h_zjpsi_dimuon_mass_vs_dimuon_tau_xy = (TH2D*) file_data_zmumu->Get("ZFinder/Z_To_Muons_And_Jpsi/dimuon_mass_vs_dimuon_tau_xy_fine");
+  TH2D *h_zjpsi_dimuon_mass_vs_dimuon_tau_xy_zee = (TH2D*) file_data_zee->Get("ZFinder/Z_To_Electrons_And_Jpsi/dimuon_mass_vs_dimuon_tau_xy_fine");
+  h_zjpsi_dimuon_mass_vs_dimuon_tau_xy->Add(h_zjpsi_dimuon_mass_vs_dimuon_tau_xy_zee);
+  TCanvas *c20 = new TCanvas("c20", "c20");
+  c20->cd();
+  h_zjpsi_dimuon_mass_vs_dimuon_tau_xy->SetTitle("J/#psi Lifetime vs Mass");
+  h_zjpsi_dimuon_mass_vs_dimuon_tau_xy->Rebin2D(5,5);
+  h_zjpsi_dimuon_mass_vs_dimuon_tau_xy->Draw("colz");
+  h_zjpsi_dimuon_mass_vs_dimuon_tau_xy->GetXaxis()->SetTitle("M_{#mu^{+}#mu^{-1}} [GeV]");
+  h_zjpsi_dimuon_mass_vs_dimuon_tau_xy->GetYaxis()->SetTitle("t_{xy} [ps]");
+  //h_zjpsi_dimuon_mass_vs_dimuon_tau_xy->GetYaxis()->SetLabelSize(0.04);
+  //h_zjpsi_dimuon_mass_vs_dimuon_tau_xy->GetXaxis()->SetLabelSize(0.02);
+  h_zjpsi_dimuon_mass_vs_dimuon_tau_xy->GetXaxis()->SetNdivisions(5);
+  h_zjpsi_dimuon_mass_vs_dimuon_tau_xy->GetYaxis()->SetRangeUser(-2,5);
+
+  mark.DrawLatex(0.725,0.957,"19.7 fb^{-1} (8 TeV)");
+  mark.DrawLatex(0.195,0.89,"CMS");
+  mark.DrawLatex(0.195,0.86,"#it{Preliminary}");
+  //leg20->Draw();
+
+  image_name20.append("zjpsi_dimuon_mass_vs_dimuon_tau_xy");
+  image_name20.append(".png");
+  c20->Print(image_name20.c_str() , "png");
+
+  TH2D *h_zjpsi_dimuon_mass_vs_dimuon_tau_xy = (TH2D*) file_data_zmumu->Get("ZFinder/Z_To_Muons_And_Jpsi/dimuon_mass_vs_dimuon_tau_xy_fine");
+  TH2D *h_zjpsi_dimuon_mass_vs_dimuon_tau_xy_zee = (TH2D*) file_data_zee->Get("ZFinder/Z_To_Electrons_And_Jpsi/dimuon_mass_vs_dimuon_tau_xy_fine");
+  h_zjpsi_dimuon_mass_vs_dimuon_tau_xy->Add(h_zjpsi_dimuon_mass_vs_dimuon_tau_xy_zee);
+  TCanvas *c21 = new TCanvas("c21", "c21");
+  c21->cd();
+  h_jpsi_dimuon_mass_vs_dimuon_tau_xy->SetTitle("J/#psi Lifetime vs Mass");
+  h_jpsi_dimuon_mass_vs_dimuon_tau_xy->Rebin2D(5,5);
+  h_jpsi_dimuon_mass_vs_dimuon_tau_xy->Draw("colz");
+  h_jpsi_dimuon_mass_vs_dimuon_tau_xy->GetXaxis()->SetTitle("M_{#mu^{+}#mu^{-}} [GeV]");
+  h_jpsi_dimuon_mass_vs_dimuon_tau_xy->GetYaxis()->SetTitle("t_{xy} [ps]");
+  //h_jpsi_dimuon_mass_vs_dimuon_tau_xy->GetYaxis()->SetLabelSize(0.04);
+  //h_jpsi_dimuon_mass_vs_dimuon_tau_xy->GetXaxis()->SetLabelSize(0.02);
+  h_jpsi_dimuon_mass_vs_dimuon_tau_xy->GetXaxis()->SetNdivisions(5);
+  h_jpsi_dimuon_mass_vs_dimuon_tau_xy->GetYaxis()->SetRangeUser(-2,5);
+
+  mark.DrawLatex(0.725,0.957,"19.7 fb^{-1} (8 TeV)");
+  mark.DrawLatex(0.195,0.89,"CMS");
+  mark.DrawLatex(0.195,0.86,"#it{Preliminary}");
+
+  image_name21.append("jpsi_dimuon_mass_vs_dimuon_tau_xy");
+  image_name21.append(".png");
+  c21->Print(image_name21.c_str() , "png");
+
 }

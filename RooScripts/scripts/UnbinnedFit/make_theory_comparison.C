@@ -49,6 +49,7 @@ void make_theory_comparison(std::string image_dir = "~/public_html/ZPhysics/tmp/
   setTDRStyle();
   gStyle->SetLineWidth(2.);
   gStyle->SetHistLineWidth(2.5);
+  gStyle->SetPadBottomMargin(0.15);
   gROOT->ForceStyle();
   gStyle->SetOptStat(0);
   gStyle->SetPadRightMargin(0.05);
@@ -101,36 +102,45 @@ void make_theory_comparison(std::string image_dir = "~/public_html/ZPhysics/tmp/
   //TH1* h_zjpsi_cms_prompt = zjpsi_prompt_hist.createHistogram("h_zjpsi_cms_prompt", *onia_pt);
 
   TH1F* h_zjpsi_cms_prompt = new TH1F ("h_zjpsi_cms_prompt", "h_zjpsi_cms_prompt", 5, bins);
-  h_zjpsi_cms_prompt->SetBinContent(1, 10.5574277113E-7); h_zjpsi_cms_prompt->SetBinError(1, TMath::Sqrt(6.1043030461**2 + 2.7862418006**2)*1E-7);
-  h_zjpsi_cms_prompt->SetBinContent(2, 5.0144490001E-7); h_zjpsi_cms_prompt->SetBinError(2, TMath::Sqrt(1.9208565661**2 + 1.0818902095**2)*1E-7);
-  h_zjpsi_cms_prompt->SetBinContent(3, 0.2115452932E-7); h_zjpsi_cms_prompt->SetBinError(3, TMath::Sqrt(0.9112500667**2 + 0.0269464576**2)*1E-7);
-  h_zjpsi_cms_prompt->SetBinContent(4, 0.2321810142E-7); h_zjpsi_cms_prompt->SetBinError(4, TMath::Sqrt(0.2788649981**2 + 0.028014271**2)*1E-7);
-  h_zjpsi_cms_prompt->SetBinContent(5, 0.0358347174E-7); h_zjpsi_cms_prompt->SetBinError(5, TMath::Sqrt(0.0359961998**2 + 0.005662698**2)*1E-7);
+  h_zjpsi_cms_prompt->SetBinContent(1, 10.4191575129E-7); h_zjpsi_cms_prompt->SetBinError(1, TMath::Sqrt(6.0679379824**2 + 0.508740104**2)*1E-7);
+  h_zjpsi_cms_prompt->SetBinContent(2, 4.9463423482E-7); h_zjpsi_cms_prompt->SetBinError(2, TMath::Sqrt(1.9384997581**2 + 0.2234517598**2)*1E-7);
+  h_zjpsi_cms_prompt->SetBinContent(3, 0.2006021418E-7); h_zjpsi_cms_prompt->SetBinError(3, TMath::Sqrt(1.4014106634**2 + 0.00922161**2)*1E-7);
+  h_zjpsi_cms_prompt->SetBinContent(4, 0.2201768623E-7); h_zjpsi_cms_prompt->SetBinError(4, TMath::Sqrt(0.2865197093**2 +  0.0107990082**2)*1E-7);
+  h_zjpsi_cms_prompt->SetBinContent(5, 0.0380699475E-7); h_zjpsi_cms_prompt->SetBinError(5, TMath::Sqrt(0.0387957974**2 + 0.0036175143**2)*1E-7);
   h_zjpsi_cms_prompt->SetMarkerStyle(25);
 
   TH1F* h_zjpsi_theory_prompt = new TH1F ("h_zjpsi_theory_prompt", "h_zjpsi_theory_prompt", 5, bins);
-  h_zjpsi_theory_prompt->SetBinContent(1, 1.1471544715E-7); h_zjpsi_theory_prompt->SetBinError(1, 0.1147154472E-7);
-  h_zjpsi_theory_prompt->SetBinContent(2, 0.7057926829E-7); h_zjpsi_theory_prompt->SetBinError(2, 0.0705792683E-7);
-  h_zjpsi_theory_prompt->SetBinContent(3, 0.3445121951E-7); h_zjpsi_theory_prompt->SetBinError(3, 0.0344512195E-7);
-  h_zjpsi_theory_prompt->SetBinContent(4, 0.144004065E-7); h_zjpsi_theory_prompt->SetBinError(4, 0.0144004065E-7);
-  h_zjpsi_theory_prompt->SetBinContent(5, 0.0126829268E-7); h_zjpsi_theory_prompt->SetBinError(5, 0.0012682927E-7);
+  h_zjpsi_theory_prompt->SetBinContent(1, 0.7717886179E-7); h_zjpsi_theory_prompt->SetBinError(1, 0.0771788618E-7);
+  h_zjpsi_theory_prompt->SetBinContent(2, 0.4781402439E-7); h_zjpsi_theory_prompt->SetBinError(2, 0.0478140244E-7);
+  h_zjpsi_theory_prompt->SetBinContent(3, 0.2563506098E-7); h_zjpsi_theory_prompt->SetBinError(3, 0.025635061E-7);
+  h_zjpsi_theory_prompt->SetBinContent(4, 0.1056402439E-7); h_zjpsi_theory_prompt->SetBinError(4, 0.0105640244E-7);
+  h_zjpsi_theory_prompt->SetBinContent(5, 0.0099965157E-7); h_zjpsi_theory_prompt->SetBinError(5, 0.0009996516E-7);
   h_zjpsi_theory_prompt->SetMarkerStyle(27);
 
+  //TH1F* h_zjpsi_theory_prompt = new TH1F ("h_zjpsi_theory_prompt", "h_zjpsi_theory_prompt", 5, bins); //old values emailed by theorist (wrong)
+  //h_zjpsi_theory_prompt->SetBinContent(1, 1.1471544715E-7); h_zjpsi_theory_prompt->SetBinError(1, 0.1147154472E-7);
+  //h_zjpsi_theory_prompt->SetBinContent(2, 0.7057926829E-7); h_zjpsi_theory_prompt->SetBinError(2, 0.0705792683E-7);
+  //h_zjpsi_theory_prompt->SetBinContent(3, 0.3445121951E-7); h_zjpsi_theory_prompt->SetBinError(3, 0.0344512195E-7);
+  //h_zjpsi_theory_prompt->SetBinContent(4, 0.144004065E-7); h_zjpsi_theory_prompt->SetBinError(4, 0.0144004065E-7);
+  //h_zjpsi_theory_prompt->SetBinContent(5, 0.0126829268E-7); h_zjpsi_theory_prompt->SetBinError(5, 0.0012682927E-7);
+
   TH1F* h_zjpsi_dps_prompt = new TH1F ("h_zjpsi_dps_prompt", "h_zjpsi_dps_prompt", 5, bins);
-  h_zjpsi_dps_prompt->SetBinContent(1, 3.8167422744E-7); h_zjpsi_dps_prompt->SetBinError(1, 1.2258395366*1E-7);
-  h_zjpsi_dps_prompt->SetBinContent(2, 1.0692782379E-7); h_zjpsi_dps_prompt->SetBinError(2, 0.3434246919*1E-7);
-  h_zjpsi_dps_prompt->SetBinContent(3, 0.2095427881E-7); h_zjpsi_dps_prompt->SetBinError(3, 0.0672997588*1E-7);
-  h_zjpsi_dps_prompt->SetBinContent(4, 0.0295145771E-7); h_zjpsi_dps_prompt->SetBinError(4, 0.0094793237*1E-7);
-  h_zjpsi_dps_prompt->SetBinContent(5, 0.0005232614E-7); h_zjpsi_dps_prompt->SetBinError(5, 0.0001680581*1E-7);
+  h_zjpsi_dps_prompt->SetBinContent(1, 3.8167422744E-7); h_zjpsi_dps_prompt->SetBinError(1, 1.2824172986*1E-7);
+  h_zjpsi_dps_prompt->SetBinContent(2, 1.0692782379E-7); h_zjpsi_dps_prompt->SetBinError(2, 0.3549668257*1E-7);
+  h_zjpsi_dps_prompt->SetBinContent(3, 0.2095427881E-7); h_zjpsi_dps_prompt->SetBinError(3, 0.069003193*1E-7);
+  h_zjpsi_dps_prompt->SetBinContent(4, 0.0295145771E-7); h_zjpsi_dps_prompt->SetBinError(4, 0.009723299*1E-7);
+  h_zjpsi_dps_prompt->SetBinContent(5, 0.0005232614E-7); h_zjpsi_dps_prompt->SetBinError(5, 0.000173431*1E-7);
   h_zjpsi_dps_prompt->SetMarkerStyle(26);
 
   h_zjpsi_cms_prompt->Draw("E1");
   h_zjpsi_atlas_prompt->SetLineColor(kRed - 2);
   h_zjpsi_atlas_prompt->Draw("E1same");
   h_zjpsi_dps_prompt->SetLineColor(kGreen - 2);
-  h_zjpsi_dps_prompt->Draw("E1same");
+  //h_zjpsi_dps_prompt->Draw("E1same");
+  h_zjpsi_dps_prompt->Draw("hist same");
   h_zjpsi_theory_prompt->SetLineColor(kMagenta - 2);
-  h_zjpsi_theory_prompt->Draw("E1same");
+  //h_zjpsi_theory_prompt->Draw("E1same");
+  h_zjpsi_theory_prompt->Draw("hist same");
 
   Double_t xl1_l5=.60, yl1_l5=0.70, xl2_l5=xl1_l5+.3, yl2_l5=yl1_l5+.2;
   TLegend *leg5 = new TLegend(xl1_l5,yl1_l5,xl2_l5,yl2_l5);
@@ -163,28 +173,28 @@ void make_theory_comparison(std::string image_dir = "~/public_html/ZPhysics/tmp/
   //TH1* h_zjpsi_cms_nonprompt = zjpsi_nonprompt_hist.createHistogram("h_zjpsi_cms_nonprompt", *onia_pt);
 
   TH1F* h_zjpsi_cms_nonprompt = new TH1F ("h_zjpsi_cms_nonprompt", "h_zjpsi_cms_nonprompt", 5, bins);
-  h_zjpsi_cms_nonprompt->SetBinContent(1, 13.400610612E-7); h_zjpsi_cms_nonprompt->SetBinError(1,TMath::Sqrt( 6.6905206225**2 + 3.5365945628**2)*1E-7);
-  h_zjpsi_cms_nonprompt->SetBinContent(2, 5.7336688784E-7); h_zjpsi_cms_nonprompt->SetBinError(2,TMath::Sqrt( 2.1589059133**2 + 1.2370651739**2)*1E-7);
-  h_zjpsi_cms_nonprompt->SetBinContent(3, 4.031344658E-7); h_zjpsi_cms_nonprompt->SetBinError(3, TMath::Sqrt( 1.5319663997**2 + 0.5135092165**2)*1E-7);
-  h_zjpsi_cms_nonprompt->SetBinContent(4, 1.7323716183E-7); h_zjpsi_cms_nonprompt->SetBinError(4, TMath::Sqrt(0.4914166095**2 + 0.20902281**2)*1E-7);
-  h_zjpsi_cms_nonprompt->SetBinContent(5, 0.0157856671E-7); h_zjpsi_cms_nonprompt->SetBinError(5, TMath::Sqrt(0.0337188967**2 + 0.0024944934**2)*1E-7);
+  h_zjpsi_cms_nonprompt->SetBinContent(1, 14.8128409512E-7); h_zjpsi_cms_nonprompt->SetBinError(1,TMath::Sqrt(7.3545893405**2 + 0.5725845673**2)*1E-7);
+  h_zjpsi_cms_nonprompt->SetBinContent(2, 6.4377403065E-7); h_zjpsi_cms_nonprompt->SetBinError(2,TMath::Sqrt( 2.3523998462**2 + 0.1958872772**2)*1E-7);
+  h_zjpsi_cms_nonprompt->SetBinContent(3, 4.5504658769E-7); h_zjpsi_cms_nonprompt->SetBinError(3, TMath::Sqrt(1.7073620094**2 + 0.1437741915**2)*1E-7);
+  h_zjpsi_cms_nonprompt->SetBinContent(4, 2.0700933627E-7); h_zjpsi_cms_nonprompt->SetBinError(4, TMath::Sqrt(0.5872229737**2 + 0.0743700066**2)*1E-7);
+  h_zjpsi_cms_nonprompt->SetBinContent(5, 0.0286060354E-7); h_zjpsi_cms_nonprompt->SetBinError(5, TMath::Sqrt(0.0427427923**2 + 0.0025448771**2)*1E-7);
   h_zjpsi_cms_nonprompt->SetMarkerStyle(25);
 
   TH1F* h_zjpsi_dps_nonprompt = new TH1F ("h_zjpsi_dps_nonprompt", "h_zjpsi_dps_nonprompt", 5, bins);
-  h_zjpsi_dps_nonprompt->SetBinContent(1, 1.6465232421E-7); h_zjpsi_dps_nonprompt->SetBinError(1, 0.5288209533*1E-7);
-  h_zjpsi_dps_nonprompt->SetBinContent(2, 0.5949677939E-7); h_zjpsi_dps_nonprompt->SetBinError(2, 0.191088366*1E-7);
-  h_zjpsi_dps_nonprompt->SetBinContent(3, 0.2533485162E-7); h_zjpsi_dps_nonprompt->SetBinError(3, 0.0813690329*1E-7);
-  h_zjpsi_dps_nonprompt->SetBinContent(4, 0.0346806073E-7); h_zjpsi_dps_nonprompt->SetBinError(4, 0.0111385199*1E-7);
-  h_zjpsi_dps_nonprompt->SetBinContent(5, 0.0009995655E-7); h_zjpsi_dps_nonprompt->SetBinError(5, 0.0003210348*1E-7);
+  h_zjpsi_dps_nonprompt->SetBinContent(1, 1.6465232421E-7); h_zjpsi_dps_nonprompt->SetBinError(1, 0.5522042838*1E-7);
+  h_zjpsi_dps_nonprompt->SetBinContent(2, 0.5949677939E-7); h_zjpsi_dps_nonprompt->SetBinError(2, 0.1974431433*1E-7);
+  h_zjpsi_dps_nonprompt->SetBinContent(3, 0.2533485162E-7); h_zjpsi_dps_nonprompt->SetBinError(3, 0.082291385*1E-7);
+  h_zjpsi_dps_nonprompt->SetBinContent(4, 0.0346806073E-7); h_zjpsi_dps_nonprompt->SetBinError(4, 0.0114200585*1E-7);
+  h_zjpsi_dps_nonprompt->SetBinContent(5, 0.0009995655E-7); h_zjpsi_dps_nonprompt->SetBinError(5, 0.0003296463*1E-7);
   h_zjpsi_dps_nonprompt->SetMarkerStyle(26);
 
   //TODO fix this - from DY MC
   TH1F* h_zjpsi_theory_nonprompt = new TH1F ("h_zjpsi_theory_nonprompt", "h_zjpsi_theory_nonprompt", 5, bins);
-  h_zjpsi_theory_nonprompt->SetBinContent(1, 6.8176855787E-7); h_zjpsi_theory_nonprompt->SetBinError(1, 6.901411542E-7);
-  h_zjpsi_theory_nonprompt->SetBinContent(2, 15.6250588698E-7); h_zjpsi_theory_nonprompt->SetBinError(2, 4.5750258489E-7);
-  h_zjpsi_theory_nonprompt->SetBinContent(3, 3.0780504792E-7); h_zjpsi_theory_nonprompt->SetBinError(3, 1.7896424644E-7);
-  h_zjpsi_theory_nonprompt->SetBinContent(4, 1.272559886E-7); h_zjpsi_theory_nonprompt->SetBinError(4, 0.611498553E-7);
-  h_zjpsi_theory_nonprompt->SetBinContent(5, 0.2078958385E-7); h_zjpsi_theory_nonprompt->SetBinError(5, 0.0848366138E-7);
+  h_zjpsi_theory_nonprompt->SetBinContent(1, 6.7830171165E-7); h_zjpsi_theory_nonprompt->SetBinError(1, 6.9349746493E-7);
+  h_zjpsi_theory_nonprompt->SetBinContent(2, 16.757312192E-7); h_zjpsi_theory_nonprompt->SetBinError(2, 4.9110614975E-7);
+  h_zjpsi_theory_nonprompt->SetBinContent(3, 3.3765482022E-7); h_zjpsi_theory_nonprompt->SetBinError(3, 1.9815423722E-7);
+  h_zjpsi_theory_nonprompt->SetBinContent(4, 1.485594065E-7); h_zjpsi_theory_nonprompt->SetBinError(4, 0.7172577809E-7);
+  h_zjpsi_theory_nonprompt->SetBinContent(5, 0.2706176136E-7); h_zjpsi_theory_nonprompt->SetBinError(5, 0.1104793287E-7);
   h_zjpsi_theory_nonprompt->SetMarkerStyle(27);
 
   h_zjpsi_cms_nonprompt->SetLineColor(kBlue - 2);
@@ -193,9 +203,11 @@ void make_theory_comparison(std::string image_dir = "~/public_html/ZPhysics/tmp/
   h_zjpsi_atlas_nonprompt->SetLineColor(kRed - 2);
   h_zjpsi_dps_nonprompt->SetLineColor(kGreen - 2);
   h_zjpsi_atlas_nonprompt->Draw("E1same");
-  h_zjpsi_dps_nonprompt->Draw("E1same");
+  //h_zjpsi_dps_nonprompt->Draw("E1same");
+  h_zjpsi_dps_nonprompt->Draw("hist same");
   h_zjpsi_theory_nonprompt->SetLineColor(kMagenta - 2);
-  h_zjpsi_theory_nonprompt->Draw("E1same");
+  //h_zjpsi_theory_nonprompt->Draw("E1same");
+  h_zjpsi_theory_nonprompt->Draw("hist same");
 
   Double_t xl1_l6=.60, yl1_l6=0.70, xl2_l6=xl1_l6+.3, yl2_l6=yl1_l6+.2;
   TLegend *leg6 = new TLegend(xl1_l6,yl1_l6,xl2_l6,yl2_l6);
@@ -228,7 +240,9 @@ void make_theory_comparison(std::string image_dir = "~/public_html/ZPhysics/tmp/
   //THStack hs_nonprompt("hs_nonprompt","hs_nonprompt");
   c_hstack->cd(1);
   h_zjpsi_dps_prompt->SetFillColor(kGreen - 2);
-  h_zjpsi_theory_prompt->SetFillColor(kMagenta - 2);
+  //h_zjpsi_theory_prompt->SetFillColor(kMagenta - 2);
+  h_zjpsi_theory_prompt->SetFillColorAlpha(kMagenta - 2,0.35);
+  //h_zjpsi_theory_nonprompt->SetFillColorAlpha(kMagenta - 2, 0.35);
 
   h_zjpsi_dps_prompt->GetYaxis()->SetLimits(1E-11, 1E-5);
   h_zjpsi_dps_prompt->GetXaxis()->SetLimits(8.5, 100);
@@ -239,8 +253,9 @@ void make_theory_comparison(std::string image_dir = "~/public_html/ZPhysics/tmp/
   //hs.Add(h_zjpsi_atlas_prompt);
 
 
-  hs->Draw("BAR");
+  hs->Draw("hist BAR");
   h_zjpsi_cms_prompt->Draw("E1same");
+  h_zjpsi_cms_prompt->SetLineColor(kBlue - 2);
   //h_zjpsi_cms_prompt->Draw("E1");
   //hs.Draw("BARSAME");
   //hs.Draw("BAR");
@@ -250,6 +265,9 @@ void make_theory_comparison(std::string image_dir = "~/public_html/ZPhysics/tmp/
   //hs->GetYaxis()->SetLimits(1E-11, 1E-5);
   hs->SetMaximum(1E-5);
   hs->SetMinimum(1E-11);
+  hs->GetXaxis()->SetTitle("J/#psi p_{T} (GeV)");
+  hs->GetXaxis()->SetTitleOffset(1.05);
+  hs->GetYaxis()->SetTitle("R_{J/#psi} Prompt");
   //hs->GetXaxis()->SetLimits(10.5, 100);
 
   //h_zjpsi_cms_prompt->GetYaxis()->SetRangeUser(1E-11, 1E-5);
@@ -259,10 +277,10 @@ void make_theory_comparison(std::string image_dir = "~/public_html/ZPhysics/tmp/
   Double_t xl1_l7=.60, yl1_l7=0.70, xl2_l7=xl1_l7+.3, yl2_l7=yl1_l5+.2;
   TLegend *leg7 = new TLegend(xl1_l7,yl1_l7,xl2_l7,yl2_l7);
   leg7->SetFillColor(kWhite);
-  leg7->AddEntry(h_zjpsi_cms_prompt,"CMS prompt","l");
-  leg7->AddEntry(h_zjpsi_atlas_prompt,"ATLAS prompt","l");
-  leg7->AddEntry(h_zjpsi_dps_prompt,"DPS prompt","l");
-  leg7->AddEntry(h_zjpsi_theory_prompt,"Theory prompt","l");
+  leg7->AddEntry(h_zjpsi_cms_prompt,"CMS prompt","lp");
+  leg7->AddEntry(h_zjpsi_atlas_prompt,"ATLAS prompt","lp");
+  leg7->AddEntry(h_zjpsi_dps_prompt,"DPS prompt","f");
+  leg7->AddEntry(h_zjpsi_theory_prompt,"Theory prompt","f");
   leg7->SetShadowColor(0);
   leg7->SetFillStyle(0);
   leg7->SetBorderSize(0);
@@ -299,12 +317,15 @@ void make_theory_comparison(std::string image_dir = "~/public_html/ZPhysics/tmp/
 
   hs_nonprompt->Add(h_zjpsi_dps_nonprompt);
   hs_nonprompt->Add(h_zjpsi_theory_nonprompt);
-  hs_nonprompt->Draw("BAR");
-  h_zjpsi_cms_nonprompt->Draw("E1same");
-  h_zjpsi_atlas_nonprompt->Draw("E1same");
+  hs_nonprompt->Draw("hist BAR");
+  h_zjpsi_cms_nonprompt->Draw("same");
+  h_zjpsi_atlas_nonprompt->Draw("same");
 
   hs_nonprompt->SetMaximum(1E-5);
   hs_nonprompt->SetMinimum(1E-11);
+  hs_nonprompt->GetXaxis()->SetTitle("J/#psi p_{T} (GeV)");
+  hs_nonprompt->GetXaxis()->SetTitleOffset(1.05);
+  hs_nonprompt->GetYaxis()->SetTitle("R_{J/#psi} Nonprompt");
 
   //h_zjpsi_cms_nonprompt->SetLineColor(kBlue - 2);
   //h_zjpsi_cms_nonprompt->Draw("E1");
@@ -318,10 +339,10 @@ void make_theory_comparison(std::string image_dir = "~/public_html/ZPhysics/tmp/
   Double_t xl1_l8=.60, yl1_l8=0.70, xl2_l8=xl1_l6+.3, yl2_l8=yl1_l6+.2;
   TLegend *leg8 = new TLegend(xl1_l8,yl1_l8,xl2_l8,yl2_l8);
   leg8->SetFillColor(kWhite);
-  leg8->AddEntry(h_zjpsi_cms_nonprompt,"CMS nonprompt","l");
-  leg8->AddEntry(h_zjpsi_atlas_nonprompt,"ATLAS nonprompt","l");
-  leg8->AddEntry(h_zjpsi_dps_nonprompt,"DPS nonprompt","l");
-  leg8->AddEntry(h_zjpsi_theory_nonprompt,"DY MC nonprompt","l");
+  leg8->AddEntry(h_zjpsi_cms_nonprompt,"CMS nonprompt","lp");
+  leg8->AddEntry(h_zjpsi_atlas_nonprompt,"ATLAS nonprompt","lp");
+  leg8->AddEntry(h_zjpsi_dps_nonprompt,"DPS nonprompt","f");
+  leg8->AddEntry(h_zjpsi_theory_nonprompt,"DY MC nonprompt","f");
   leg8->SetShadowColor(0);
   leg8->SetFillStyle(0);
   leg8->SetBorderSize(0);

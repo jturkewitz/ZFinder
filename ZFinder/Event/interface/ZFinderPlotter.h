@@ -45,6 +45,7 @@ namespace zf {
             TH1D* z_pt_mc_;
             TH1D* z_vtx_prob_;
             TH1D* phistar_;
+            TH1D* phistar_2_;
 
             TH1D* z_from_muons_mass_all_;
             TH1D* z_from_muons_mass_coarse_;
@@ -60,6 +61,7 @@ namespace zf {
             TH1D* z_from_muons_pt_mc_;
             TH1D* z_from_muons_vtx_prob_;
             TH1D* z_from_muons_phistar_;
+            TH1D* z_from_muons_phistar_2_;
 
             TH1D* muon0_from_z_pt_;
             TH1D* muon1_from_z_pt_;
@@ -105,6 +107,8 @@ namespace zf {
             TH2D* jpsi_pt_vs_rap_finer_;
             TH2D* jpsi_pt_vs_rap_finer_pos_;
             TH2D* jpsi_pt_vs_rap_finer_neg_;
+            TH2D* jpsi_pt_vs_rap_finer_pos_0p1_;
+            TH2D* jpsi_pt_vs_rap_finer_neg_0p1_;
             TH2D* jpsi_pt_vs_rap_fine_;
             TH2D* jpsi_pt_vs_rap_polarization_long;
             TH2D* jpsi_pt_vs_rap_polarization_TPlusZero;
@@ -206,6 +210,11 @@ namespace zf {
             TH1D* dimuon_deltaR_;
 
             TH1D* z_jpsi_delta_phi_;
+            TH1D* z_jpsi_delta_phi_8p5to10_;
+            TH1D* z_jpsi_delta_phi_10to14_;
+            TH1D* z_jpsi_delta_phi_14to18_;
+            TH1D* z_jpsi_delta_phi_18to30_;
+            TH1D* z_jpsi_delta_phi_30to100_;
 
             TH1D* jet_pt_;
             TH1D* jet_eta_;
@@ -224,6 +233,12 @@ namespace zf {
             TH1D* jpsi_vtx_distance_z_vtx_x_;
             TH1D* jpsi_vtx_distance_z_vtx_y_;
             TH1D* jpsi_vtx_distance_z_vtx_z_;
+
+            TH1D* jpsi_vtx_distance_z_vtx_z_8p5to10_;
+            TH1D* jpsi_vtx_distance_z_vtx_z_10to14_;
+            TH1D* jpsi_vtx_distance_z_vtx_z_14to18_;
+            TH1D* jpsi_vtx_distance_z_vtx_z_18to30_;
+            TH1D* jpsi_vtx_distance_z_vtx_z_30to100_;
 
             TH1D* jpsi_iso_mu0_;
             TH1D* jpsi_iso_sum_charged_hadron_pt_mu0_;

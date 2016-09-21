@@ -115,6 +115,12 @@ void Run(std::string file_name, bool use_z_to_muons = false, bool use_z_to_elect
   TFile cms_acc_eff_neg = ("AcceptanceMaps/acc_eff_map_pol_neg.root");
   TH2* h_acc_eff_cms_neg = (TH2*)cms_acc_eff_neg.Get("jpsi_pt_vs_rap_finer_neg");
 
+  //TODO
+  //TFile cms_acc_eff_pos = ("AcceptanceMaps/acc_eff_map_pol_pos_0p1.root");
+  //TH2* h_acc_eff_cms_pos = (TH2*)cms_acc_eff_pos.Get("jpsi_pt_vs_rap_finer_pos_0p1");
+
+  //TFile cms_acc_eff_neg = ("AcceptanceMaps/acc_eff_map_pol_neg_0p1.root");
+  //TH2* h_acc_eff_cms_neg = (TH2*)cms_acc_eff_neg.Get("jpsi_pt_vs_rap_finer_neg_0p1");
 
 
   //TFile mainfile_acc( "../AcceptanceMaps/acceptancejpsi_RapMax2.1_PtMax100_RapBins100_PtBins400_Sampling10k.root" );
@@ -191,8 +197,9 @@ void Run(std::string file_name, bool use_z_to_muons = false, bool use_z_to_elect
     }
     //limit entries in case of inclusive J/Psi
     //if(iEntry > 20000 && !use_z_to_muons && !use_z_to_electrons) {
-    //if(iEntry > 200000 && !use_z_to_muons && !use_z_to_electrons) {
-    if(iEntry > 100000 && !use_z_to_muons && !use_z_to_electrons) {
+
+    if(iEntry > 250000 && !use_z_to_muons && !use_z_to_electrons) {
+    //if(iEntry > 100000 && !use_z_to_muons && !use_z_to_electrons) {
       break;
     }
         
